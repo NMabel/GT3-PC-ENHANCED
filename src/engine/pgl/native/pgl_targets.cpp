@@ -46,6 +46,7 @@
 #include "platform/challenge_osd.h"             /* PC (2026-11-14): the challenge modes' panel */
 #include "platform/texture_menu.h"              /* PC (2026-11-13): the texture interface */
 #include "platform/gpu.h"
+#include "platform/vr.h"
 #include "platform/log.h"
 #include "platform/screenshot.h"               /* PC (2026-11-15): the screenshot's picture */
 #include "platform/settings.h"
@@ -63,6 +64,9 @@ float    g_picAspect = 0.0f;
 /* That race frame is drawn over the screens' canvas (gpu.h "Screens";
  * pglr_set_picture_multi): its picture the canvas's size. */
 bool     g_picMulti = false;
+/* PC VR (pglr_set_picture_vr; platform/vr.h): that race frame is a stereo one,
+ * its picture the headset's eye texture's size, not the window's. */
+bool     g_picVr = false;
 uint64_t g_frameNo = 1;
 std::vector<std::unique_ptr<Target>> g_targets;
 
@@ -164,10 +168,15 @@ constexpr float kMaxPixels = 64.0f * 1024.0f * 1024.0f;
 void picture_scales(float aspect, float &sx, float &sy)
 {
     int bw = 0, bh = 0, pw, ph;
-    if (aspect > 0.0f && g_picMulti && gpu::screen_count() > 1)
+    if (aspect > 0.0f && g_picVr)
+        vr::eye_size(&bw, &bh);                 /* PC VR: the eye texture */
+    if (aspect > 0.0f && g_picVr && bw > 0 && bh > 0) {
+        /* (the eye's size) */
+    } else if (aspect > 0.0f && g_picMulti && gpu::screen_count() > 1) {
         gpu::canvas_size(&bw, &bh);             /* (the screens' canvas) */
-    else
+    } else {
         gpu::backbuffer_size(&bw, &bh);
+    }
     if (bw <= 0 || bh <= 0) {
         sx = sy = 1.0f;
         return;
@@ -1368,13 +1377,14 @@ static void follow_output()
 /* Before a frame executes: its picture (pglr_set_picture_aspect, recorded
  * with it).  A change between the 4:3 picture and the window's (a race view
  * begins or ends) rescales the targets at once, before the frame draws. */
-void targets_frame_aspect(float aspect, bool multi)
+void targets_frame_aspect(float aspect, bool multi, bool vrFrame)
 {
     const bool race = aspect > 0.0f, was = g_picAspect > 0.0f;
-    const bool wasMulti = g_picMulti;
+    const bool wasMulti = g_picMulti, wasVr = g_picVr;
     g_picAspect = race ? aspect : 0.0f;
     g_picMulti = race && multi;
-    if (race == was && g_picMulti == wasMulti)
+    g_picVr = race && vrFrame;
+    if (race == was && g_picMulti == wasMulti && g_picVr == wasVr)
         return;
     float sx, sy;
     picture_scales(g_picAspect, sx, sy);
@@ -1642,7 +1652,7 @@ static void present_now(bool fresh = true)
      * part (a multi-screen frame: pglr_set_picture_multi), any other frame
      * is the game window's, the others black */
     const int screens = gpu::screen_count();
-    const bool multi = g_picAspect > 0.0f && g_picMulti && screens > 1;
+    const bool multiScreens = g_picAspect > 0.0f && g_picMulti && screens > 1;
     int canvasW = 1, canvasH = 1;
     gpu::canvas_size(&canvasW, &canvasH);
     /* the display area of the buffer (gfx_set_display_area); the display
@@ -1654,16 +1664,28 @@ static void present_now(bool fresh = true)
         shown.u1 = std::min(1.0f, (float)(g_disp.dx + g_disp.dw) / (float)t->gsW);
         shown.v1 = std::min(1.0f, (float)(g_disp.dy + g_disp.dh) / (float)t->gsH);
     }
-    for (int si = 0; si < screens; si++) {
-        ID3D11RenderTargetView *rtv = si == 0 ? bb : gpu::screen_backbuffer(si);
+    /* PC VR (platform/vr.h): the headset's flat screen is one more screen,
+     * the last: the same picture, over all of it (never a part of the canvas) */
+    ID3D11RenderTargetView *vrRtv = nullptr;
+    int vrW = 0, vrH = 0;
+    const bool vrScreen = vr::flat_acquire(&vrRtv, &vrW, &vrH);
+    for (int si = 0; si < screens + (vrScreen ? 1 : 0); si++) {
+        const bool isVr = vrScreen && si == screens;
+        const bool multi = multiScreens && !isVr;
+        ID3D11RenderTargetView *rtv = isVr ? vrRtv : si == 0 ? bb : gpu::screen_backbuffer(si);
         if (rtv == nullptr)
             continue;
         /* (queued: the D3D thread, pgl_queue.h; the state objects found here) */
         q::run([rtv, black] { qdc()->ClearRenderTargetView(rtv, black); });
-        if (t == nullptr || picture == nullptr || (si > 0 && !multi))
+        if (t == nullptr || picture == nullptr || (si > 0 && !multi && !isVr))
             continue;
         int bw = 0, bh = 0;
-        gpu::screen_size(si, &bw, &bh);
+        if (isVr) {
+            bw = vrW;
+            bh = vrH;
+        } else {
+            gpu::screen_size(si, &bw, &bh);
+        }
         /* the picture: a race frame at its aspect (the whole window), else
          * the largest 4:3 rectangle, black bars (picture_size); a part of
          * the canvas over the whole screen */

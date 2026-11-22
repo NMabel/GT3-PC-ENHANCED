@@ -1278,6 +1278,18 @@ void gfx_set_picture_aspect(float aspect);
  * (multi-monitor: platform/gpu.h "Screens"), each screen its part; every
  * frame starts on the game window alone (0).  pgl_core.cpp. */
 void gfx_set_picture_multi(int multi);
+/* PC VR (no original; platform/vr.h): that race frame is a stereo one - its
+ * picture is sized to the headset's eye textures (every frame starts off).
+ * pgl_core.cpp. */
+void gfx_set_picture_vr(int on);
+/* PC VR: one eye's picture is done in the w x h buffer at fbWordAddr (before
+ * the HUD): the renderer sends it to the headset's eye `eye' (0 left, 1
+ * right). */
+void gfx_vr_eye(u32 fbWordAddr, int w, int h, int eye);
+/* PC VR: the overlay picture (the dashboard, the mirror) is done in the w x h
+ * buffer at fbWordAddr: its part (u0, v0) - (u1, v1), fractions of the buffer,
+ * goes onto the panel `kind' (0 the dashboard, 1 the mirror). */
+void gfx_vr_overlay(u32 fbWordAddr, int w, int h, int kind, f32 u0, f32 v0, f32 u1, f32 v1);
 /* PC (no original; kept until changed): a frame that sets no picture aspect
  * (a 4:3 menu) is shown at `aspect' - its 640 x 448 picture stretched over
  * the window (game/app/pc_aspect.h, the menus' stretch); 0: at 4:3 with

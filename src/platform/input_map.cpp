@@ -393,6 +393,11 @@ const HotkeyInfo kHotkeys[kHotkeyCount] = {
     {"TextureRefresh", N_("Refresh replacement textures"), {VK_F10, true, false, false}, {}},
     {"TextureToggle", N_("Replacement textures on / off"), {VK_F12}, {}},
     {"Screenshot", N_("Screenshot"), {VK_F1}, {}},                      /* PC (2026-11-15): screenshot.h */
+    {"VrRecenter", N_("VR: centre the view"), {VK_HOME}, {}},           /* PC VR: vr.h */
+    {"VrHud", N_("VR: dashboard on / off"), {VK_END}, {}},
+    {"VrMirror", N_("VR: rear-view mirror on / off"), {VK_INSERT}, {}},
+    {"VrScaleDown", N_("VR: world smaller"), {VK_OEM_4}, {}},
+    {"VrScaleUp", N_("VR: world larger"), {VK_OEM_6}, {}},
 };
 KeyCombo g_hotkeys[kHotkeyCount];
 Binding g_hotDevices[kHotkeyCount];         /* PC: the hotkeys' devices */

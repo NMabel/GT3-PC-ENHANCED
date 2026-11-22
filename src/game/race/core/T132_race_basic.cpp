@@ -44,6 +44,7 @@
 #include "game/data/T487_race_mode_database.h"   /* RaceModeDatabase g_002F00C0 */
 #include "game/menu/records/T116_race_result_base.h"     /* RaceResultBase (RaceBasic::subDisplay) */
 #include "game/race/pause/T168_pause_base.h"           /* PauseBase */
+#include "game/app/pc_vr.h"                     /* PC VR: a menu up, the dashboard off */
 #include "game/enhanced.h"                  /* ENH_HUD_TELEMETRY_CYCLE, ENH_HUD_LOGO_LOOK (the hud's switches
                                                of the race display's side) */
 
@@ -286,7 +287,10 @@ void RaceBasic::virtual_45(GSBuffer *buf)
     RacePS2Base::virtual_45(buf);
     RaceOrganization *o = org;
     CameraManager *cm = virtual_6();
-    if (raceDisplay != NULL)
+    /* PC VR: a pause menu or the result sequence (done: the player's car reached the goal) up: the flat screen
+     * shows it.  (subDisplay alone is set for the whole race: the result object waits in it.) */
+    pc_vr_menu(paused != 0 || (subDisplay != NULL && subDisplay->done != 0));
+    if (raceDisplay != NULL && !pc_vr_hide_hud())       /* (PC VR: the dashboard off) */
         raceDisplay->virtual_3(*buf);
     if (subDisplay != NULL)
         subDisplay->render(*buf, *o);

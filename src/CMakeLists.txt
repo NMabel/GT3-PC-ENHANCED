@@ -155,6 +155,7 @@ add_library(gt3_platform STATIC
     platform/heap_arena.cpp
     platform/memstat.cpp
     platform/gpu.cpp
+    platform/vr.cpp
     platform/frame_monitor.cpp
     platform/frame_step.cpp
     platform/overlay.cpp
@@ -188,6 +189,10 @@ target_link_libraries(gt3_platform PUBLIC winmm d3d11 dxgi d3dcompiler dbghelp w
 # ---- the controllers: SDL3, delay-loaded (cmake/sdl3.cmake) -----------------------
 include(${GT3PC_ROOT}/cmake/sdl3.cmake)
 target_link_libraries(gt3_platform PUBLIC gt3_sdl3)
+
+# ---- VR (this fork): the OpenXR loader, delay-loaded (cmake/openxr.cmake) ---------
+include(${GT3PC_ROOT}/cmake/openxr.cmake)
+target_link_libraries(gt3_platform PUBLIC gt3_openxr)
 
 # ---- the game configs' and the database folder's tables: SQLite, a static
 # library (cmake/sqlite.cmake) ----------------------------------------------------
@@ -255,5 +260,6 @@ target_link_options(gt3pc PRIVATE /LARGEADDRESSAWARE)
 include(${GT3PC_ROOT}/cmake/languages.cmake)
 gt3pc_languages(gt3pc)
 add_custom_command(TARGET gt3pc POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GT3PC_SDL3_DLL} $<TARGET_FILE_DIR:gt3pc>)
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GT3PC_SDL3_DLL} $<TARGET_FILE_DIR:gt3pc>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:OpenXR::openxr_loader> $<TARGET_FILE_DIR:gt3pc>)
 add_subdirectory(launcher)

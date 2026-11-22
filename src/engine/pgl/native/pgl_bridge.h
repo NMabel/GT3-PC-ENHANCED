@@ -392,6 +392,20 @@ void pglr_set_line_width(float px);
  * h buffer at `block' (its 2D comes after): with FXAA chosen
  * (settings::anti_aliasing), the executor filters it there. */
 void pglr_post_aa(uint32_t block, int w, int h);
+/* PC VR (gfx_set_picture_vr; platform/vr.h): the frame being recorded is a
+ * stereo race frame: its picture (the eye's shape: gfx_set_picture_aspect)
+ * is sized to the headset's eye textures, not the window.  Per frame, like
+ * the aspect. */
+void pglr_set_picture_vr(int on);
+/* PC VR (gfx_vr_eye): one eye's picture is done in the w x h buffer at
+ * `block' (before the HUD): the executor draws it onto the eye's swapchain
+ * image (vr::eye_acquire; eye 0 left, 1 right). */
+void pglr_vr_eye(uint32_t block, int w, int h, int eye);
+/* PC VR (gfx_vr_overlay): the overlay picture (the dashboard, the mirror) is
+ * done in the w x h buffer at `block': its part (u0, v0) - (u1, v1), as
+ * fractions of the buffer, goes onto the panel `kind' (vr.h: 0 the dashboard,
+ * 1 the mirror). */
+void pglr_vr_overlay(uint32_t block, int w, int h, int kind, float u0, float v0, float u1, float v1);
 
 /* ======================================================================== */
 /* Logging                                                                  */

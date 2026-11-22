@@ -160,6 +160,8 @@ const char *cmd_name(uint8_t t)
     case CMD_DESIGN: return "design";
     case CMD_LINE_WIDTH: return "line width";
     case CMD_POST_AA: return "post aa";
+    case CMD_VR_EYE: return "vr eye";
+    case CMD_VR_OVERLAY: return "vr overlay";
     case CMD_GPU_SECTION: return "gpu section";
     case CMD_TEX_SOURCE: return "tex source";
     case 255: return "run replayed";

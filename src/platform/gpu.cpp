@@ -5,6 +5,8 @@
 #include "platform/log.h"
 #include "platform/scheduler.h"
 #include "platform/settings.h"
+#include "platform/vr.h"
+#include "platform/vr_view.h"
 #include "platform/window.h"
 
 #include <d3dcompiler.h>
@@ -536,15 +538,41 @@ bool init(HWND window)
     D3D_FEATURE_LEVEL levels[] = {D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1,
                                   D3D_FEATURE_LEVEL_10_0};
     D3D_FEATURE_LEVEL got;
-    HRESULT hr = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flags, levels, 4,
+    /* PC VR (vr.h): with a headset, the device is made on the adapter the
+     * OpenXR runtime asks for (a PC with two GPUs), and the session on it */
+    IDXGIAdapter *vrAdapter = nullptr;
+    LUID vrLuid = {};
+    if (vr::prepare(&vrLuid)) {
+        IDXGIFactory1 *f1 = nullptr;
+        if (SUCCEEDED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)&f1))) {
+            IDXGIAdapter1 *a1 = nullptr;
+            for (UINT i = 0; f1->EnumAdapters1(i, &a1) == S_OK; i++) {
+                DXGI_ADAPTER_DESC1 d1;
+                a1->GetDesc1(&d1);
+                if (d1.AdapterLuid.LowPart == vrLuid.LowPart && d1.AdapterLuid.HighPart == vrLuid.HighPart) {
+                    vrAdapter = a1;
+                    break;
+                }
+                a1->Release();
+            }
+            f1->Release();
+        }
+        if (vrAdapter == nullptr)
+            pclog::write("gpu: the headset's adapter was not found: the default one");
+    }
+    const D3D_DRIVER_TYPE driver = vrAdapter != nullptr ? D3D_DRIVER_TYPE_UNKNOWN : D3D_DRIVER_TYPE_HARDWARE;
+    HRESULT hr = D3D11CreateDevice(vrAdapter, driver, nullptr, flags, levels, 4,
                                    D3D11_SDK_VERSION, &g_device, &got, &g_context);
     if (hr == E_INVALIDARG)
-        hr = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flags, levels + 1, 3,
+        hr = D3D11CreateDevice(vrAdapter, driver, nullptr, flags, levels + 1, 3,
                                D3D11_SDK_VERSION, &g_device, &got, &g_context);
+    if (vrAdapter != nullptr)
+        vrAdapter->Release();
     if (FAILED(hr)) {
         pclog::write("gpu: D3D11CreateDevice failed (0x%08lX)", (unsigned long)hr);
         return false;
     }
+    vr::start(g_device);                    /* PC VR: the session on this device (a failure: no VR) */
 
     IDXGIDevice *dxgiDevice = nullptr;
     IDXGIAdapter *adapter = nullptr;
@@ -793,11 +821,17 @@ static void present_call(void *)
         present_result(s.swap->Present((UINT)g_presentInterval,
                                        g_presentInterval == 0 && g_tearing ? DXGI_PRESENT_ALLOW_TEARING : 0),
                        "a screen");
+    /* PC VR: the frame goes to the compositor, and the wait for the next one
+     * (the headset's rate) paces the game; the window, the mirror of it,
+     * presents at once */
+    const bool vrPaced = vr::active();
+    vr::end_frame();
+    const UINT interval = vrPaced ? 0u : (UINT)g_presentInterval;
     UINT flags = 0;
-    if (g_presentInterval == 0 && g_tearing && !fs)
+    if (interval == 0 && g_tearing && !fs)
         flags = DXGI_PRESENT_ALLOW_TEARING;
     const double t0 = sched::now_seconds();
-    present_result(g_swap->Present((UINT)g_presentInterval, flags), "the game window");
+    present_result(g_swap->Present(interval, flags), "the game window");
     phase_note(t0, sched::now_seconds());  /* PC (2026-11-19): (the native call's own wait, not the turn after it) */
 }
 
@@ -1144,12 +1178,21 @@ void start_vblank_watch()
 /* frame_pacing.h, over the swap chain above */
 namespace pacing {
 
-bool high_refresh() { return gpu::refresh_hz() > 61.0; }
-double refresh_hz() { return gpu::refresh_hz(); }
+/* PC VR: while a headset session runs, its rate is the game's display rate
+ * (the monitor's own is only the mirror window's) */
+bool high_refresh() { return (vr::active() ? vr::refresh_hz() : gpu::refresh_hz()) > 61.0; }
+double refresh_hz() { return vr::active() ? vr::refresh_hz() : gpu::refresh_hz(); }
 void set_vsync(bool on) { gpu::set_present_interval(on ? 1 : 0); }
 double last_present_time() { return gpu::g_lastPresent; }
 double present_wait_total() { return gpu::g_presentWait; }
-void output_size(int *w, int *h) { gpu::backbuffer_size(w, h); }
+/* PC VR: a stereo race frame's picture area is the headset's eye texture */
+void output_size(int *w, int *h)
+{
+    if (vrview::frame_on())
+        vrview::eye_size(w, h);
+    if (!vrview::frame_on() || *w <= 0 || *h <= 0)
+        gpu::backbuffer_size(w, h);
+}
 int screen_count() { return gpu::screen_count(); }
 void canvas_size(int *w, int *h) { gpu::canvas_size(w, h); }
 void canvas_rect(int i, int *x, int *w) { gpu::canvas_rect(i, x, w); }

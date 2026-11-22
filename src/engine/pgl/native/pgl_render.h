@@ -129,7 +129,9 @@ enum CmdType : uint8_t {
     CMD_LINE_WIDTH,     /* the width of the lines that follow (pglr_set_line_width) */
     CMD_POST_AA,        /* a race view's 3D picture done: FXAA over it when chosen (pglr_post_aa) */
     CMD_GPU_SECTION,    /* GPU timing: the draws after it are this section's (pglr_gpu_section) */
-    CMD_TEX_SOURCE      /* PC: the texture selected is a VRAM-less Tex1 set's (pglr_texture_source) */
+    CMD_TEX_SOURCE,     /* PC: the texture selected is a VRAM-less Tex1 set's (pglr_texture_source) */
+    CMD_VR_EYE,         /* PC VR: one eye's picture done: onto the headset's swapchain (pglr_vr_eye) */
+    CMD_VR_OVERLAY      /* PC VR: the overlay picture done: a part onto a panel's swapchain (pglr_vr_overlay) */
 };
 
 /* PC (2026-11-05): key - the command's structure hashed as it is recorded
@@ -170,6 +172,8 @@ struct CmdHalfBlend { int32_t begin; uint32_t base, fbw, psm; int32_t w, h; };
 struct CmdDesign { float kx, ky; };
 struct CmdLineWidth { float px; };
 struct CmdPostAa { uint32_t base; int32_t w, h; };
+struct CmdVrEye  { uint32_t base; int32_t w, h; int32_t eye; };
+struct CmdVrOverlay { uint32_t base; int32_t w, h; int32_t kind; float u0, v0, u1, v1; };
 struct CmdSection { int32_t id; };
 struct CmdTexSource { const void *img; uint32_t vramBase; uint64_t tex0; uint32_t copyBytes; };  /* (+ as CmdTex1) */
 
@@ -378,7 +382,7 @@ float output_scale();
 /* Before a frame executes: its picture's aspect (0: the 4:3 picture, else a
  * race frame drawn at the window's aspect; pglr_set_picture_aspect), and
  * whether it is drawn over the screens' canvas (pglr_set_picture_multi). */
-void targets_frame_aspect(float aspect, bool multi);
+void targets_frame_aspect(float aspect, bool multi, bool vr);
 /* A draw buffer's GS size (CMD_TARGET, gfx_set_draw_buffer / _target_b);
  * fbwPixels: the buffer width in pixels. */
 void target_size(uint32_t base, uint32_t fbwPixels, uint32_t psm, int w, int h);

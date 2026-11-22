@@ -119,6 +119,7 @@ bool    g_readyValid = false;
  * the 4:3 picture) */
 float   g_frameAspect = 0.0f, g_readyAspect = 0.0f;
 bool    g_frameMulti = false, g_readyMulti = false;    /* (pglr_set_picture_multi) */
+bool    g_frameVr = false, g_readyVr = false;          /* PC VR (pglr_set_picture_vr) */
 float   g_menuAspect = 0.0f;                /* (pglr_set_menu_aspect: a 4:3 frame's when > 0) */
 /* A readback the game reads was recorded in the frame (pglr_readback: the
  * frame executes at the kick, not on the executor thread) */
@@ -247,6 +248,7 @@ void pglr_begin_frame(void)
     g_recStack.clear();
     g_frameAspect = 0.0f;                   /* the 4:3 picture unless a race view says otherwise */
     g_frameMulti = false;
+    g_frameVr = false;
 }
 
 void pglr_set_picture_aspect(float aspect)
@@ -257,6 +259,11 @@ void pglr_set_picture_aspect(float aspect)
 void pglr_set_picture_multi(int multi)
 {
     g_frameMulti = multi != 0;
+}
+
+void pglr_set_picture_vr(int on)
+{
+    g_frameVr = on != 0;
 }
 
 void pglr_set_menu_aspect(float aspect)
@@ -316,6 +323,7 @@ void pglr_end_frame(void)
     g_frame.clear();
     g_readyAspect = g_frameAspect;
     g_readyMulti = g_frameMulti;
+    g_readyVr = g_frameVr;
     g_readyReadback = g_frameReadback;
     g_readyValid = true;
     g_rec = &g_frame;
@@ -339,6 +347,7 @@ void pglr_end_frame(void)
 static CmdList g_execList;                  /* the frame being executed */
 static float g_execAspect;
 static bool g_execMulti;
+static bool g_execVr;
 static HANDLE g_execThread, g_execStart;
 static bool g_execOn;
 static std::atomic<uint32_t> g_execBusy{0};
@@ -488,6 +497,7 @@ void pglr_kick(void)
     g_readyValid = false;
     g_execAspect = g_readyAspect;
     g_execMulti = g_readyMulti;
+    g_execVr = g_readyVr;
     if (g_execOn && !g_readyReadback) {
         g_execBusy.store(1, std::memory_order_release);
         SetEvent(g_execStart);
@@ -532,7 +542,7 @@ static void execute_frame(void)
     const bool timed = q.disjoint && q.t0 && q.t1;
 
     targets_frame_settings();               /* the anti-aliasing chosen (MSAA: the targets' samples) */
-    targets_frame_aspect(g_execAspect, g_execMulti);    /* the targets for the frame's picture */
+    targets_frame_aspect(g_execAspect, g_execMulti, g_execVr);    /* the targets for the frame's picture */
     exec_begin_frame();                     /* (the GPU sections' results read first: before anything is queued) */
     if (timed) {
         ID3D11Query *dj0 = q.disjoint.get(), *t0q = q.t0.get();
@@ -914,6 +924,28 @@ void pglr_post_aa(uint32_t block, int w, int h)
     c->base = block;
     c->w = w;
     c->h = h;
+}
+
+void pglr_vr_eye(uint32_t block, int w, int h, int eye)
+{
+    CmdVrEye *c = (CmdVrEye *)g_rec->add(CMD_VR_EYE, sizeof(CmdVrEye));
+    c->base = block;
+    c->w = w;
+    c->h = h;
+    c->eye = eye;
+}
+
+void pglr_vr_overlay(uint32_t block, int w, int h, int kind, float u0, float v0, float u1, float v1)
+{
+    CmdVrOverlay *c = (CmdVrOverlay *)g_rec->add(CMD_VR_OVERLAY, sizeof(CmdVrOverlay));
+    c->base = block;
+    c->w = w;
+    c->h = h;
+    c->kind = kind;
+    c->u0 = u0;
+    c->v0 = v0;
+    c->u1 = u1;
+    c->v1 = v1;
 }
 
 void pglr_half_blend(int begin, uint32_t block, uint32_t fbw, uint32_t psm, int w, int h)

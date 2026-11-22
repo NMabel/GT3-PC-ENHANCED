@@ -54,6 +54,7 @@
 #include "platform/log.h"
 #include "platform/sample_prof.h"
 #include "platform/settings.h"
+#include "platform/vr.h"
 #include "platform/window.h"
 
 namespace pglr {
@@ -8329,6 +8330,84 @@ void exec_post_aa(const CmdPostAa &c)
         pclog::write("pgl trace %u: FXAA over the %dx%d picture at 0x%X", g_traceN++, c.w, c.h, c.base);
 }
 
+/* PC VR (pglr_vr_eye; platform/vr.h): one eye's picture of a stereo race view,
+ * done in the w x h buffer at c.base, drawn onto that eye's swapchain image
+ * (the headset's size: the picture filtered down to it when it is larger, as
+ * present_now does for the window). */
+void exec_vr_eye(const CmdVrEye &c)
+{
+    flush_batch();
+    Target *t = find_color_target(c.base);                        /* (as present_now finds the shown buffer) */
+    if (t == nullptr)
+        return;
+    ID3D11ShaderResourceView *src = target_srv(*t);               /* (a resolve first) */
+    if (src == nullptr)
+        return;
+    ID3D11RenderTargetView *rtv = nullptr;
+    int ew = 0, eh = 0;
+    if (!vr::eye_acquire(c.eye, &rtv, &ew, &eh))
+        return;
+    CbPresent cb = {0.0f, 0.0f, std::min(1.0f, (float)c.w / (float)t->gsW), std::min(1.0f, (float)c.h / (float)t->gsH),
+                    0.0f, 0.0f, 1.0f, 1.0f};
+    {
+        const float rx = (cb.u1 - cb.u0) * (float)t->nw / (float)ew, ry = (cb.v1 - cb.v0) * (float)t->nh / (float)eh;
+        if (rx > 1.01f || ry > 1.01f) {
+            cb.tapsX = std::min(16.0f, std::max(1.0f, std::ceil(rx - 0.01f)));
+            cb.tapsY = std::min(16.0f, std::max(1.0f, std::ceil(ry - 0.01f)));
+            cb.stepU = (cb.u1 - cb.u0) / (float)ew / cb.tapsX;
+            cb.stepV = (cb.v1 - cb.v0) / (float)eh / cb.tapsY;
+        }
+    }
+    d3d_invalidate();
+    const D3D11_VIEWPORT vp = {0, 0, (float)ew, (float)eh, 0, 1};
+    queue_pass_state(rtv, vp, raster_state(0, false), blend_plain(gs::WRITE_RGB | gs::WRITE_A), nullptr,
+                     depth_state(false, gs::Compare::Always, false));
+    bind_vs(Vs::Full);
+    bind_ps(Ps::Present);
+    bind_ps_cb(&cb, sizeof(cb));
+    queue_pass_draw(src, nullptr, sampler_state(true, true, 1, 1));
+    d3d_invalidate();
+    if (g_tracing)
+        pclog::write("pgl trace %u: VR eye %d from the %dx%d picture at 0x%X", g_traceN++, c.eye, c.w, c.h, c.base);
+}
+
+/* PC VR (pglr_vr_overlay; platform/vr.h): a part of the overlay picture (the
+ * dashboard's, the mirror's), drawn onto its panel's swapchain image by the
+ * VR module's own pass. */
+void exec_vr_overlay(const CmdVrOverlay &c)
+{
+    flush_batch();
+    /* by address and size: the 640 x 224 field buffers and the 640 x 448 race screen share addresses (as for the
+     * FXAA pass); the latest used at the address may be the other one */
+    Target *t = find_color_target_sized(c.base, c.w, c.h);
+    if (t == nullptr) {
+        t = find_color_target(c.base);
+        static int s_logged;
+        if (t != nullptr && s_logged++ < 4)
+            pclog::write("vr: overlay %d: no %dx%d target at 0x%X, took the latest there (%dx%d)", c.kind, c.w, c.h,
+                         c.base, t->gsW, t->gsH);
+    }
+    if (t == nullptr)
+        return;
+    ID3D11ShaderResourceView *src = target_srv(*t);               /* (a resolve first) */
+    if (src == nullptr)
+        return;
+    const float su = std::min(1.0f, (float)c.w / (float)t->gsW), sv = std::min(1.0f, (float)c.h / (float)t->gsH);
+    const float u0 = c.u0 * su, v0 = c.v0 * sv, u1 = c.u1 * su, v1 = c.v1 * sv;
+    const float aspect = ((u1 - u0) * (float)t->nw) / std::max(1.0f, (v1 - v0) * (float)t->nh);
+    ID3D11RenderTargetView *rtv = nullptr;
+    int ow = 0, oh = 0;
+    if (!vr::overlay_acquire(c.kind, aspect, &rtv, &ow, &oh))
+        return;
+    d3d_invalidate();
+    const int kind = c.kind;
+    q::run([src, rtv, ow, oh, u0, v0, u1, v1, kind] {
+        const float uv[4] = {u0, v0, u1, v1};
+        vr::overlay_draw(qdc(), src, rtv, ow, oh, uv, kind);
+    });
+    d3d_invalidate();
+}
+
 }  /* namespace */
 
 /* ======================================================================== */
@@ -8721,6 +8800,14 @@ void exec_list(const CmdList &list)
             g_dirty = true;
             break;
         }
+        case CMD_VR_EYE:
+            exec_vr_eye(*static_cast<const CmdVrEye *>(p));
+            g_dirty = true;
+            break;
+        case CMD_VR_OVERLAY:
+            exec_vr_overlay(*static_cast<const CmdVrOverlay *>(p));
+            g_dirty = true;
+            break;
         case CMD_GPU_SECTION:
             if (sec_active()) {
                 flush_batch();

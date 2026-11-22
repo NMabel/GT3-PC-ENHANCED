@@ -14,6 +14,7 @@
 #include "platform/screenshot.h"               /* PC (2026-11-15): TAKE SCREENSHOT */
 #include "platform/settings.h"
 #include "platform/ui_text.h"                  /* PC (2026-11-16): the interface's languages */
+#include "platform/vr.h"                       /* PC VR: the VR category */
 #include "platform/wheel.h"                    /* PC (2026-11-20): GT3's own force feedback option */
 #include "platform/window.h"
 
@@ -237,6 +238,46 @@ void shot_step(int dir, int heldMs)
 {
     if (dir == 0 && heldMs == 0)
         screenshot::request();
+}
+
+/* PC VR (platform/vr.h): the VR category - the dashboard and the rear-view mirror shown or not and where
+ * their panels hang, the world's scale, centring the view.  Left / Right by the setting's step (4 times that
+ * once held 1.5 s), Enter / Cross back to the default. */
+int vr_hud_get() { return vr::hud_on() ? 1 : 0; }
+void vr_hud_set(int v) { vr::set_hud_on(v != 0); }
+int vr_mirror_get() { return vr::mirror_on() ? 1 : 0; }
+void vr_mirror_set(int v) { vr::set_mirror_on(v != 0); }
+template <int S> void vr_text(char *out, size_t n)
+{
+    const int v = vr::setting((vr::Setting)S);
+    if (S == vr::kWorldScale)
+        snprintf(out, n, "%d%%", v);
+    else
+        snprintf(out, n, "%d CM", v);
+}
+template <int S> void vr_step(int dir, int heldMs)
+{
+    const vr::SettingInfo &i = vr::setting_info((vr::Setting)S);
+    if (dir == 0) {
+        vr::set_setting((vr::Setting)S, i.def);
+        return;
+    }
+    vr::set_setting((vr::Setting)S, vr::setting((vr::Setting)S) + (dir > 0 ? 1 : -1) * i.step * (heldMs < 1500 ? 1 : 4));
+}
+template <int S> int vr_edges()
+{
+    const vr::SettingInfo &i = vr::setting_info((vr::Setting)S);
+    const int v = vr::setting((vr::Setting)S);
+    return (v > i.min ? 1 : 0) | (v < i.max ? 2 : 0);
+}
+void vr_center_text(char *out, size_t n)
+{
+    snprintf(out, n, "%s", vr::available() ? tr("ENTER") : tr("NO HEADSET"));
+}
+void vr_center_step(int dir, int heldMs)
+{
+    if (dir == 0 && heldMs == 0)
+        vr::hotkey(vr::kActRecenter);
 }
 
 /* PC (2026-11-16): INTERFACE LANGUAGE (settings::interface_language,
@@ -1430,6 +1471,29 @@ const Item kItems[] = {
      0, nullptr, nullptr, nullptr, custom_text, custom_step<cockpit_osd::kRequestEdit>, no_edges},
     {2, N_("DELETE CAMERA"), N_("IN A RACE: DELETES THE CUSTOM CAMERA IN VIEW.\nENTER TWICE."),
      0, nullptr, nullptr, nullptr, custom_delete_text, custom_delete_step, no_edges},
+    /* PC VR (platform/vr.h): the headset's own settings (gt3pc.ini [VR]; Enabled there, at the start) */
+    {0, N_("VR"), N_("THE HEADSET: THE DASHBOARD AND THE REAR-VIEW MIRROR AS PANELS OF THE\nCOCKPIT, THE WORLD'S SCALE. ENABLED IN GT3PC.INI [VR]."), kCategory},
+    {1, N_("CENTER THE VIEW"), N_("THE SEAT AND THE FLAT SCREEN WHERE YOU ARE, FACING FORWARD.\nENTER."), 0, nullptr, nullptr,
+     nullptr, vr_center_text, vr_center_step, no_edges, input_map::kHotVrRecenter},
+    {1, N_("WORLD SCALE"), N_("THE WORLD'S SIZE TO YOUR EYES: ABOVE 100% THE COCKPIT LOOKS\nLARGER. ENTER: 100%."), 0, nullptr,
+     nullptr, nullptr, vr_text<vr::kWorldScale>, vr_step<vr::kWorldScale>, vr_edges<vr::kWorldScale>,
+     input_map::kHotVrScaleUp},
+    {1, N_("DASHBOARD"), N_("THE SPEED, REVS AND LAP INFORMATION AS A PANEL OF THE COCKPIT."), 2, vr_hud_get, vr_hud_set,
+     on_off_value, nullptr, nullptr, nullptr, input_map::kHotVrHud},
+    {2, N_("DISTANCE"), N_("THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 100 CM."), 0, nullptr, nullptr, nullptr,
+     vr_text<vr::kHudDistance>, vr_step<vr::kHudDistance>, vr_edges<vr::kHudDistance>},
+    {2, N_("SIZE"), N_("THE PANEL'S WIDTH. ENTER: 70 CM."), 0, nullptr, nullptr, nullptr, vr_text<vr::kHudWidth>,
+     vr_step<vr::kHudWidth>, vr_edges<vr::kHudWidth>},
+    {2, N_("HEIGHT"), N_("THE PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: -30 CM."), 0, nullptr, nullptr,
+     nullptr, vr_text<vr::kHudHeight>, vr_step<vr::kHudHeight>, vr_edges<vr::kHudHeight>},
+    {1, N_("REAR-VIEW MIRROR"), N_("THE MIRROR AS A PANEL OF THE COCKPIT, FROM THE BUMPER CAMERA'S\nREAR VIEW (GRAPHICS > REAR VIEW)."), 2,
+     vr_mirror_get, vr_mirror_set, on_off_value, nullptr, nullptr, nullptr, input_map::kHotVrMirror},
+    {2, N_("DISTANCE"), N_("THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."), 0, nullptr, nullptr, nullptr,
+     vr_text<vr::kMirrorDistance>, vr_step<vr::kMirrorDistance>, vr_edges<vr::kMirrorDistance>},
+    {2, N_("SIZE"), N_("THE PANEL'S WIDTH. ENTER: 30 CM."), 0, nullptr, nullptr, nullptr, vr_text<vr::kMirrorWidth>,
+     vr_step<vr::kMirrorWidth>, vr_edges<vr::kMirrorWidth>},
+    {2, N_("HEIGHT"), N_("THE PANEL'S HEIGHT FROM YOUR EYES. ENTER: 20 CM."), 0, nullptr, nullptr, nullptr,
+     vr_text<vr::kMirrorHeight>, vr_step<vr::kMirrorHeight>, vr_edges<vr::kMirrorHeight>},
     {0, N_("SPLIT SCREEN"), N_("THE 2-PLAYER SPLIT SCREEN."), kCategory},
     {1, N_("SPLIT SCREEN"), N_("HORIZONTAL: ONE VIEW ABOVE THE OTHER.\nVERTICAL: SIDE BY SIDE.\nTWO MONITORS: PLAYER 2 ON A SECOND MONITOR.\nFROM THE NEXT RACE OR REPLAY."),
      settings::kSplitScreenCount, split_get, split_set, split_value},

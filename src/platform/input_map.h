@@ -397,6 +397,9 @@ enum Hotkey {
     kHotTextureRefresh,                                     /* PC (2026-11-13): its refresh, the panel shown or not */
     kHotTextureToggle,                                      /* PC (2026-11-13): the replacements on / off */
     kHotScreenshot,                                         /* PC (2026-11-15): a screenshot (screenshot.h) */
+    /* PC VR (vr.h): centre the view, the dashboard and the rear-view mirror shown / hidden, the world smaller /
+     * larger; they also act while the game's window has not the keyboard (the player is in the headset) */
+    kHotVrRecenter, kHotVrHud, kHotVrMirror, kHotVrScaleDown, kHotVrScaleUp,
     kHotkeyCount
 };
 struct KeyCombo {

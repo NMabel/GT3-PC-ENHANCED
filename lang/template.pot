@@ -187,7 +187,7 @@ msgstr ""
 msgid "SIDE"
 msgstr ""
 
-#: src/game/app/pc_customcam.cpp src/game/app/pc_headcam.cpp
+#: src/game/app/pc_customcam.cpp src/game/app/pc_headcam.cpp src/platform/settings_menu.cpp
 msgid "HEIGHT"
 msgstr ""
 
@@ -4132,6 +4132,26 @@ msgid "Screenshot"
 msgstr ""
 
 #: src/platform/input_map.cpp
+msgid "VR: centre the view"
+msgstr ""
+
+#: src/platform/input_map.cpp
+msgid "VR: dashboard on / off"
+msgstr ""
+
+#: src/platform/input_map.cpp
+msgid "VR: rear-view mirror on / off"
+msgstr ""
+
+#: src/platform/input_map.cpp
+msgid "VR: world smaller"
+msgstr ""
+
+#: src/platform/input_map.cpp
+msgid "VR: world larger"
+msgstr ""
+
+#: src/platform/input_map.cpp
 msgid "Button %d"
 msgstr ""
 
@@ -4285,6 +4305,10 @@ msgstr ""
 
 #: src/platform/settings_menu.cpp src/platform/texture_menu.cpp
 msgid "ENTER"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "NO HEADSET"
 msgstr ""
 
 #: src/platform/settings_menu.cpp
@@ -5035,6 +5059,86 @@ msgstr ""
 msgid ""
 "IN A RACE: DELETES THE CUSTOM CAMERA IN VIEW.\n"
 "ENTER TWICE."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "VR"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE HEADSET: THE DASHBOARD AND THE REAR-VIEW MIRROR AS PANELS OF THE\n"
+"COCKPIT, THE WORLD'S SCALE. ENABLED IN GT3PC.INI [VR]."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "CENTER THE VIEW"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE SEAT AND THE FLAT SCREEN WHERE YOU ARE, FACING FORWARD.\n"
+"ENTER."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "WORLD SCALE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WORLD'S SIZE TO YOUR EYES: ABOVE 100% THE COCKPIT LOOKS\n"
+"LARGER. ENTER: 100%."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "DASHBOARD"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE SPEED, REVS AND LAP INFORMATION AS A PANEL OF THE COCKPIT."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "DISTANCE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 100 CM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "SIZE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE PANEL'S WIDTH. ENTER: 70 CM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: -30 CM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "REAR-VIEW MIRROR"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE MIRROR AS A PANEL OF THE COCKPIT, FROM THE BUMPER CAMERA'S\n"
+"REAR VIEW (GRAPHICS > REAR VIEW)."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE PANEL'S WIDTH. ENTER: 30 CM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE PANEL'S HEIGHT FROM YOUR EYES. ENTER: 20 CM."
 msgstr ""
 
 #: src/platform/settings_menu.cpp

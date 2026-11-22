@@ -612,6 +612,22 @@ void gfx_set_picture_multi(int multi)
     pglr_set_picture_multi(multi);
 }
 
+/* PC VR (G001_flare.h) */
+void gfx_set_picture_vr(int on)
+{
+    pglr_set_picture_vr(on);
+}
+
+void gfx_vr_eye(u32 fbWordAddr, int w, int h, int eye)
+{
+    pglr_vr_eye(fbWordAddr >> 6, w, h, eye);
+}
+
+void gfx_vr_overlay(u32 fbWordAddr, int w, int h, int kind, f32 u0, f32 v0, f32 u1, f32 v1)
+{
+    pglr_vr_overlay(fbWordAddr >> 6, w, h, kind, u0, v0, u1, v1);
+}
+
 /* PC (G001_flare.h; docs/renderer.md "Aspect"): the menus' stretch. */
 void gfx_set_menu_aspect(float aspect)
 {

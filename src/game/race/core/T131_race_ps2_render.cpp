@@ -79,6 +79,8 @@
 #include "game/app/pc_headcam.h"                /* PC: the cockpit camera's own car (drawCars) */
 #include "game/app/pc_customcam.h"              /* PC: a custom camera's own car (drawCars) */
 #include "game/app/pc_debugcam.h"               /* PC: the debug camera */
+#include "game/app/pc_vr.h"                     /* PC VR: the cockpit view in stereo */
+#include "platform/vr_view.h"                   /* PC VR: the dashboard / mirror shown */
 
 /* GSBufferPair's current / other buffer.  Retail takes the pair's address
  * (g_002F4230+0xAC4 / +0xA50, kept in a register) and reads cur at +0x70
@@ -208,12 +210,67 @@ private:
     int active;
 };
 
+/* PC VR (game/app/pc_vr.h): the stereo frame's overlay picture, after the two
+ * eyes: buf cleared clear, the rear-view mirror drawn in the rectangle the
+ * game gives it (through a scene buffer, as drawView draws it), then the 2D
+ * (the race display, the error view) - and its parts sent on to the panels of
+ * the cockpit they are shown on. */
+static void pc_vr_overlay_pass(RacePS2Base *r, GSBuffer *buf)
+{
+    PcAnimPose pose(r->org);                /* (the mirror's cars at the shown time) */
+    CameraManager *cm = r->virtual_6();
+    /* the scene buffer drawView draws in is the canvas, cleared clear.  The mirror first, while the 3D state
+     * is as drawView has it for it (the 2D turns the depth test and more off), handed to its panel; cleared
+     * again, the dashboard on it, handed to its panel.  buf keeps the second eye's picture (the window
+     * shows it). */
+    GSBuffer screen(pair_current(&g_002F4230.unkAC4), SCE_GS_PSMCT32);
+    screen.setField(rc_field_mode(&g_002F4230) != 0 ? PGL_FIELD_FRAME_SHIFT : PGL_FIELD_FRAME);
+    screen.setDrawBuffer();
+    pair_current(&g_002F4230.unkAC4)->setZBuffer();
+    gs_set_clear_color(0);
+    gs_clear_buffers(PGL_CLEAR_COLOR | PGL_CLEAR_DEPTH);
+    if (vrview::mirror_on() && r->replayMode == RACE_LIVE && cm->isDrawBackMirror() != 0) {
+        r->drawMirror(&screen, 0);
+        pc_vr_capture_mirror(&screen);
+        screen.setDrawBuffer();
+        pair_current(&g_002F4230.unkAC4)->setZBuffer();
+        gs_set_clear_color(0);
+        gs_clear_buffers(PGL_CLEAR_COLOR | PGL_CLEAR_DEPTH);
+    }
+    /* the 2D as drawView leaves the state for it */
+    gfx_disable(PGL_CAP_DEPTH_TEST);
+    g_002F1968.setStyle(NULL);
+    cm->begin2D(r->org, &screen);
+    gfx_disable(PGL_CAP_CULL_FACE);
+    gfx_disable(PGL_CAP_ALPHA_TEST);
+    gfx_disable(PGL_CAP_DEST_ALPHA);
+    gfx_disable(PGL_CAP_BLEND);
+    r->virtual_45(&screen);
+    r->virtual_46(&screen);
+    pc_vr_capture_hud(&screen);
+    screen.freeVram();
+    buf->setDrawBuffer();
+}
+
 // FUNC 0x0017E6C0 RacePS2Base::render
 //   GameObject::render: while renderEnabled, the 3D view, the 2D overlays and
 //   the error view.
 void RacePS2Base::render(GSBuffer &buf)
 {
     if (renderEnabled != 0) {
+        CameraManager *vrCam = virtual_6();
+        if (pc_vr_stereo(vrCam)) {
+            /* PC VR: the cockpit view once for each eye, then the overlay picture (the mirror, the dashboard) */
+            pc_vr_frame(1);
+            for (int eye = 0; eye < 2; eye++) {
+                pc_vr_eye_begin(eye);
+                drawView(&buf);
+                pc_vr_eye_end(&buf);
+            }
+            pc_vr_overlay_pass(this, &buf);
+            pc_vr_frame(0);
+            return;
+        }
         drawView(&buf);
         if (!pc_debugcam_on())              /* PC: no HUD under the debug camera (game/app/pc_debugcam.h) */
             virtual_45(&buf);
@@ -276,6 +333,8 @@ void RacePS2Base::drawView(GSBuffer *buf)
     g_pcViewLag = lag;
     if (!pc_debugcam_owns(cm->current))     /* PC (the debug camera moves every frame itself) */
         pc_view_interpolate(pc_view_key(cm), pc_view_shot(cm));
+    pc_vr_apply();                          /* PC VR: the eye's frustum and the head's place, over the view as shown
+                                             * (after the interpolation: it keeps and blends the matrices it reads) */
 
     /* the course */
     course_env_apply(env);
@@ -297,8 +356,9 @@ void RacePS2Base::drawView(GSBuffer *buf)
     drawCars(&envmap, -1, 1, 0.0f);
 
     /* the rear-view mirror: live race, a camera that shows it, the centre
-     * screen of an i.LINK wall (isCenterScreen) */
-    if (replayMode == RACE_LIVE) {
+     * screen of an i.LINK wall (isCenterScreen).  PC VR: not in an eye - a panel of the
+     * cockpit of its own (pc_vr_overlay_pass) */
+    if (replayMode == RACE_LIVE && !pc_vr_in_eye()) {
         if (cm->isDrawBackMirror() != 0) {
             if (cm->isCenterScreen() != 0) {
                 setMirrorRect(320, 52, 240, 64, 1.3f);
@@ -982,6 +1042,7 @@ void RacePS2Base::drawMirror(GSBuffer *screen, int sub)
 {
     /* implicit: GSBuffer::copy (the inline copy constructor) */
     GSBuffer view(*screen);                                                 /* sp+0x00 */
+    const f32 vrViewW = (f32)view.width, vrViewH = (f32)view.displayHeight();   /* PC VR: the whole view (displayHeight is the rectangle's once one is set) */
     /* PC: the dynamic aspect (game/app/pc_aspect.h): the mirror keeps its
      * 4:3 size on the screen, as a HUD element: its rectangle (in the 640 x
      * 448 design) placed as the HUD of the view it is in maps it - the
@@ -1002,6 +1063,7 @@ void RacePS2Base::drawMirror(GSBuffer *screen, int sub)
         mh *= sy;
     }
     view.setRect((int)mx, (int)my, (int)mw, (int)mh);
+    pc_vr_note_mirror(mx, my, mw, mh, vrViewW, vrViewH);                    /* PC VR: the mirror's panel */
     CourseData *course = org->course->data;
     CourseEnv *env = course->env;
     CameraManager *cm = virtual_6();

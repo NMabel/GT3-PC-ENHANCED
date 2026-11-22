@@ -11,6 +11,7 @@
 #include "platform/song_osd.h"
 #include "platform/system_menu.h"
 #include "platform/texture_menu.h"
+#include "platform/vr.h"                          /* PC VR: the VR hotkeys */
 
 #include <windows.h>
 
@@ -257,6 +258,19 @@ void run_hotkey(HWND hwnd, int h, bool repeat)
             update_mouse(hwnd, false);
         }
         break;
+    case input_map::kHotVrRecenter:
+    case input_map::kHotVrHud:
+    case input_map::kHotVrMirror:
+    case input_map::kHotVrScaleDown:
+    case input_map::kHotVrScaleUp:
+        /* PC VR (vr.h): the scale keys repeat while held */
+        if (!repeat || h == input_map::kHotVrScaleDown || h == input_map::kHotVrScaleUp)
+            vr::hotkey(h == input_map::kHotVrRecenter ? vr::kActRecenter
+                       : h == input_map::kHotVrHud     ? vr::kActHud
+                       : h == input_map::kHotVrMirror  ? vr::kActMirror
+                       : h == input_map::kHotVrScaleDown ? vr::kActScaleDown
+                                                         : vr::kActScaleUp);
+        break;
     case input_map::kHotFlickerCapture:
     case input_map::kHotTrace:
     case input_map::kHotFrameCapture:
@@ -389,7 +403,9 @@ LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
                                      input_map::kHotDebugCamera, input_map::kHotFlickerCapture,
                                      input_map::kHotTrace, input_map::kHotFrameCapture,
                                      input_map::kHotTextureMenu, input_map::kHotTextureRefresh,
-                                     input_map::kHotTextureToggle, input_map::kHotScreenshot};
+                                     input_map::kHotTextureToggle, input_map::kHotScreenshot,
+                                     input_map::kHotVrRecenter, input_map::kHotVrHud, input_map::kHotVrMirror,
+                                     input_map::kHotVrScaleDown, input_map::kHotVrScaleUp};
         for (int h : kFirst)
             if (hot(h)) {
                 run_hotkey(hwnd, h, repeat);
