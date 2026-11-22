@@ -297,7 +297,8 @@ Vu1Clip vs_vu1(Vu1In i)
     } else if (prog == 8) {         /* the flare program */
         /* the occlusion texel's R byte: from the strip on the GPU (the
          * queries just before wrote it), or flareO; 0: not drawn (beyond the
-         * far plane: gs_vu1 drops the triangle) */
+)HLSL"
+R"HLSL(         * far plane: gs_vu1 drops the triangle) */
         float occ = flareO;
         if (flareGpu != 0)
             occ = round(flareStrip.Load(int3(flareX, flareY, 0)).r * 255.0);
@@ -590,7 +591,8 @@ float4 sample_slot_grad(uint slot, float2 uv, float2 dx, float2 dy)
  * (CbPs::pad2) taps across it, each the GS's own sample (the draw's sampler
  * at level 0: bilinear), weighted by its alpha, so a texel the alpha hides
  * adds nothing and its colour never shows (user: "a texture might have
- * negative space that's transparent, but it has latent RGB values that
+)HLSL"
+R"HLSL( * negative space that's transparent, but it has latent RGB values that
  * suddenly become visible while anisotropic filtering is active" - PCSX2's,
  * whose hardware filter averages the colours alone).  The textures have one
  * level (no mipmaps), so the footprint's short axis stays the GS's.  None
@@ -843,7 +845,8 @@ float4 ps_present(FullOut i) : SV_Target
     /* the screen pixel's part of a larger picture, averaged (supersampling) */
     float2 o = uv - taps.xy * (float2(nx, ny) - 1.0) * 0.5;
     float3 sum = 0;
-    [loop] for (int y = 0; y < ny; y++)
+)HLSL"
+R"HLSL(    [loop] for (int y = 0; y < ny; y++)
         [loop] for (int x = 0; x < nx; x++)
             sum += tex0.SampleLevel(samp0, o + taps.xy * float2(x, y), 0).rgb;
     return float4(sum / (nx * ny), 1);
@@ -1094,7 +1097,8 @@ float4 ps_fxaa(FullOut i) : SV_Target
     if (!horzSpan) lumaN = lumaW;
     if (!horzSpan) lumaS = lumaE;
     if (horzSpan) lengthSign = rcpFrame.y;
-    float subpixB = subpixA * (1.0 / 12.0) - lumaM;
+)HLSL"
+R"HLSL(    float subpixB = subpixA * (1.0 / 12.0) - lumaM;
     float gradientN = lumaN - lumaM, gradientS = lumaS - lumaM;
     float lumaNN = lumaN + lumaM, lumaSS = lumaS + lumaM;
     bool pairN = abs(gradientN) >= abs(gradientS);
