@@ -355,6 +355,12 @@ Inside the plugin's folder is `engine.txt`, this allows you to set the mod's tit
 - Car Decay: Your cars become weaker each day. Find the optimal route to win every race.
 - Course Shrinkage: Courses get smaller each day. Can you make it to the end before traffic jams?
 
+### VR (SteamVR / OpenXR) - this fork
+- The cockpit camera in a VR headset, in stereo and head-tracked (tested on a Valve Index).
+- The dashboard, the rear-view mirror and the pause / result menus as panels in the cockpit.
+- Everything else is shown on a large virtual screen.
+- Turn on with `Enabled=on` under `[VR]` in `gt3pc.ini`. Setup, controls, settings and how it works: [docs/vr.md](docs/vr.md)
+
 ### Controls
 - Keyboard / Mouse, Controllers, and Wheels are supported
 - Button mappings
