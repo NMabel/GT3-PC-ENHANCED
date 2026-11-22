@@ -5374,6 +5374,32 @@ msgid "THE PANEL'S HEIGHT FROM YOUR EYES. ENTER: 20 CM."
 msgstr ""
 
 #: src/platform/settings_menu.cpp
+msgid "MENU DISTANCE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE PAUSE MENU AND THE RACE'S RESULT SHOW AS A PANEL IN FRONT OF YOU,\n"
+"THE RACE STAYS IN THE HEADSET. ITS DISTANCE. ENTER: 90 CM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "MENU SIZE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE MENU PANEL'S WIDTH. ENTER: 80 CM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "MENU HEIGHT"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "THE MENU PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: 0 CM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
 msgid "SPLIT SCREEN"
 msgstr "SCHERMO DIVISO"
 

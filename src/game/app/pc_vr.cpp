@@ -9,8 +9,14 @@
 #include "platform/vr_view.h"
 #include <stdio.h>
 
+/* The panels the overlay pass can feed (the numbering of vr.h's kOverlay*, which this file does not include:
+ * it is Windows-free). */
+enum { OVERLAY_HUD = 0, OVERLAY_MIRROR = 1, OVERLAY_MENU = 2 };
+
 static int s_eye = -1;                          /* the eye being drawn, else -1 */
 static int s_menuUp;                            /* a pause menu or a result is up (pc_vr_menu) */
+static int s_layer = PC_VR_LAYER_ALL;           /* the layer of the 2D being drawn (pc_vr_layer_set) */
+static int s_layerTaken;                        /* ... the 2D split by it this frame */
 static f32 s_mirror[6];                         /* the mirror as last drawn: x y w h, the view's size */
 static int s_mirrorSeen;                        /* ... drawn since the last capture */
 
@@ -25,11 +31,9 @@ int pc_vr_stereo(CameraManager *cm)
         why = 2;
     else if (pc_debugcam_on())
         why = 3;
-    else if (s_menuUp)
-        why = 4;
     if (why != s_why) {
         static const char *const names[] = {"stereo", "the headset is not ready (no frame to draw)",
-                                            "not the cockpit view", "the debug camera", "a pause menu or the result is up"};
+                                            "not the cockpit view", "the debug camera"};
         printf("vr: race view: %s\n", names[why]);
         s_why = why;
     }
@@ -51,6 +55,33 @@ void pc_vr_menu(int up)
     s_menuUp = up;
 }
 
+int pc_vr_menu_up(void)
+{
+    return s_menuUp;
+}
+
+void pc_vr_layer_set(int layer)
+{
+    s_layer = layer;
+    if (layer == PC_VR_LAYER_HUD)
+        s_layerTaken = 0;                       /* (a new frame's first layer) */
+}
+
+int pc_vr_layer(void)
+{
+    return s_layer;
+}
+
+void pc_vr_layer_taken(void)
+{
+    s_layerTaken = 1;
+}
+
+int pc_vr_layer_was_taken(void)
+{
+    return s_layerTaken;
+}
+
 void pc_vr_note_mirror(f32 x, f32 y, f32 w, f32 h, f32 vw, f32 vh)
 {
     s_mirror[0] = x;
@@ -67,24 +98,37 @@ void pc_vr_capture_mirror(GSBuffer *buf)
     const u32 addr = (u32)buf->addr;
     if (vrview::mirror_on() && s_mirrorSeen && s_mirror[4] > 0.0f && s_mirror[5] > 0.0f && s_mirror[2] > 0.0f &&
         s_mirror[3] > 0.0f)
-        gfx_vr_overlay(addr, buf->width, buf->height, 1, s_mirror[0] / s_mirror[4], s_mirror[1] / s_mirror[5],
+        gfx_vr_overlay(addr, buf->width, buf->height, OVERLAY_MIRROR, s_mirror[0] / s_mirror[4], s_mirror[1] / s_mirror[5],
                        (s_mirror[0] + s_mirror[2]) / s_mirror[4], (s_mirror[1] + s_mirror[3]) / s_mirror[5]);
     s_mirrorSeen = 0;
 }
 
-void pc_vr_capture_hud(GSBuffer *buf)
+/* The 2D's canvas to a panel: the HUD, and the race menus, are laid out on a 4:3 band across the whole width,
+ * centred vertically (pc_aspect.h).  The canvas is as large as the eye texture, whose shape is not 4:3 (the
+ * Index's eyes are taller than wide), so the band is a part of its height: bandHeight (a fraction of 1).
+ * The part, as (u0, v0) - (u1, v1) of the canvas, goes to the panel. */
+static void capture_band(GSBuffer *canvas, int overlay)
 {
-    const u32 addr = (u32)buf->addr;
-    if (vrview::hud_on()) {
-        /* the dashboard's canvas: a 4:3 band across the whole width, centred vertically (pc_aspect.h) */
-        int ew = 0, eh = 0;
-        vrview::eye_size(&ew, &eh);
-        const f32 a = (ew > 0 && eh > 0) ? (f32)ew / (f32)eh : 1.0f;
-        f32 fh = a * 0.75f;
-        if (fh > 1.0f)
-            fh = 1.0f;
-        gfx_vr_overlay(addr, buf->width, buf->height, 0, 0.0f, (1.0f - fh) * 0.5f, 1.0f, (1.0f + fh) * 0.5f);
-    }
+    int eyeWidth = 0, eyeHeight = 0;
+    vrview::eye_size(&eyeWidth, &eyeHeight);
+    const f32 canvasAspect = (eyeWidth > 0 && eyeHeight > 0) ? (f32)eyeWidth / (f32)eyeHeight : 1.0f;
+    const f32 menuAspectInverse = 3.0f / 4.0f;      /* the 4:3 screen's height over its width */
+    f32 bandHeight = canvasAspect * menuAspectInverse;
+    if (bandHeight > 1.0f)
+        bandHeight = 1.0f;                          /* (a canvas wider than 4:3 would show the whole of it) */
+    gfx_vr_overlay((u32)canvas->addr, canvas->width, canvas->height, overlay, 0.0f, (1.0f - bandHeight) * 0.5f, 1.0f,
+                   (1.0f + bandHeight) * 0.5f);
+}
+
+void pc_vr_capture_hud(GSBuffer *canvas)
+{
+    if (vrview::hud_on())
+        capture_band(canvas, OVERLAY_HUD);
+}
+
+void pc_vr_capture_menu(GSBuffer *canvas)
+{
+    capture_band(canvas, OVERLAY_MENU);
 }
 
 void pc_vr_frame(int on)
@@ -109,28 +153,42 @@ void pc_vr_eye_end(GSBuffer *buf)
     s_eye = -1;
 }
 
+/* The elements of a projection matrix that glFrustum sets, as indices into the column-major array (element
+ * [column * 4 + row]) the game's matrices are: */
+enum ProjectionElement {
+    PROJ_X_SCALE = 0,                   /* x' = x * this ...                      (column 0, row 0) */
+    PROJ_Y_SCALE = 5,                   /* y' = y * this ...                      (column 1, row 1) */
+    PROJ_X_PER_Z = 8,                   /* ... + z * this: the frustum's off-centre shift in x */
+    PROJ_Y_PER_Z = 9,                   /* ... + z * this: and in y */
+    PROJ_Z_PER_Z = 10,                  /* the depth: z' = z * this + PROJ_Z_OFFSET (the game's own terms) */
+    PROJ_W_PER_Z = 11,                  /* the perspective divide: w' = -z (glFrustum: -1) */
+    PROJ_Z_OFFSET = 14
+};
+
 void pc_vr_apply(void)
 {
     if (s_eye < 0)
         return;
-    f32 tan[4], inv[16];
+    f32 tan[4], inv[16];                /* the eye's field of view as tangents, and its place (a view matrix) */
     if (!vrview::eye(s_eye, tan, inv))
         return;
-    f32 m[16];
+    f32 m[16];                          /* the game's projection, as the camera set it */
     pgl_matrix_mode(PGL_MTX_PROJECTION);
     pgl_get_matrix(m);
-    /* glFrustum's x / y terms from the headset's field of view, the game's own z terms */
+    /* Replace its x / y terms with the headset's field of view, which is not symmetrical (an eye sits off
+     * the middle of its lens), as glFrustum builds them from the left / right / bottom / top tangents.  The depth
+     * terms stay the game's own: the renderer's emulation of the PS2's depth buffer reads them. */
     f32 p[16];
     for (int i = 0; i < 16; i++)
         p[i] = 0.0f;
-    const f32 tl = tan[0], tr = tan[1], tb = tan[2], tt = tan[3];
-    p[0] = 2.0f / (tr - tl);
-    p[5] = 2.0f / (tt - tb);
-    p[8] = (tr + tl) / (tr - tl);
-    p[9] = (tt + tb) / (tt - tb);
-    p[10] = m[10];
-    p[11] = m[11];
-    p[14] = m[14];
+    const f32 tanLeft = tan[0], tanRight = tan[1], tanDown = tan[2], tanUp = tan[3];
+    p[PROJ_X_SCALE] = 2.0f / (tanRight - tanLeft);
+    p[PROJ_Y_SCALE] = 2.0f / (tanUp - tanDown);
+    p[PROJ_X_PER_Z] = (tanRight + tanLeft) / (tanRight - tanLeft);
+    p[PROJ_Y_PER_Z] = (tanUp + tanDown) / (tanUp - tanDown);
+    p[PROJ_Z_PER_Z] = m[PROJ_Z_PER_Z];
+    p[PROJ_W_PER_Z] = m[PROJ_W_PER_Z];
+    p[PROJ_Z_OFFSET] = m[PROJ_Z_OFFSET];
     pgl_load_matrix(p);
     {
         /* (a few lines in the log: the game's own projection terms against the headset's, and where the eye is) */

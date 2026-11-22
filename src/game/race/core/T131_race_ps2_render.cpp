@@ -245,9 +245,28 @@ static void pc_vr_overlay_pass(RacePS2Base *r, GSBuffer *buf)
     gfx_disable(PGL_CAP_ALPHA_TEST);
     gfx_disable(PGL_CAP_DEST_ALPHA);
     gfx_disable(PGL_CAP_BLEND);
+    pc_vr_layer_set(PC_VR_LAYER_HUD);       /* the dashboard's layer of the 2D (RaceBasic::virtual_45) ... */
     r->virtual_45(&screen);
     r->virtual_46(&screen);
     pc_vr_capture_hud(&screen);
+    if (pc_vr_layer_was_taken() && pc_vr_menu_up()) {
+        /* ... then, a pause menu or the result up, the menu layer on a clean canvas: a panel of its own */
+        screen.setDrawBuffer();
+        pair_current(&g_002F4230.unkAC4)->setZBuffer();
+        gs_set_clear_color(0);
+        gs_clear_buffers(PGL_CLEAR_COLOR | PGL_CLEAR_DEPTH);
+        gfx_disable(PGL_CAP_DEPTH_TEST);
+        g_002F1968.setStyle(NULL);
+        cm->begin2D(r->org, &screen);
+        gfx_disable(PGL_CAP_CULL_FACE);
+        gfx_disable(PGL_CAP_ALPHA_TEST);
+        gfx_disable(PGL_CAP_DEST_ALPHA);
+        gfx_disable(PGL_CAP_BLEND);
+        pc_vr_layer_set(PC_VR_LAYER_MENU);
+        r->virtual_45(&screen);
+        pc_vr_capture_menu(&screen);
+    }
+    pc_vr_layer_set(PC_VR_LAYER_ALL);
     screen.freeVram();
     buf->setDrawBuffer();
 }

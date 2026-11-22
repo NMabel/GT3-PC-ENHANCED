@@ -32,7 +32,7 @@ void eye_size(int *width, int *height);
  *           seat's frame - to be multiplied before the camera's view (the
  *           car's frame: x right, y up, -z forward, metres; the head's
  *           movements and the eyes' distance divided by the world's scale).  The seat is
- *           where the head was when the view was last centred (F9), looking
+ *           where the head was when the view was last centred (Home), looking
  *           along the car's forward.
  * false: no pose this frame. */
 bool eye(int eye, float tan[4], float viewInv[16]);

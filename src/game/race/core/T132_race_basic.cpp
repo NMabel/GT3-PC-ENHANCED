@@ -287,15 +287,38 @@ void RaceBasic::virtual_45(GSBuffer *buf)
     RacePS2Base::virtual_45(buf);
     RaceOrganization *o = org;
     CameraManager *cm = virtual_6();
-    /* PC VR: a pause menu or the result sequence (done: the player's car reached the goal) up: the flat screen
-     * shows it.  (subDisplay alone is set for the whole race: the result object waits in it.) */
-    pc_vr_menu(paused != 0 || (subDisplay != NULL && subDisplay->done != 0));
-    if (raceDisplay != NULL && !pc_vr_hide_hud())       /* (PC VR: the dashboard off) */
+    /* PC VR: a pause menu, or the result sequence (done: the player's car reached the goal), is up.  (subDisplay
+     * alone is set for the whole race: the result object waits in it.)  In a stereo frame the 2D is drawn in two
+     * layers, on canvases of their own for the dashboard and for the menu panel (game/app/pc_vr.h): the race
+     * display on the one, the result's board and the pause menu on the other - in the headset the race goes on
+     * (or stands still, paused) behind them. */
+    const int result = subDisplay != NULL && subDisplay->done != 0;
+    const int layer = pc_vr_layer();
+    pc_vr_menu(paused != 0 || result);
+    if (layer != PC_VR_LAYER_ALL)
+        pc_vr_layer_taken();
+    if (layer != PC_VR_LAYER_MENU && raceDisplay != NULL && !pc_vr_hide_hud())  /* (PC VR: the dashboard off) */
         raceDisplay->virtual_3(*buf);
-    if (subDisplay != NULL)
-        subDisplay->render(*buf, *o);
-    if (paused != 0)
-        pauseMenu->virtual_3(buf, o, cm->views[0].camera);
+    if (layer != PC_VR_LAYER_HUD) {
+        if (layer == PC_VR_LAYER_MENU && result && raceDisplay != NULL && pc_vr_hide_hud()) {
+            /* the dashboard is off: the race display's messages alone (FINISH...), its centre panel without the
+             * meters, on the menu panel - the player has not asked for the dashboard, but for the end of the race */
+            RaceDisplay *rd = dynamic_cast<RaceDisplay *>(raceDisplay);
+            if (rd != NULL) {
+                const u8 panels = rd->panels;
+                const int mask = rd->showMask;
+                rd->panels = RD_PANEL_CENTER;
+                rd->showMask = 0;
+                raceDisplay->virtual_3(*buf);
+                rd->panels = panels;
+                rd->showMask = mask;
+            }
+        }
+        if (subDisplay != NULL)
+            subDisplay->render(*buf, *o);
+        if (paused != 0)
+            pauseMenu->virtual_3(buf, o, cm->views[0].camera);
+    }
 }
 
 // FUNC 0x001814D8 RaceBasic::setPause

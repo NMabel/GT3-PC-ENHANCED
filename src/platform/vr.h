@@ -1,5 +1,6 @@
 /* vr.h - PC VR (OpenXR): the headset session of GT3 PC.  No original: new PC
- * code, a fork's feature (docs: the plan in the fork's VR notes).
+ * code, a fork's feature.  How the pieces fit together (the frame's journey,
+ * what is drawn where, how to set it up) is in docs/vr.md.
  *
  * gt3pc.ini [VR]:
  *   Enabled=off | on     on: start an OpenXR session when a headset is found
@@ -22,6 +23,9 @@
  *                        negative)
  *   Mirror=on | off      the rear-view mirror, a panel of its own at
  *                        MirrorDistance, MirrorWidth, MirrorHeight
+ *   ScreenDistance=90    the menu panel (the pause menu, the race's result), in
+ *   ScreenWidth=80       the same centimetres; ScreenHeight 0 is at the eyes
+ *   ScreenHeight=0
  *   MenuFov=0            degrees (5 .. 120; 0: off): the width as the angle the
  *                        screen covers, from MenuDistance (THX: ~40, SMPTE: 30)
  *
@@ -30,14 +34,16 @@
  * from the game thread that presents (pgl_targets.cpp present_now ->
  * gpu::present); none is thread-safe.
  *
- * Phase 3: a race view from the cockpit camera is drawn twice, once per eye
- * (vr_view.h for the game's side), onto the eye swapchains of a projection
- * layer; the flat screen is shown for every other picture.
- *
- * Phase 2 (this file): the picture the game presents is also drawn onto a
- * quad layer, the "flat screen", world-locked in front of the player where
- * they sat down (recentre: F9, or SteamVR's).  Phase 3 adds the stereo
- * projection layer of the cockpit view. */
+ * What the headset shows, frame by frame:
+ *   - a race view from the cockpit camera (the player's own car, live race,
+ *     pause menu and result included): drawn twice, once per eye, onto the eye
+ *     swapchains of a projection layer (vr_view.h is the game's side of it),
+ *     with the dashboard, the rear-view mirror and the menu as panels of the
+ *     cockpit (the overlays below);
+ *   - every other picture - the menus, the other cameras, replays: the "flat
+ *     screen", the picture the game presents drawn onto a quad layer,
+ *     world-locked in front of the player where they sat down (recentre: the
+ *     Home key, or SteamVR's own). */
 #pragma once
 
 #include <d3d11.h>
@@ -63,7 +69,7 @@ void shutdown();
 
 /* ---- the settings ([VR]; the F2 menu's VR category; saved when changed) ---- */
 enum Setting { kWorldScale, kHudDistance, kHudWidth, kHudHeight, kMirrorDistance, kMirrorWidth, kMirrorHeight,
-               kSettingCount };
+               kScreenDistance, kScreenWidth, kScreenHeight, kSettingCount };
 struct SettingInfo {
     const char *key;                    /* the ini key */
     int def, min, max, step;            /* percent (the world's scale), else centimetres */
@@ -82,17 +88,18 @@ bool available();
 enum Action { kActRecenter, kActHud, kActMirror, kActScaleDown, kActScaleUp };
 void hotkey(Action a);
 
-/* ---- the overlays: the dashboard and the mirror, panels of the cockpit ----
- * kind 0 the dashboard, 1 the mirror.  A render target for this frame's panel
- * (aspect: its width over its height; nullptr / false: none this frame - off,
- * or no stereo frame); the renderer's executor draws the panel's part of the
- * overlay picture onto it (pgl_exec.cpp exec_vr_overlay: overlay_draw on the D3D
- * thread). */
-constexpr int kOverlayHud = 0, kOverlayMirror = 1;
+/* ---- the overlays: the dashboard, the mirror and the menu, panels of the cockpit ----
+ * kind 0 the dashboard, 1 the mirror, 2 the menu (the pause menu and the result of a
+ * race: shown in front of the player while the race stays in the headset).  A render
+ * target for this frame's panel (aspect: its width over its height; nullptr / false:
+ * none this frame - off, or no stereo frame); the renderer's executor draws the
+ * panel's part of the overlay picture onto it (pgl_exec.cpp exec_vr_overlay:
+ * overlay_draw on the D3D thread). */
+constexpr int kOverlayHud = 0, kOverlayMirror = 1, kOverlayScreen = 2, kOverlayCount = 3;
 bool overlay_wanted(int kind);
 bool overlay_acquire(int kind, float aspect, ID3D11RenderTargetView **rtv, int *width, int *height);
 /* The part uv[4] (u0, v0, u1, v1) of src over all of rtv (width x height); the
- * dashboard (kind 0) keyed - black is clear - the mirror opaque.  On the D3D
+ * dashboard (kind 0) and the menu (2) keyed - black is clear - the mirror opaque.  On the D3D
  * thread; the context's state is left as it finds it not: the caller
  * invalidates its caches. */
 void overlay_draw(ID3D11DeviceContext *dc, ID3D11ShaderResourceView *src, ID3D11RenderTargetView *rtv, int width,
@@ -103,9 +110,10 @@ void overlay_draw(ID3D11DeviceContext *dc, ID3D11ShaderResourceView *src, ID3D11
  * picture, before gpu::present, which ends the frame (end_frame). */
 bool flat_acquire(ID3D11RenderTargetView **rtv, int *width, int *height);
 
-/* Phase 3.  A stereo frame can be drawn (vr_view.h ready); the eye textures'
- * size; one eye's render target for this frame (the renderer's executor draws
- * the eye's picture onto it: pgl_exec.cpp exec_vr_eye); false: none. */
+/* The stereo cockpit.  A stereo frame can be drawn (vr_view.h ready); the eye
+ * textures' size; one eye's render target for this frame (the renderer's
+ * executor draws the eye's picture onto it: pgl_exec.cpp exec_vr_eye); false:
+ * none. */
 bool stereo_ready();
 void eye_size(int *width, int *height);
 bool eye_acquire(int eye, ID3D11RenderTargetView **rtv, int *width, int *height);
