@@ -12,12 +12,18 @@ tested with a Valve Index on SteamVR. Any headset whose OpenXR runtime accepts a
 1. Build as usual (`build.cmd`). The first configure downloads the OpenXR SDK
    (a pinned version, checksum verified: `cmake/openxr.cmake`) and builds its
    loader, `openxr_loader.dll`, next to `gt3pc.exe`.
-2. Turn it on in `gt3pc.ini`, next to the game:
+2. Turn it on in the launcher: **Game** tab, **Cameras**, **VR headset (OpenXR): On**.
+   VR draws the cockpit camera, so this also switches **Cockpit camera** on (and says
+   so in a message), or the race would stay a flat screen. The launcher's on / off
+   settings are lists, not check boxes; this one is Off / On like the rest. Or in
+   `gt3pc.ini`, next to the game:
    ```ini
    [VR]
    Enabled=on
+
+   [Graphics]
+   CockpitCamera=on
    ```
-   (There is no launcher checkbox yet.)
 3. Start SteamVR, put the headset on, then run `gt3pc.exe`.
 4. In a race, use the **cockpit camera** view (the PC-ENHANCED cockpit camera
    must be on). That is the view drawn in stereo.
@@ -161,7 +167,6 @@ These cost time to find; they are also commented where they matter.
 
 ## Not done yet
 
-- A launcher checkbox for `Enabled`.
 - Translations of the new menu strings (they show in English).
 - Replays and the other cameras in stereo.
 - Screen-space effects (lens flares, FXAA, the replay depth of field) are drawn

@@ -38,8 +38,8 @@ flowchart TD
     A(["GT3 PC-ENHANCED installed with its launcher<br/>(not yet? install it first)"]) --> B["Unzip the VR download<br/>into a folder of its own"]
     B --> C["In your usual launcher:<br/>engine selector, Add engine...,<br/>pick that folder"]
     C --> D["Start GT3 PC VR from the selector.<br/>First time: Install game files...<br/>or Add disc..."]
-    D --> E["Add Enabled=on under [VR]<br/>in gt3pc.ini"]
-    E --> F["Start SteamVR, put the headset on,<br/>press Play, choose the cockpit camera"]
+    D --> E["In its Game tab, Cameras:<br/>set VR headset to On"]
+    E --> F["Start SteamVR, put the headset on,<br/>press Play, view button to the cockpit"]
     F --> G(["The cockpit in stereo, head-tracked"])
 ```
 
@@ -50,13 +50,12 @@ flowchart TD
    download it only from this repository's Releases page.
 3. Start **GT3 PC VR** from the selector. The first time, give it the game files: **Install game files...**
    from your disc image, or **Add disc...** to play straight from the image.
-4. Turn VR on. Open `gt3pc.ini` (the settings file next to the launcher you started the selector from)
-   and add:
-   ```ini
-   [VR]
-   Enabled=on
-   ```
-5. Start SteamVR, put the headset on, press Play. In a race, choose the cockpit camera.
+4. Turn VR on, in that same launcher window: **Game** tab, **Cameras**, **VR headset (OpenXR): On**.
+   VR draws the cockpit camera, so this also switches **Cockpit camera** on, and tells you when it does.
+   (Prefer the file? In `gt3pc.ini`, the settings file shared with your install, that is
+   `Enabled=on` under `[VR]` and `CockpitCamera=on` under `[Graphics]`.)
+5. Start SteamVR, put the headset on, press **Play**. In a race, press the view button until you reach
+   the cockpit view.
 
 What the VR engine **shares** with your install, and what it **keeps for itself**:
 
