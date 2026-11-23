@@ -35,20 +35,12 @@ runs next to your installed game. Nothing of your install is replaced.
 
 ```mermaid
 flowchart TD
-    A(["Start"]) --> B{"GT3 PC-ENHANCED already<br/>installed and working?"}
-    B -- "No" --> C["Install the normal game first:<br/>open its launcher and extract the<br/>game files from your disc image"]
-    B -- "Yes" --> D
-    C --> D["Download the VR zip from Releases<br/>and unzip it into a folder of its own"]
-    D --> E["Open your usual gt3launcher.exe.<br/>On its first screen, the engine selector,<br/>press Add engine..."]
-    E --> F["Pick the unzipped folder and accept<br/>the 'source you trust' warning"]
-    F --> G["Start GT3 PC VR from the selector"]
-    G --> H{"Game files installed<br/>for this engine?"}
-    H -- "No" --> I["Install game files... from your disc image<br/>(or Add disc... to play from the image)"]
-    H -- "Yes" --> J
-    I --> J["Turn VR on: add Enabled=on under [VR]<br/>in gt3pc.ini"]
-    J --> K["Start SteamVR and put the headset on"]
-    K --> L["Press Play, and in a race<br/>choose the cockpit camera"]
-    L --> M(["The cockpit in stereo, head-tracked"])
+    A(["GT3 PC-ENHANCED installed with its launcher<br/>(not yet? install it first)"]) --> B["Unzip the VR download<br/>into a folder of its own"]
+    B --> C["In your usual launcher:<br/>engine selector, Add engine...,<br/>pick that folder"]
+    C --> D["Start GT3 PC VR from the selector.<br/>First time: Install game files...<br/>or Add disc..."]
+    D --> E["Add Enabled=on under [VR]<br/>in gt3pc.ini"]
+    E --> F["Start SteamVR, put the headset on,<br/>press Play, choose the cockpit camera"]
+    F --> G(["The cockpit in stereo, head-tracked"])
 ```
 
 1. Download the VR zip from [Releases](https://github.com/NMabel/GT3-PC-ENHANCED/releases) and unzip
