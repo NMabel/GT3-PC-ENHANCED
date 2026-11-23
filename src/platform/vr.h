@@ -7,7 +7,10 @@
  *                        (SteamVR's runtime; the game is 32-bit, so the
  *                        runtime must register a 32-bit OpenXR client - SteamVR
  *                        does).  Without a headset, a runtime or the loader
- *                        DLL the game runs as without VR (logged).
+ *                        DLL the game runs as without VR (logged).  The
+ *                        launcher sets it: Game > Cameras > VR headset
+ *                        (OpenXR), which also turns [Graphics] CockpitCamera
+ *                        on, the one view drawn in stereo.
  *   MenuDistance=2.5     metres: where the flat screen (menus, and every
  *                        picture that is not a stereo race view) hangs
  *   MenuWidth=4.0        metres: its width (16:9)

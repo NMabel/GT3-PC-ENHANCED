@@ -1876,6 +1876,10 @@ void build_options()
      * in [Graphics]): settings.h's kFovMin .., kChaseAngleMin ..,
      * kCockpitFovMin .. */
     const size_t cameras = g.options.size();
+    /* PC VR (this fork, docs/vr.md): [VR] Enabled, read when the game starts (platform/vr.cpp wanted).  The
+     * launcher's on / off settings are lists, not check boxes: this one is Off / On like Cockpit camera, which
+     * the headset needs (vr_needs_cockpit_camera).  First of the sub-tab, where it is seen without scrolling. */
+    add(TAB_GAME, tr(L"VR headset (OpenXR)"), L"VR", L"Enabled", L"off", {{tr(L"Off"), L"off"}, {tr(L"On"), L"on"}});
     add_slider(TAB_GAME, tr(L"Field of view"), L"Graphics", L"Fov", L"100", 50, 200, 1, 0, percent_text);
     add_slider(TAB_GAME, tr(L"Replay field of view"), L"Graphics", L"ReplayFov", L"100", 50, 200, 1, 0, percent_text);
     /* (PC 2026-11-15: the rear view's two rows moved to the Graphics tab) */
@@ -2293,6 +2297,28 @@ void restart_in_language()
     PostMessageW(g.wnd, WM_CLOSE, 0, 0);
 }
 
+/* PC VR (this fork, docs/vr.md): the headset shows the cockpit camera's view in stereo and the rest of the
+ * race on a flat screen, so VR turned on with the cockpit camera off would look like VR doing nothing.  Turns
+ * the cockpit camera on too - in the file and in its row, which is refreshed - and says so.  "On" as the game
+ * reads it (platform/settings.cpp): on, or 1. */
+void vr_needs_cockpit_camera()
+{
+    for (Option &o : g.options) {
+        if (_wcsicmp(o.section, L"Graphics") != 0 || _wcsicmp(o.key, L"CockpitCamera") != 0)
+            continue;
+        wchar_t cur[16] = L"";
+        GetPrivateProfileStringW(o.section, o.key, o.def, cur, 16, ini_path().c_str());
+        if (_wcsicmp(cur, L"on") == 0 || wcscmp(cur, L"1") == 0)
+            return;                         /* (already on) */
+        WritePrivateProfileStringW(o.section, o.key, L"on", ini_path().c_str());
+        fill_option(o);
+        message(tr(L"VR shows the cockpit camera's view, so the cockpit camera is now On too (Game > Cameras > Cockpit "
+                   L"camera)."),
+                MB_ICONINFORMATION);
+        return;
+    }
+}
+
 /* A list's choice, written to gt3pc.ini at once. */
 void setting_changed(int id)
 {
@@ -2314,6 +2340,9 @@ void setting_changed(int id)
                 show_game_rows();
                 layout();
             }
+            /* PC VR (this fork): the headset needs the cockpit camera */
+            if (_wcsicmp(o.section, L"VR") == 0 && _wcsicmp(o.key, L"Enabled") == 0 && o.choices[i].value == L"on")
+                vr_needs_cockpit_camera();
             /* PC (2026-11-16): the interface's language */
             if (_wcsicmp(o.section, L"Interface") == 0 && _wcsicmp(o.key, L"Language") == 0) {
                 restart_in_language();

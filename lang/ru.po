@@ -2788,6 +2788,10 @@ msgid "Replay logo"
 msgstr "Логотип в повторах"
 
 #: src/launcher/ui.cpp
+msgid "VR headset (OpenXR)"
+msgstr ""
+
+#: src/launcher/ui.cpp
 msgid "Field of view"
 msgstr "Угол обзора"
 
@@ -3098,6 +3102,10 @@ msgstr ""
 #: src/launcher/ui.cpp
 msgid "The launcher shows the new language from its next start."
 msgstr "Лаунчер покажет новый язык при следующем запуске."
+
+#: src/launcher/ui.cpp
+msgid "VR shows the cockpit camera's view, so the cockpit camera is now On too (Game > Cameras > Cockpit camera)."
+msgstr ""
 
 #: src/launcher/ui.cpp
 msgid "The game (%s) was not found in %s."
