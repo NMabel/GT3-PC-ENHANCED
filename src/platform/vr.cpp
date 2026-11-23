@@ -923,9 +923,18 @@ void end_frame()
             if (!g_ov[kind].acquired)
                 continue;               /* the game drew nothing on this panel this frame */
             release(g_ov[kind]);
-            const float distance = (float)setting(kDistanceSetting[kind]) / 100.0f;     /* (settings are in cm) */
-            const float width = (float)setting(kWidthSetting[kind]) / 100.0f;
+            float distance = (float)setting(kDistanceSetting[kind]) / 100.0f;           /* (settings are in cm) */
+            float width = (float)setting(kWidthSetting[kind]) / 100.0f;
             const float height = (float)setting(kHeightSetting[kind]) / 100.0f;
+            /* Layers that lie in one plane flicker against each other like z-fighting (the compositor sorts quads
+             * by depth): every panel is 1 cm nearer than the one behind it in the order, the width scaled to
+             * keep its apparent size.  (The dashboard and the mirror share a distance by default; the menu and
+             * the desktop panels hang at the same place.) */
+            {
+                const float nearer = std::max(0.2f, distance - 0.01f * (float)order);
+                width *= nearer / distance;
+                distance = nearer;
+            }
             XrCompositionLayerQuad &panel = panelLayers[order];
             /* The dashboard and the menu have transparent parts (black is keyed out: the overlay shader; the
              * colours are not multiplied by the alpha).  The desktop panels are drawn by overlay.cpp's blend,
@@ -944,9 +953,18 @@ void end_frame()
                 /* Over the flat screen the desktop panels are the window's: they fill the screen's height, as
                  * the window's own panels fill the window, in the same place (the layer order puts them in
                  * front); a window not 16:9 keeps its shape. */
+                /* 5 cm in front of the screen, not in its plane (two layers in one plane flicker like
+                 * z-fighting), and scaled down to look the same size from the seat. */
                 const float flatHeight = g_menuWidth * (float)g_flat.h / (float)g_flat.w;
+                const float screenDistance = std::max(0.5f, g_menuDistance);
+                const float inFront = 0.05f;
+                const Vec3 towardViewer = quat_rotate(to_quat(g_flatScreenPose.orientation), {0.0f, 0.0f, 1.0f});
+                const float shrink = (screenDistance - inFront) / screenDistance;
                 panel.pose = g_flatScreenPose;
-                panel.size = {flatHeight * g_ovAspect[kind], flatHeight};
+                panel.pose.position.x += towardViewer.x * inFront;
+                panel.pose.position.y += towardViewer.y * inFront;
+                panel.pose.position.z += towardViewer.z * inFront;
+                panel.size = {flatHeight * g_ovAspect[kind] * shrink, flatHeight * shrink};
             }
             /* (the cockpit's panels are part of the cockpit: without the eyes they are not shown; the desktop
              * panels are shown over the flat screen too) */
