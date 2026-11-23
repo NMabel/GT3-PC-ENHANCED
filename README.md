@@ -14,6 +14,69 @@ Then open the launcher, extract the game files from any of the three main versio
 or run the game from a disc file directly,
 configure the settings, and play.
 
+## Play in VR (this fork)
+
+This fork adds **PC VR**: the cockpit view of a Gran Turismo 3 race, drawn in stereo
+in a SteamVR / OpenXR headset and tracking your head. You sit in the driver's seat,
+look round the cabin, lean in, and glance at the mirror. It is for sim players who
+want GT3 from inside the car. Nothing else about the game changes: the cars, the
+physics, your saves, and the wheel or pad you already use.
+
+- **In a race, with the cockpit camera:** the cockpit in stereo. The dashboard, the rear-view
+  mirror and the pause / result menus hang inside it as panels you can move and resize.
+- **Everything else** (menus, replays, the other cameras): a large virtual screen in the headset.
+- **Tested** on a Valve Index with SteamVR, nothing else. Another headset should work if its
+  OpenXR runtime accepts a 32-bit program and Direct3D 11, but that is not tried.
+
+### Add it to a game you already have
+
+The VR build comes as an *engine plugin*: a small download (about 7 MB zipped) that your launcher
+runs next to your installed game. Nothing of your install is replaced.
+
+```mermaid
+flowchart TD
+    A(["Start"]) --> B{"GT3 PC-ENHANCED already<br/>installed and working?"}
+    B -- "No" --> C["Install the normal game first:<br/>open its launcher and extract the<br/>game files from your disc image"]
+    B -- "Yes" --> D
+    C --> D["Download the VR zip from Releases<br/>and unzip it into a folder of its own"]
+    D --> E["Open your usual gt3launcher.exe.<br/>On its first screen, the engine selector,<br/>press Add engine..."]
+    E --> F["Pick the unzipped folder and accept<br/>the 'source you trust' warning"]
+    F --> G["Start GT3 PC VR from the selector"]
+    G --> H{"Game files installed<br/>for this engine?"}
+    H -- "No" --> I["Install game files... from your disc image<br/>(or Add disc... to play from the image)"]
+    H -- "Yes" --> J
+    I --> J["Turn VR on: add Enabled=on under [VR]<br/>in gt3pc.ini"]
+    J --> K["Start SteamVR and put the headset on"]
+    K --> L["Press Play, and in a race<br/>choose the cockpit camera"]
+    L --> M(["The cockpit in stereo, head-tracked"])
+```
+
+1. Download the VR zip from [Releases](https://github.com/NMabel/GT3-PC-ENHANCED/releases) and unzip
+   it into a folder of its own (not over your game folder).
+2. Open the launcher you already use. Its first screen is the engine selector: press **Add engine...**
+   and pick that folder. The launcher warns you to trust the source: the zip holds programs, so
+   download it only from this repository's Releases page.
+3. Start **GT3 PC VR** from the selector. The first time, give it the game files: **Install game files...**
+   from your disc image, or **Add disc...** to play straight from the image.
+4. Turn VR on. Open `gt3pc.ini` (the settings file next to the launcher you started the selector from)
+   and add:
+   ```ini
+   [VR]
+   Enabled=on
+   ```
+5. Start SteamVR, put the headset on, press Play. In a race, choose the cockpit camera.
+
+What the VR engine **shares** with your install, and what it **keeps for itself**:
+
+| Shared with your install | Kept by the VR engine |
+|---|---|
+| The settings file `gt3pc.ini`, so your graphics, controls and display settings carry over | The game files (`data_US` ...: about 7 GB unless you play from the disc image) |
+| The `screenshots` folder | Its memory cards: `saves\GT3 PC VR\`. Copy a card folder over from `saves\Gran Turismo 3 A-Spec\` to carry on a save |
+
+To build the zip yourself, run `Build Mod Plugin.cmd "GT3 PC VR"`: it writes the folder to
+`build\plugins\GT3 PC VR`. The controls, every `[VR]` setting, how a frame gets to the headset and what is
+not done yet are in [docs/vr.md](docs/vr.md).
+
 
 
 # Perfect 1:1 parity with the PlayStation 2 original, only better:
