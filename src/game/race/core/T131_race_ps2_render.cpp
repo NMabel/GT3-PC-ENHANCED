@@ -229,6 +229,7 @@ static void pc_vr_overlay_pass(RacePS2Base *r, GSBuffer *buf)
     pair_current(&g_002F4230.unkAC4)->setZBuffer();
     gs_set_clear_color(0);
     gs_clear_buffers(PGL_CLEAR_COLOR | PGL_CLEAR_DEPTH);
+    pc_vr_log_mirror_state(vrview::mirror_on(), r->replayMode == RACE_LIVE, cm->isDrawBackMirror() != 0);
     if (vrview::mirror_on() && r->replayMode == RACE_LIVE && cm->isDrawBackMirror() != 0) {
         r->drawMirror(&screen, 0);
         pc_vr_capture_mirror(&screen);

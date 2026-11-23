@@ -98,7 +98,13 @@ void hotkey(Action a);
  * none this frame - off, or no stereo frame); the renderer's executor draws the
  * panel's part of the overlay picture onto it (pgl_exec.cpp exec_vr_overlay:
  * overlay_draw on the D3D thread). */
-constexpr int kOverlayHud = 0, kOverlayMirror = 1, kOverlayScreen = 2, kOverlayCount = 3;
+constexpr int kOverlayHud = 0, kOverlayMirror = 1, kOverlayScreen = 2, kOverlayDesktop = 3, kOverlayCount = 4;
+/* kind 3, the desktop panels: the game's own panels over the picture (the F2 menu, the Esc menu, the frame
+ * monitor, the notices: platform/overlay.h), which the overlay draws a second time onto this panel (not
+ * through overlay_acquire / overlay_draw).  The panel's render target for this frame - cleared by the caller
+ * when `fresh' (the first call of the frame) - for a picture of this aspect; false: none (no session, or
+ * not a frame to draw).  Shown for stereo and flat frames alike, in front of everything else. */
+bool desktop_panel_target(float aspect, ID3D11RenderTargetView **rtv, int *width, int *height, bool *fresh);
 bool overlay_wanted(int kind);
 bool overlay_acquire(int kind, float aspect, ID3D11RenderTargetView **rtv, int *width, int *height);
 /* The part uv[4] (u0, v0, u1, v1) of src over all of rtv (width x height); the

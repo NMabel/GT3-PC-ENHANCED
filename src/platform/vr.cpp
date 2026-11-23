@@ -63,10 +63,10 @@ const SettingInfo kInfo[kSettingCount] = {
     /* kWorldScale      */ {"WorldScale", 100, 50, 200, 5},
     /* kHudDistance     */ {"HudDistance", 100, 40, 300, 5},
     /* kHudWidth        */ {"HudWidth", 70, 20, 200, 5},
-    /* kHudHeight       */ {"HudHeight", -30, -100, 100, 5},
-    /* kMirrorDistance  */ {"MirrorDistance", 90, 40, 300, 5},
-    /* kMirrorWidth     */ {"MirrorWidth", 30, 10, 100, 5},
-    /* kMirrorHeight    */ {"MirrorHeight", 20, -50, 80, 5},
+    /* kHudHeight       */ {"HudHeight", -10, -100, 100, 5},
+    /* kMirrorDistance  */ {"MirrorDistance", 100, 40, 300, 5},
+    /* kMirrorWidth     */ {"MirrorWidth", 50, 10, 100, 5},
+    /* kMirrorHeight    */ {"MirrorHeight", 25, -50, 80, 5},
     /* kScreenDistance  */ {"ScreenDistance", 90, 40, 300, 5},
     /* kScreenWidth     */ {"ScreenWidth", 80, 20, 250, 5},
     /* kScreenHeight    */ {"ScreenHeight", 0, -100, 100, 5},
@@ -131,10 +131,12 @@ constexpr int kFlatW = 2560, kFlatH = 1440;
 /* The cockpit's panels (vr.h: kOverlayHud, kOverlayMirror, kOverlayScreen): a swapchain each, shown as a
  * quad layer.  Index = the overlay kind. */
 Chain g_ov[kOverlayCount];
-constexpr int kOvW[kOverlayCount] = {2048, 1280, 2048};    /* pixels: dashboard, mirror, menu */
-constexpr int kOvH[kOverlayCount] = {1536, 384, 1536};
-const char *const kOvName[kOverlayCount] = {"dashboard panel", "mirror panel", "menu panel"};
-float g_ovAspect[kOverlayCount] = {4.0f / 3.0f, 3.75f, 4.0f / 3.0f};  /* width / height of the picture on the panel */
+/* (the desktop panels' texture is the flat screen's size: the panels' pixel font is laid out for the window, and
+ * a 1440p window then maps 1:1 - at another size its thin strokes fall on fractions of a pixel and shimmer) */
+constexpr int kOvW[kOverlayCount] = {2048, 1280, 2048, kFlatW};  /* pixels: dashboard, mirror, menu, desktop panels */
+constexpr int kOvH[kOverlayCount] = {1536, 384, 1536, kFlatH};
+const char *const kOvName[kOverlayCount] = {"dashboard panel", "mirror panel", "menu panel", "desktop panels"};
+float g_ovAspect[kOverlayCount] = {4.0f / 3.0f, 3.75f, 4.0f / 3.0f, 16.0f / 9.0f};  /* width / height of the picture on the panel */
 
 /* ---- the head ------------------------------------------------------------
  * OpenXR gives poses as a quaternion (rotation) and a vector (position); the little maths below is all
@@ -873,8 +875,9 @@ void end_frame()
         XrCompositionLayerQuad flatLayer = {XR_TYPE_COMPOSITION_LAYER_QUAD};
         XrCompositionLayerQuad panelLayers[kOverlayCount] = {{XR_TYPE_COMPOSITION_LAYER_QUAD},
                                                              {XR_TYPE_COMPOSITION_LAYER_QUAD},
+                                                             {XR_TYPE_COMPOSITION_LAYER_QUAD},
                                                              {XR_TYPE_COMPOSITION_LAYER_QUAD}};
-        const XrCompositionLayerBaseHeader *layers[1 + kOverlayCount + 1] = {};   /* eyes, panels, flat screen */
+        const XrCompositionLayerBaseHeader *layers[1 + kOverlayCount + 1] = {};   /* eyes, flat screen, panels */
         uint32_t layerCount = 0;
         const bool eyesDrawn = g_eye[0].acquired && g_eye[1].acquired && g_viewsValid;
         for (int eye = 0; eye < 2; eye++)
@@ -892,34 +895,9 @@ void end_frame()
             eyesLayer.views = eyeViews;
             layers[layerCount++] = (const XrCompositionLayerBaseHeader *)&eyesLayer;
         }
-        /* The panels of the cockpit hang where the seat is.  Back to front: the mirror, the dashboard over
-         * it, the menu over both.  Each overlay kind's placement settings are in the tables below. */
-        static const int kBackToFront[kOverlayCount] = {kOverlayMirror, kOverlayHud, kOverlayScreen};
-        static const Setting kDistanceSetting[kOverlayCount] = {kHudDistance, kMirrorDistance, kScreenDistance};
-        static const Setting kWidthSetting[kOverlayCount] = {kHudWidth, kMirrorWidth, kScreenWidth};
-        static const Setting kHeightSetting[kOverlayCount] = {kHudHeight, kMirrorHeight, kScreenHeight};
-        for (int order = 0; order < kOverlayCount; order++) {
-            const int kind = kBackToFront[order];
-            if (!g_ov[kind].acquired)
-                continue;               /* the game drew nothing on this panel this frame */
-            release(g_ov[kind]);
-            const float distance = (float)setting(kDistanceSetting[kind]) / 100.0f;     /* (settings are in cm) */
-            const float width = (float)setting(kWidthSetting[kind]) / 100.0f;
-            const float height = (float)setting(kHeightSetting[kind]) / 100.0f;
-            XrCompositionLayerQuad &panel = panelLayers[order];
-            /* the dashboard and the menu have transparent parts (black is keyed out: the overlay shader) */
-            panel.layerFlags = kind != kOverlayMirror ? (XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT |
-                                                         XR_COMPOSITION_LAYER_UNPREMULTIPLIED_ALPHA_BIT)
-                                                      : 0;
-            panel.space = g_local;
-            panel.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
-            panel.subImage.swapchain = g_ov[kind].swapchain;
-            panel.subImage.imageRect = {{0, 0}, {g_ov[kind].w, g_ov[kind].h}};
-            panel.pose = seat_panel(distance, height);
-            panel.size = {width, width / g_ovAspect[kind]};
-            if (eyesDrawn)              /* (panels are part of the cockpit: without the eyes they are not shown) */
-                layers[layerCount++] = (const XrCompositionLayerBaseHeader *)&panel;
-        }
+        /* The flat screen (a frame without the eyes) goes first: layers are composited in order, later ones
+         * over earlier, so the desktop panels below must come after it. */
+        const bool flatFrame = g_flat.acquired;
         if (g_flat.acquired) {
             release(g_flat);
             flatLayer.layerFlags = 0;
@@ -930,6 +908,50 @@ void end_frame()
             flatLayer.pose = g_flatScreenPose;
             flatLayer.size = {g_menuWidth, g_menuWidth * (float)g_flat.h / (float)g_flat.w};
             layers[layerCount++] = (const XrCompositionLayerBaseHeader *)&flatLayer;
+        }
+        /* The panels of the cockpit hang where the seat is.  Back to front: the mirror, the dashboard over
+         * it, the menu over both, the desktop panels (F2 ...) over all.  Each overlay kind's placement
+         * settings are in the tables below (the desktop panels hang where the menu does). */
+        static const int kBackToFront[kOverlayCount] = {kOverlayMirror, kOverlayHud, kOverlayScreen, kOverlayDesktop};
+        static const Setting kDistanceSetting[kOverlayCount] = {kHudDistance, kMirrorDistance, kScreenDistance,
+                                                                kScreenDistance};
+        static const Setting kWidthSetting[kOverlayCount] = {kHudWidth, kMirrorWidth, kScreenWidth, kScreenWidth};
+        static const Setting kHeightSetting[kOverlayCount] = {kHudHeight, kMirrorHeight, kScreenHeight,
+                                                              kScreenHeight};
+        for (int order = 0; order < kOverlayCount; order++) {
+            const int kind = kBackToFront[order];
+            if (!g_ov[kind].acquired)
+                continue;               /* the game drew nothing on this panel this frame */
+            release(g_ov[kind]);
+            const float distance = (float)setting(kDistanceSetting[kind]) / 100.0f;     /* (settings are in cm) */
+            const float width = (float)setting(kWidthSetting[kind]) / 100.0f;
+            const float height = (float)setting(kHeightSetting[kind]) / 100.0f;
+            XrCompositionLayerQuad &panel = panelLayers[order];
+            /* The dashboard and the menu have transparent parts (black is keyed out: the overlay shader; the
+             * colours are not multiplied by the alpha).  The desktop panels are drawn by overlay.cpp's blend,
+             * whose result is premultiplied (colour x alpha, alpha).  The mirror is opaque. */
+            panel.layerFlags = kind == kOverlayMirror    ? 0
+                               : kind == kOverlayDesktop ? XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT
+                                                         : (XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT |
+                                                            XR_COMPOSITION_LAYER_UNPREMULTIPLIED_ALPHA_BIT);
+            panel.space = g_local;
+            panel.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
+            panel.subImage.swapchain = g_ov[kind].swapchain;
+            panel.subImage.imageRect = {{0, 0}, {g_ov[kind].w, g_ov[kind].h}};
+            panel.pose = seat_panel(distance, height);
+            panel.size = {width, width / g_ovAspect[kind]};
+            if (kind == kOverlayDesktop && flatFrame) {
+                /* Over the flat screen the desktop panels are the window's: they fill the screen's height, as
+                 * the window's own panels fill the window, in the same place (the layer order puts them in
+                 * front); a window not 16:9 keeps its shape. */
+                const float flatHeight = g_menuWidth * (float)g_flat.h / (float)g_flat.w;
+                panel.pose = g_flatScreenPose;
+                panel.size = {flatHeight * g_ovAspect[kind], flatHeight};
+            }
+            /* (the cockpit's panels are part of the cockpit: without the eyes they are not shown; the desktop
+             * panels are shown over the flat screen too) */
+            if (eyesDrawn || kind == kOverlayDesktop)
+                layers[layerCount++] = (const XrCompositionLayerBaseHeader *)&panel;
         }
         XrFrameEndInfo frameEnd = {XR_TYPE_FRAME_END_INFO};
         frameEnd.displayTime = g_displayTime;
@@ -1045,6 +1067,26 @@ bool overlay_acquire(int kind, float aspect, ID3D11RenderTargetView **rtv, int *
         g_ovAspect[kind] = aspect;
     *width = g_ov[kind].w;
     *height = g_ov[kind].h;
+    return true;
+}
+
+bool desktop_panel_target(float aspect, ID3D11RenderTargetView **rtv, int *width, int *height, bool *fresh)
+{
+    Chain &panel = g_ov[kOverlayDesktop];
+    *fresh = false;
+    if (!active() || !g_frameOpen || !g_shouldRender || panel.swapchain == XR_NULL_HANDLE)
+        return false;
+    if (!panel.acquired) {
+        if (!acquire(panel, rtv))
+            return false;
+        *fresh = true;                  /* the first panel of this frame: the caller clears it */
+    } else {
+        *rtv = panel.shadowRtv ? panel.shadowRtv : panel.images[panel.index].rtv;
+    }
+    if (aspect > 0.05f)
+        g_ovAspect[kOverlayDesktop] = aspect;
+    *width = panel.w;
+    *height = panel.h;
     return true;
 }
 

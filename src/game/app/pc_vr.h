@@ -52,6 +52,10 @@ void pc_vr_layer_set(int layer);
 int pc_vr_layer(void);
 void pc_vr_layer_taken(void);
 int pc_vr_layer_was_taken(void);
+/* The three things that decide whether the mirror panel gets a picture, logged each time they change (a mirror
+ * that is not seen: which of them says no): the switch (Insert / F2), a live race (not a replay), the camera
+ * having a rear-view mirror (the bumper camera with Graphics > Rear view: bumper cam on, the original's). */
+void pc_vr_log_mirror_state(int switchOn, int liveRace, int cameraHasMirror);
 /* drawMirror: the rectangle it drew (pixels of the view, which is vw x vh), for the mirror's panel. */
 void pc_vr_note_mirror(f32 x, f32 y, f32 w, f32 h, f32 vw, f32 vh);
 /* The dashboard drawn into `canvas' / the mirror drawn into it / the menu layer (each on a canvas of its own,

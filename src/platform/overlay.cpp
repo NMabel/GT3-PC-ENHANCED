@@ -4,6 +4,7 @@
 #include "platform/overlay_font.h"                /* PC (2026-11-16): the font's tables */
 #include "platform/gpu.h"
 #include "platform/log.h"
+#include "platform/vr.h"
 
 #include <windows.h>
 
@@ -37,6 +38,7 @@ Vertex *g_v;                                    /* the mapped buffer while build
 int g_n;
 int g_bw, g_bh;
 float g_toX, g_toY;                             /* pixels to clip space */
+bool g_headset;                                 /* PC VR: the panels on the game window are drawn on the headset too */
 
 const char kShader[] = R"(
 struct VsOut { float4 pos : SV_Position; float4 color : COLOR; };
@@ -346,6 +348,28 @@ void end(ID3D11RenderTargetView *bb)
     dc->GSSetShader(nullptr, nullptr, 0);
     dc->PSSetShader(g_ps, nullptr, 0);
     dc->Draw((UINT)g_n, 0);
+    /* PC VR: the same panel once more, onto the headset's desktop panel.  The vertices are in clip space, so
+     * they fit a target of another size; the panel is shown at the window's aspect, which keeps the shapes. */
+    if (g_headset && bb == gpu::backbuffer()) {
+        ID3D11RenderTargetView *headsetTarget = nullptr;
+        int w = 0, h = 0;
+        bool fresh = false;
+        if (vr::desktop_panel_target((float)g_bw / (float)g_bh, &headsetTarget, &w, &h, &fresh)) {
+            if (fresh) {
+                const float clear[4] = {0.0f, 0.0f, 0.0f, 0.0f};     /* transparent: only the panels show */
+                dc->ClearRenderTargetView(headsetTarget, clear);
+            }
+            const D3D11_VIEWPORT headsetViewport = {0.0f, 0.0f, (float)w, (float)h, 0.0f, 1.0f};
+            dc->OMSetRenderTargets(1, &headsetTarget, nullptr);
+            dc->RSSetViewports(1, &headsetViewport);
+            dc->Draw((UINT)g_n, 0);
+        }
+    }
+}
+
+void headset_mirror(bool on)
+{
+    g_headset = on;
 }
 
 } // namespace overlay

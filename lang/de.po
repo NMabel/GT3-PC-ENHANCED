@@ -5362,8 +5362,8 @@ msgid "THE PANEL'S WIDTH. ENTER: 70 CM."
 msgstr "BREITE DES PANELS. ENTER: 70 CM."
 
 #: src/platform/settings_menu.cpp
-msgid "THE PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: -30 CM."
-msgstr "HÖHE DES PANELS AB AUGENHÖHE, DARUNTER MINUS. ENTER: -30 CM."
+msgid "THE PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: -10 CM."
+msgstr "HÖHE DES PANELS AB AUGENHÖHE, DARUNTER MINUS. ENTER: -10 CM."
 
 #: src/platform/settings_menu.cpp
 msgid "REAR-VIEW MIRROR"
@@ -5378,16 +5378,12 @@ msgstr ""
 "STOSSSTANGENKAMERA (GRAFIK > RÜCKSPIEGEL)."
 
 #: src/platform/settings_menu.cpp
-msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
-msgstr "ABSTAND DES PANELS VOR DEM FAHRER. ENTER: 90 CM."
+msgid "THE PANEL'S WIDTH. ENTER: 50 CM."
+msgstr "BREITE DES PANELS. ENTER: 50 CM."
 
 #: src/platform/settings_menu.cpp
-msgid "THE PANEL'S WIDTH. ENTER: 30 CM."
-msgstr "BREITE DES PANELS. ENTER: 30 CM."
-
-#: src/platform/settings_menu.cpp
-msgid "THE PANEL'S HEIGHT FROM YOUR EYES. ENTER: 20 CM."
-msgstr "HÖHE DES PANELS AB AUGENHÖHE. ENTER: 20 CM."
+msgid "THE PANEL'S HEIGHT FROM YOUR EYES. ENTER: 25 CM."
+msgstr "HÖHE DES PANELS AB AUGENHÖHE. ENTER: 25 CM."
 
 #: src/platform/settings_menu.cpp
 msgid "MENU DISTANCE"
@@ -6750,6 +6746,9 @@ msgstr "AUF / AB  LINKS / RECHTS  %s%sESC SCHLIESSEN"
 #: src/platform/texture_menu.cpp
 msgid "TEXTURES"
 msgstr "TEXTUREN"
+
+#~ msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
+#~ msgstr "ABSTAND DES PANELS VOR DEM FAHRER. ENTER: 90 CM."
 
 #~ msgid "On (the game's: the lock shrinks with speed)"
 #~ msgstr "Ein (das des Spiels: Einschlag sinkt mit dem Tempo)"

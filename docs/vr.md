@@ -95,9 +95,9 @@ below is negative.
 | `RenderScale` | `1.0` | 0.5 to 2: eye texture size, times the runtime's recommended size |
 | `WorldScale` | `100` | Percent, 50 to 200: above 100 the cockpit looks larger |
 | `Hud` | `on` | Dashboard panel |
-| `HudDistance` / `HudWidth` / `HudHeight` | `100` / `70` / `-30` | Where the dashboard hangs |
+| `HudDistance` / `HudWidth` / `HudHeight` | `100` / `70` / `-10` | Where the dashboard hangs |
 | `Mirror` | `on` | Rear-view mirror panel |
-| `MirrorDistance` / `MirrorWidth` / `MirrorHeight` | `90` / `30` / `20` | Where the mirror hangs |
+| `MirrorDistance` / `MirrorWidth` / `MirrorHeight` | `100` / `50` / `25` | Where the mirror hangs |
 | `ScreenDistance` / `ScreenWidth` / `ScreenHeight` | `90` / `80` / `0` | The menu panel (pause menu, race result) |
 | `MenuDistance` / `MenuWidth` | `2.5` / `4.0` | Metres: the flat screen |
 | `MenuFov` | `0` | Degrees (5 to 120, 0 = off): size the flat screen by the angle it covers instead of `MenuWidth` (THX recommends about 40) |

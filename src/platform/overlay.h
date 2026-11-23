@@ -39,5 +39,9 @@ int text_cells(const char *str);
 float text(float x, float y, int s, const char *str, uint32_t color);
 /* Draws what was built on the back buffer. */
 void end(ID3D11RenderTargetView *backbuffer);
+/* PC VR (platform/vr.h kOverlayDesktop): while on, what end() draws on the game window's back buffer is drawn
+ * a second time onto the headset's desktop panel, so the F2 menu, the Esc menu and the rest are seen in the
+ * headset too.  The caller (pgl_targets.cpp present) sets it round the panels' present calls, once a frame. */
+void headset_mirror(bool on);
 
 } // namespace overlay

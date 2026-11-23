@@ -82,6 +82,18 @@ int pc_vr_layer_was_taken(void)
     return s_layerTaken;
 }
 
+void pc_vr_log_mirror_state(int switchOn, int liveRace, int cameraHasMirror)
+{
+    static int s_last = -1;
+    const int state = (switchOn != 0) | ((liveRace != 0) << 1) | ((cameraHasMirror != 0) << 2);
+    if (state == s_last)
+        return;
+    s_last = state;
+    printf("vr: mirror panel: switch %s, live race %s, camera has a mirror %s%s\n", switchOn ? "on" : "off",
+           liveRace ? "yes" : "no", cameraHasMirror ? "yes" : "no",
+           (switchOn && liveRace && cameraHasMirror) ? " -> drawn" : " -> not drawn");
+}
+
 void pc_vr_note_mirror(f32 x, f32 y, f32 w, f32 h, f32 vw, f32 vh)
 {
     s_mirror[0] = x;

@@ -51,6 +51,7 @@
 #include "platform/screenshot.h"               /* PC (2026-11-15): the screenshot's picture */
 #include "platform/settings.h"
 #include "platform/settings_menu.h"
+#include "platform/overlay.h"                   /* PC VR: headset_mirror */
 #include "platform/system_menu.h"
 
 namespace pglr {
@@ -1769,6 +1770,7 @@ static void present_now(bool fresh = true)
         flicker_capture(drawn ? picture : nullptr, uv, drawn ? t->gsW : 640, drawn ? t->gsH : 448,
                         drawn ? t->base : ~0u);
     }
+    overlay::headset_mirror(vr::active());      /* PC VR: the panels below are drawn on the headset's desktop panel too */
     challenge_osd::present(bb);                 /* PC (2026-11-14): the challenge modes' panel, under the menus */
     settings_menu::present(bb);                 /* F2: the settings menu (its own state) */
     system_menu::present(bb);                   /* Esc: Back, Restart, Exit (its own state) */
@@ -1778,6 +1780,7 @@ static void present_now(bool fresh = true)
     song_osd::present(bb);                      /* PC: the race's song changer (its own state) */
     cockpit_osd::present(bb);                   /* PC (2026-11-08): the cockpit camera's calibration */
     texture_menu::present(bb);                  /* PC (2026-11-13): the texture interface (F10) */
+    overlay::headset_mirror(false);
     /* (the D3D thread has run the picture's draw by now - the overlays'
      * context or this dc() waited for it: Present needs it anyway; the
      * overlays left their own state, forgotten without a queued call) */
