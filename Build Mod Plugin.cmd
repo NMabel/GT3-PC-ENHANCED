@@ -2,7 +2,10 @@
 rem Builds GT3 PC as build.cmd does, then packages the build as an engine plugin:
 rem ONE folder holding what swaps the game's engine - this tree's launcher and
 rem game (gt3launcher.exe, gt3pc.exe, and SDL3.dll, which both load) and
-rem engine.txt, the name the launcher's engine selector lists it by.
+rem engine.txt, the name the launcher's engine selector lists it by.  A tree
+rem with PC VR (docs\vr.md) also has openxr_loader.dll, which the game loads
+rem when [VR] Enabled is on: it is packaged too, else the engine would run as
+rem a flat screen game, the reason only a line in gt3pc.log.
 rem
 rem     "Build Mod Plugin.cmd" [name]
 rem
@@ -38,6 +41,11 @@ for %%F in (gt3launcher.exe gt3pc.exe SDL3.dll) do (
     copy /Y "%ROOT%build\bin\%%F" "%OUT%\" >nul
     if errorlevel 1 echo "%OUT%\%%F" could not be written: is that engine running? & set "RESULT=1" & goto end
 )
+rem (the OpenXR loader: only a tree with PC VR builds one)
+if not exist "%ROOT%build\bin\openxr_loader.dll" goto noxr
+copy /Y "%ROOT%build\bin\openxr_loader.dll" "%OUT%\" >nul
+if errorlevel 1 echo "%OUT%\openxr_loader.dll" could not be written: is that engine running? & set "RESULT=1" & goto end
+:noxr
 rem (a name given, or none yet: an engine.txt edited by hand is kept otherwise)
 if defined NAMED goto name
 if exist "%OUT%\engine.txt" goto done

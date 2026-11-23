@@ -25,6 +25,35 @@ tested with a Valve Index on SteamVR. Any headset whose OpenXR runtime accepts a
 Without a headset, a runtime, or the loader DLL the game starts as usual and the
 reason is written to `gt3pc.log` (lines starting `vr:`).
 
+### Adding it to an existing install (engine plugin)
+
+The launcher can run another build of the game as an *engine* (its first screen,
+the engine selector: **Add engine...**). That is the way to offer this fork's VR
+to people who already have the game installed, without replacing anything of
+theirs:
+
+1. Run **`Build Mod Plugin.cmd "GT3 PC VR"`**. It builds, then fills
+   `build\plugins\GT3 PC VR\` with `gt3launcher.exe`, `gt3pc.exe`, `SDL3.dll`,
+   `openxr_loader.dll` and `engine.txt` (the name the selector lists it by). Zip
+   that folder to share it (about 7 MB).
+2. The user unzips it anywhere, opens their own launcher, chooses
+   **Add engine...** (a warning asks them to trust the source), picks the folder
+   and starts it from the selector.
+3. The settings are *shared*: the engine reads and writes the user's own
+   `gt3pc.ini`, so `[VR] Enabled=on` goes in the file they already have. Their
+   installed game is not touched.
+
+What stays the engine's own (`src/launcher/engines.h`): its **save folders**
+(`saves\<engine name>\`, beside the shared `gt3pc.ini`: copy a memory card
+folder over from `saves\Gran Turismo 3 A-Spec\` to carry on a save) and its
+**installed game files** (`data_US` ...: the engine's launcher installs them from
+a disc image, **Install game files...**, or plays straight from the image,
+**Add disc...**).
+
+`openxr_loader.dll` must be in the folder: without it the engine runs as a flat
+screen game and only `gt3pc.log` says why. The script copies it when the build
+has one.
+
 ### What you see
 
 | Situation | In the headset |
