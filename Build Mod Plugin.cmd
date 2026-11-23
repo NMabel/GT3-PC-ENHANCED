@@ -45,6 +45,8 @@ rem (the OpenXR loader: only a tree with PC VR builds one)
 if not exist "%ROOT%build\bin\openxr_loader.dll" goto noxr
 copy /Y "%ROOT%build\bin\openxr_loader.dll" "%OUT%\" >nul
 if errorlevel 1 echo "%OUT%\openxr_loader.dll" could not be written: is that engine running? & set "RESULT=1" & goto end
+rem (the loader is Apache-2.0 or MIT: a copy of it handed on needs the licence text beside it)
+for /d %%D in ("%ROOT%third_party\OpenXR-SDK-release-*") do if exist "%%D\LICENSE" copy /Y "%%D\LICENSE" "%OUT%\openxr_loader-LICENSE.txt" >nul
 :noxr
 rem (a name given, or none yet: an engine.txt edited by hand is kept otherwise)
 if defined NAMED goto name

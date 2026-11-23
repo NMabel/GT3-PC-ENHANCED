@@ -34,8 +34,9 @@ theirs:
 
 1. Run **`Build Mod Plugin.cmd "GT3 PC VR"`**. It builds, then fills
    `build\plugins\GT3 PC VR\` with `gt3launcher.exe`, `gt3pc.exe`, `SDL3.dll`,
-   `openxr_loader.dll` and `engine.txt` (the name the selector lists it by). Zip
-   that folder to share it (about 7 MB).
+   `openxr_loader.dll` (and `openxr_loader-LICENSE.txt`, its Apache-2.0 / MIT
+   licence text, which has to go with it) and `engine.txt` (the name the
+   selector lists it by). Zip that folder to share it (about 7 MB).
 2. The user unzips it anywhere, opens their own launcher, chooses
    **Add engine...** (a warning asks them to trust the source), picks the folder
    and starts it from the selector.
