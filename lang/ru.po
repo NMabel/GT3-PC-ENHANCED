@@ -4425,7 +4425,7 @@ msgstr "ENTER"
 
 #: src/platform/settings_menu.cpp
 msgid "NO HEADSET"
-msgstr ""
+msgstr "НЕТ ШЛЕМА"
 
 #: src/platform/settings_menu.cpp
 msgid "AUTO"
@@ -5302,109 +5302,119 @@ msgstr ""
 
 #: src/platform/settings_menu.cpp
 msgid "VR"
-msgstr ""
+msgstr "VR"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE HEADSET: THE DASHBOARD AND THE REAR-VIEW MIRROR AS PANELS OF THE\n"
-"COCKPIT, THE WORLD'S SCALE. ENABLED IN GT3PC.INI [VR]."
+"COCKPIT, THE WORLD'S SCALE. TURNED ON IN THE LAUNCHER (GAME > CAMERAS)."
 msgstr ""
+"ШЛЕМ: ПРИБОРЫ И ЗЕРКАЛО В ВИДЕ ЭКРАНОВ В КОКПИТЕ, МАСШТАБ МИРА.\n"
+"ВКЛЮЧАЕТСЯ В ЛАУНЧЕРЕ (ИГРА > КАМЕРЫ)."
 
 #: src/platform/settings_menu.cpp
 msgid "CENTER THE VIEW"
-msgstr ""
+msgstr "ЦЕНТРИРОВАТЬ ВИД"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE SEAT AND THE FLAT SCREEN WHERE YOU ARE, FACING FORWARD.\n"
 "ENTER."
 msgstr ""
+"СИДЕНЬЕ И ПЛОСКИЙ ЭКРАН ТАМ, ГДЕ ВЫ СЕЙЧАС, ЛИЦОМ ВПЕРЁД.\n"
+"ENTER."
 
 #: src/platform/settings_menu.cpp
 msgid "WORLD SCALE"
-msgstr ""
+msgstr "МАСШТАБ МИРА"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE WORLD'S SIZE TO YOUR EYES: ABOVE 100% THE COCKPIT LOOKS\n"
 "LARGER. ENTER: 100%."
 msgstr ""
+"РАЗМЕР МИРА ДЛЯ ВАШИХ ГЛАЗ: ВЫШЕ 100% КОКПИТ КАЖЕТСЯ БОЛЬШЕ.\n"
+"ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
-msgstr ""
+msgstr "ПРИБОРЫ"
 
 #: src/platform/settings_menu.cpp
 msgid "THE SPEED, REVS AND LAP INFORMATION AS A PANEL OF THE COCKPIT."
-msgstr ""
+msgstr "СКОРОСТЬ, ОБОРОТЫ И ДАННЫЕ КРУГА В ВИДЕ ЭКРАНА В КОКПИТЕ."
 
 #: src/platform/settings_menu.cpp
 msgid "DISTANCE"
-msgstr ""
+msgstr "РАССТОЯНИЕ"
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 100 CM."
-msgstr ""
+msgstr "РАССТОЯНИЕ ДО ЭКРАНА ПЕРЕД ВАМИ. ENTER: 100 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "SIZE"
-msgstr ""
+msgstr "РАЗМЕР"
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S WIDTH. ENTER: 70 CM."
-msgstr ""
+msgstr "ШИРИНА ЭКРАНА. ENTER: 70 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: -30 CM."
-msgstr ""
+msgstr "ВЫСОТА ЭКРАНА ОТ ГЛАЗ, НИЖЕ ГЛАЗ: МИНУС. ENTER: -30 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "REAR-VIEW MIRROR"
-msgstr ""
+msgstr "ЗЕРКАЛО ЗАДНЕГО ВИДА"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE MIRROR AS A PANEL OF THE COCKPIT, FROM THE BUMPER CAMERA'S\n"
 "REAR VIEW (GRAPHICS > REAR VIEW)."
 msgstr ""
+"ЗЕРКАЛО В ВИДЕ ЭКРАНА В КОКПИТЕ, ПО ЗАДНЕМУ ВИДУ КАМЕРЫ С БАМПЕРА\n"
+"(ГРАФИКА > ЗАДНИЙ ВИД)."
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
-msgstr ""
+msgstr "РАССТОЯНИЕ ДО ЭКРАНА ПЕРЕД ВАМИ. ENTER: 90 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S WIDTH. ENTER: 30 CM."
-msgstr ""
+msgstr "ШИРИНА ЭКРАНА. ENTER: 30 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S HEIGHT FROM YOUR EYES. ENTER: 20 CM."
-msgstr ""
+msgstr "ВЫСОТА ЭКРАНА ОТ ГЛАЗ. ENTER: 20 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "MENU DISTANCE"
-msgstr ""
+msgstr "РАССТОЯНИЕ ДО МЕНЮ"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE PAUSE MENU AND THE RACE'S RESULT SHOW AS A PANEL IN FRONT OF YOU,\n"
 "THE RACE STAYS IN THE HEADSET. ITS DISTANCE. ENTER: 90 CM."
 msgstr ""
+"МЕНЮ ПАУЗЫ И РЕЗУЛЬТАТ ГОНКИ ПОКАЗЫВАЮТСЯ ЭКРАНОМ ПЕРЕД ВАМИ, ГОНКА\n"
+"ОСТАЁТСЯ В ШЛЕМЕ. РАССТОЯНИЕ ДО НЕГО. ENTER: 90 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "MENU SIZE"
-msgstr ""
+msgstr "РАЗМЕР МЕНЮ"
 
 #: src/platform/settings_menu.cpp
 msgid "THE MENU PANEL'S WIDTH. ENTER: 80 CM."
-msgstr ""
+msgstr "ШИРИНА ЭКРАНА МЕНЮ. ENTER: 80 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "MENU HEIGHT"
-msgstr ""
+msgstr "ВЫСОТА МЕНЮ"
 
 #: src/platform/settings_menu.cpp
 msgid "THE MENU PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: 0 CM."
-msgstr ""
+msgstr "ВЫСОТА ЭКРАНА МЕНЮ ОТ ГЛАЗ, НИЖЕ ГЛАЗ: МИНУС. ENTER: 0 СМ."
 
 #: src/platform/settings_menu.cpp
 msgid "SPLIT SCREEN"

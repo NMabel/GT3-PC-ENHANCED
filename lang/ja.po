@@ -4425,7 +4425,7 @@ msgstr "ENTER"
 
 #: src/platform/settings_menu.cpp
 msgid "NO HEADSET"
-msgstr ""
+msgstr "ヘッドセットなし"
 
 #: src/platform/settings_menu.cpp
 msgid "AUTO"
@@ -5302,109 +5302,119 @@ msgstr ""
 
 #: src/platform/settings_menu.cpp
 msgid "VR"
-msgstr ""
+msgstr "VR"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE HEADSET: THE DASHBOARD AND THE REAR-VIEW MIRROR AS PANELS OF THE\n"
-"COCKPIT, THE WORLD'S SCALE. ENABLED IN GT3PC.INI [VR]."
+"COCKPIT, THE WORLD'S SCALE. TURNED ON IN THE LAUNCHER (GAME > CAMERAS)."
 msgstr ""
+"ヘッドセット：ダッシュボードとバックミラーをコックピット内のパネルで表示、\n"
+"ワールドの縮尺。ランチャー（ゲーム > カメラ）でオンにします。"
 
 #: src/platform/settings_menu.cpp
 msgid "CENTER THE VIEW"
-msgstr ""
+msgstr "視点を中央に"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE SEAT AND THE FLAT SCREEN WHERE YOU ARE, FACING FORWARD.\n"
 "ENTER."
 msgstr ""
+"座席とフラットスクリーンを今の位置で正面向きにします。\n"
+"ENTER：実行。"
 
 #: src/platform/settings_menu.cpp
 msgid "WORLD SCALE"
-msgstr ""
+msgstr "ワールドの縮尺"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE WORLD'S SIZE TO YOUR EYES: ABOVE 100% THE COCKPIT LOOKS\n"
 "LARGER. ENTER: 100%."
 msgstr ""
+"目から見たワールドの大きさ：100% を超えるとコックピットが大きく見えます。\n"
+"ENTER：100%。"
 
 #: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
-msgstr ""
+msgstr "ダッシュボード"
 
 #: src/platform/settings_menu.cpp
 msgid "THE SPEED, REVS AND LAP INFORMATION AS A PANEL OF THE COCKPIT."
-msgstr ""
+msgstr "速度、回転数、ラップ情報をコックピット内のパネルとして表示します。"
 
 #: src/platform/settings_menu.cpp
 msgid "DISTANCE"
-msgstr ""
+msgstr "距離"
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 100 CM."
-msgstr ""
+msgstr "パネルまでの正面の距離。ENTER：100 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "SIZE"
-msgstr ""
+msgstr "サイズ"
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S WIDTH. ENTER: 70 CM."
-msgstr ""
+msgstr "パネルの幅。ENTER：70 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: -30 CM."
-msgstr ""
+msgstr "目の高さからのパネルの高さ。下はマイナス。ENTER：-30 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "REAR-VIEW MIRROR"
-msgstr ""
+msgstr "バックミラー"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE MIRROR AS A PANEL OF THE COCKPIT, FROM THE BUMPER CAMERA'S\n"
 "REAR VIEW (GRAPHICS > REAR VIEW)."
 msgstr ""
+"コックピット内のパネルとしてミラーを表示。バンパーカメラの後方映像を使用\n"
+"（グラフィック > リアビュー）。"
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
-msgstr ""
+msgstr "パネルまでの正面の距離。ENTER：90 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S WIDTH. ENTER: 30 CM."
-msgstr ""
+msgstr "パネルの幅。ENTER：30 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "THE PANEL'S HEIGHT FROM YOUR EYES. ENTER: 20 CM."
-msgstr ""
+msgstr "目の高さからのパネルの高さ。ENTER：20 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "MENU DISTANCE"
-msgstr ""
+msgstr "メニューの距離"
 
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE PAUSE MENU AND THE RACE'S RESULT SHOW AS A PANEL IN FRONT OF YOU,\n"
 "THE RACE STAYS IN THE HEADSET. ITS DISTANCE. ENTER: 90 CM."
 msgstr ""
+"ポーズメニューとレース結果は目の前のパネルに表示され、レースは\n"
+"ヘッドセット内に残ります。その距離。ENTER：90 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "MENU SIZE"
-msgstr ""
+msgstr "メニューのサイズ"
 
 #: src/platform/settings_menu.cpp
 msgid "THE MENU PANEL'S WIDTH. ENTER: 80 CM."
-msgstr ""
+msgstr "メニューパネルの幅。ENTER：80 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "MENU HEIGHT"
-msgstr ""
+msgstr "メニューの高さ"
 
 #: src/platform/settings_menu.cpp
 msgid "THE MENU PANEL'S HEIGHT FROM YOUR EYES, BELOW IS MINUS. ENTER: 0 CM."
-msgstr ""
+msgstr "目の高さからのメニューパネルの高さ。下はマイナス。ENTER：0 cm。"
 
 #: src/platform/settings_menu.cpp
 msgid "SPLIT SCREEN"

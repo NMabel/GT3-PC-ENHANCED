@@ -1471,8 +1471,9 @@ const Item kItems[] = {
      0, nullptr, nullptr, nullptr, custom_text, custom_step<cockpit_osd::kRequestEdit>, no_edges},
     {2, N_("DELETE CAMERA"), N_("IN A RACE: DELETES THE CUSTOM CAMERA IN VIEW.\nENTER TWICE."),
      0, nullptr, nullptr, nullptr, custom_delete_text, custom_delete_step, no_edges},
-    /* PC VR (platform/vr.h): the headset's own settings (gt3pc.ini [VR]; Enabled there, at the start) */
-    {0, N_("VR"), N_("THE HEADSET: THE DASHBOARD AND THE REAR-VIEW MIRROR AS PANELS OF THE\nCOCKPIT, THE WORLD'S SCALE. ENABLED IN GT3PC.INI [VR]."), kCategory},
+    /* PC VR (platform/vr.h): the headset's own settings (gt3pc.ini [VR]; Enabled is set in the launcher, Game > Cameras,
+     * and read at the start) */
+    {0, N_("VR"), N_("THE HEADSET: THE DASHBOARD AND THE REAR-VIEW MIRROR AS PANELS OF THE\nCOCKPIT, THE WORLD'S SCALE. TURNED ON IN THE LAUNCHER (GAME > CAMERAS)."), kCategory},
     {1, N_("CENTER THE VIEW"), N_("THE SEAT AND THE FLAT SCREEN WHERE YOU ARE, FACING FORWARD.\nENTER."), 0, nullptr, nullptr,
      nullptr, vr_center_text, vr_center_step, no_edges, input_map::kHotVrRecenter},
     {1, N_("WORLD SCALE"), N_("THE WORLD'S SIZE TO YOUR EYES: ABOVE 100% THE COCKPIT LOOKS\nLARGER. ENTER: 100%."), 0, nullptr,

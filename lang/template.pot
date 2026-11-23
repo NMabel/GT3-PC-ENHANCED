@@ -5076,7 +5076,7 @@ msgstr ""
 #: src/platform/settings_menu.cpp
 msgid ""
 "THE HEADSET: THE DASHBOARD AND THE REAR-VIEW MIRROR AS PANELS OF THE\n"
-"COCKPIT, THE WORLD'S SCALE. ENABLED IN GT3PC.INI [VR]."
+"COCKPIT, THE WORLD'S SCALE. TURNED ON IN THE LAUNCHER (GAME > CAMERAS)."
 msgstr ""
 
 #: src/platform/settings_menu.cpp
