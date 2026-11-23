@@ -2789,7 +2789,7 @@ msgstr "Logo replay"
 
 #: src/launcher/ui.cpp
 msgid "VR headset (OpenXR)"
-msgstr ""
+msgstr "Visore VR (OpenXR)"
 
 #: src/launcher/ui.cpp
 msgid "Field of view"
@@ -3105,7 +3105,7 @@ msgstr "Il launcher mostrerà la nuova lingua dal prossimo avvio."
 
 #: src/launcher/ui.cpp
 msgid "VR shows the cockpit camera's view, so the cockpit camera is now On too (Game > Cameras > Cockpit camera)."
-msgstr ""
+msgstr "La VR mostra la visuale abitacolo, quindi anche questa è stata attivata (Gioco > Telecamere > Visuale abitacolo)."
 
 #: src/launcher/ui.cpp
 msgid "The game (%s) was not found in %s."
@@ -4249,23 +4249,23 @@ msgstr "Screenshot"
 
 #: src/platform/input_map.cpp
 msgid "VR: centre the view"
-msgstr ""
+msgstr "VR: centra la vista"
 
 #: src/platform/input_map.cpp
 msgid "VR: dashboard on / off"
-msgstr ""
+msgstr "VR: cruscotto sì / no"
 
 #: src/platform/input_map.cpp
 msgid "VR: rear-view mirror on / off"
-msgstr ""
+msgstr "VR: retrovisore sì / no"
 
 #: src/platform/input_map.cpp
 msgid "VR: world smaller"
-msgstr ""
+msgstr "VR: mondo più piccolo"
 
 #: src/platform/input_map.cpp
 msgid "VR: world larger"
-msgstr ""
+msgstr "VR: mondo più grande"
 
 #: src/platform/input_map.cpp
 msgid "Button %d"

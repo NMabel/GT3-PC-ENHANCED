@@ -2789,7 +2789,7 @@ msgstr "リプレイロゴ"
 
 #: src/launcher/ui.cpp
 msgid "VR headset (OpenXR)"
-msgstr ""
+msgstr "VRヘッドセット（OpenXR）"
 
 #: src/launcher/ui.cpp
 msgid "Field of view"
@@ -3105,7 +3105,7 @@ msgstr "ランチャーは次回の起動から新しい言語で表示されま
 
 #: src/launcher/ui.cpp
 msgid "VR shows the cockpit camera's view, so the cockpit camera is now On too (Game > Cameras > Cockpit camera)."
-msgstr ""
+msgstr "VRはコックピットカメラの映像を表示するため、コックピットカメラもオンにしました（ゲーム > カメラ > コックピットカメラ）。"
 
 #: src/launcher/ui.cpp
 msgid "The game (%s) was not found in %s."
@@ -4249,23 +4249,23 @@ msgstr "スクリーンショット"
 
 #: src/platform/input_map.cpp
 msgid "VR: centre the view"
-msgstr ""
+msgstr "VR：視点を中央に合わせる"
 
 #: src/platform/input_map.cpp
 msgid "VR: dashboard on / off"
-msgstr ""
+msgstr "VR：ダッシュボードのオン / オフ"
 
 #: src/platform/input_map.cpp
 msgid "VR: rear-view mirror on / off"
-msgstr ""
+msgstr "VR：バックミラーのオン / オフ"
 
 #: src/platform/input_map.cpp
 msgid "VR: world smaller"
-msgstr ""
+msgstr "VR：ワールドを小さく"
 
 #: src/platform/input_map.cpp
 msgid "VR: world larger"
-msgstr ""
+msgstr "VR：ワールドを大きく"
 
 #: src/platform/input_map.cpp
 msgid "Button %d"
