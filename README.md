@@ -43,7 +43,7 @@ flowchart TD
     F --> G(["The cockpit in stereo, head-tracked"])
 ```
 
-1. Download the VR zip from [Releases](https://github.com/NMabel/GT3-PC-ENHANCED/releases) and unzip
+1. Download the VR zip from [Releases](https://github.com/NMabel/GT3-PC-ENHANCED-VR-Addon/releases) and unzip
    it into a folder of its own (not over your game folder).
 2. Open the launcher you already use. Its first screen is the engine selector: press **Add engine...**
    and pick that folder. The launcher warns you to trust the source: the zip holds programs, so
