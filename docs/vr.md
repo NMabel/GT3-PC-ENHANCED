@@ -29,7 +29,11 @@ tested with a Valve Index on SteamVR. Any headset whose OpenXR runtime accepts a
    must be on). That is the view drawn in stereo.
 
 Without a headset, a runtime, or the loader DLL the game starts as usual and the
-reason is written to `gt3pc.log` (lines starting `vr:`).
+reason is written to `gt3pc.log` (lines starting `vr:`). The same goes for a runtime that
+does not answer: the start-up calls that can block (`xrGetD3D11GraphicsRequirementsKHR`,
+`xrCreateSession`, the first `xrWaitFrame`) run on a helper thread with a 20 second limit
+(`bounded` in `vr.cpp`), after which the game goes on flat ("the headset's runtime did not
+answer ... in 20 s"). Once one `xrWaitFrame` has returned, the later ones are the plain call.
 
 ### Adding it to an existing install (engine plugin)
 

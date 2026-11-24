@@ -24,9 +24,12 @@
 #include <openxr/openxr_platform.h>
 
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
+#include <thread>
 #include <vector>
 
 namespace vr {
@@ -405,6 +408,67 @@ void release(Chain &chain)
     chain.acquired = false;
 }
 
+/* ---- the start-up calls have a time limit ----
+ * A runtime that is not ready (SteamVR's compositor stuck, say) can leave a call blocked for good, and
+ * the game would sit frozen at its start with the window open.  So the calls that can do that while the
+ * session starts (the graphics requirements, xrCreateSession, the first xrWaitFrame) run on a helper
+ * thread and the game waits for each at most kStartLimitMs; after that the game goes on without VR
+ * (flat, as when there is no headset).  Once one xrWaitFrame has come back the runtime is shown to be
+ * alive, and the later waits are the plain call, which is the game's pacing.
+ * A helper may still be blocked after the limit: it only writes into its own job (the call's
+ * arguments are copied into it), and shutdown leaves the runtime alone while it is (g_stuck). */
+constexpr ULONGLONG kStartLimitMs = 20000;
+bool g_waitProven;                      /* an xrWaitFrame has returned: the runtime answers */
+bool g_stuck;                           /* a start-up call did not return in time: its thread may still be inside OpenXR */
+
+template <class T> struct Job {
+    T out = {};
+    XrResult result = XR_ERROR_RUNTIME_FAILURE;
+    std::atomic<bool> done{false};
+};
+
+/* fn(T &out) -> XrResult, run on a helper thread: its result, with `out' filled when it succeeded; on
+ * the time limit the call is given up (logged, g_stuck) and the result is XR_ERROR_RUNTIME_FAILURE.
+ * fn is copied into the thread: it must hold what it needs by value (no pointers to the caller's stack). */
+template <class T, class Fn> XrResult bounded(const char *what, T init, Fn fn, T *out)
+{
+    auto job = std::make_shared<Job<T>>();
+    job->out = init;
+    std::thread([job, fn] {
+        job->result = fn(job->out);
+        job->done.store(true);
+    }).detach();
+    const ULONGLONG start = GetTickCount64();
+    while (!job->done.load()) {
+        if (GetTickCount64() - start > kStartLimitMs) {
+            pclog::write("vr: the headset's runtime did not answer %s in %d s: the game goes on without VR "
+                         "(restart SteamVR and the game to try again)",
+                         what, (int)(kStartLimitMs / 1000));
+            g_stuck = true;
+            g_running = false;
+            g_frameOpen = false;
+            return XR_ERROR_RUNTIME_FAILURE;    /* (check_xr then ends the session: g_dead) */
+        }
+        Sleep(2);
+    }
+    if (XR_SUCCEEDED(job->result))
+        *out = job->out;
+    return job->result;
+}
+
+XrResult wait_frame(XrFrameState *state)
+{
+    if (g_waitProven)
+        return xrWaitFrame(g_session, nullptr, state);
+    const XrSession session = g_session;
+    XrFrameState init = {XR_TYPE_FRAME_STATE};
+    const XrResult r = bounded<XrFrameState>(
+        "xrWaitFrame", init, [session](XrFrameState &s) { return xrWaitFrame(session, nullptr, &s); }, state);
+    if (XR_SUCCEEDED(r))
+        g_waitProven = true;
+    return r;
+}
+
 /* Opens the next frame: xrWaitFrame (which blocks until the headset wants it: this is what paces the
  * game to the headset's rate) and xrBeginFrame, then, when the frame is to be drawn, recentres if asked
  * and locates the two eyes where they will be when the frame is shown. */
@@ -412,7 +476,7 @@ void next_frame()
 {
     g_viewsValid = false;
     XrFrameState frameState = {XR_TYPE_FRAME_STATE};
-    if (!check_xr(xrWaitFrame(g_session, nullptr, &frameState), "xrWaitFrame"))
+    if (!check_xr(wait_frame(&frameState), "xrWaitFrame"))
         return;
     if (!check_xr(xrBeginFrame(g_session, nullptr), "xrBeginFrame"))
         return;
@@ -706,8 +770,18 @@ bool prepare(LUID *adapter)
         return false;
     }
     XrGraphicsRequirementsD3D11KHR requirements = {XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR};
-    if (!check_xr(getRequirements(g_instance, g_system, &requirements), "xrGetD3D11GraphicsRequirementsKHR"))
-        return false;
+    {
+        const XrInstance instance = g_instance;
+        const XrSystemId system = g_system;
+        if (!check_xr(bounded<XrGraphicsRequirementsD3D11KHR>(
+                          "xrGetD3D11GraphicsRequirementsKHR", requirements,
+                          [getRequirements, instance, system](XrGraphicsRequirementsD3D11KHR &r) {
+                              return getRequirements(instance, system, &r);
+                          },
+                          &requirements),
+                      "xrGetD3D11GraphicsRequirementsKHR"))
+            return false;
+    }
     *adapter = requirements.adapterLuid;
     ensure_loaded();
     g_menuDistance = ini_float("MenuDistance", 2.5f, 0.8f, 10.0f);
@@ -731,16 +805,27 @@ bool start(ID3D11Device *device)
         return false;
     g_device = device;
     g_device->GetImmediateContext(&g_context);
-    XrGraphicsBindingD3D11KHR graphicsBinding = {XR_TYPE_GRAPHICS_BINDING_D3D11_KHR};
-    graphicsBinding.device = device;
-    XrSessionCreateInfo sessionInfo = {XR_TYPE_SESSION_CREATE_INFO};
-    sessionInfo.next = &graphicsBinding;
-    sessionInfo.systemId = g_system;
-    if (!check_xr(xrCreateSession(g_instance, &sessionInfo, &g_session), "xrCreateSession")) {
+    const XrInstance instance = g_instance;
+    const XrSystemId system = g_system;
+    XrSession created = XR_NULL_HANDLE;
+    /* (the create info is built on the helper thread's own stack: the thread can outlive this call) */
+    if (!check_xr(bounded<XrSession>(
+                      "xrCreateSession", XR_NULL_HANDLE,
+                      [instance, system, device](XrSession &s) {
+                          XrGraphicsBindingD3D11KHR graphicsBinding = {XR_TYPE_GRAPHICS_BINDING_D3D11_KHR};
+                          graphicsBinding.device = device;
+                          XrSessionCreateInfo sessionInfo = {XR_TYPE_SESSION_CREATE_INFO};
+                          sessionInfo.next = &graphicsBinding;
+                          sessionInfo.systemId = system;
+                          return xrCreateSession(instance, &sessionInfo, &s);
+                      },
+                      &created),
+                  "xrCreateSession")) {
         g_session = XR_NULL_HANDLE;
         g_dead = true;
         return false;
     }
+    g_session = created;
     /* two reference spaces: LOCAL (still: where the player sat down) and VIEW (the head) */
     XrReferenceSpaceCreateInfo spaceInfo = {XR_TYPE_REFERENCE_SPACE_CREATE_INFO};
     spaceInfo.poseInReferenceSpace = pose_identity();
@@ -789,6 +874,16 @@ bool active()
 
 void shutdown()
 {
+    if (g_stuck) {
+        /* a helper thread is still inside xrWaitFrame of this session: calling into OpenXR now would race
+         * with it (or block behind it).  The process is ending; the runtime cleans up when it goes. */
+        if (g_context) {
+            g_context->Release();
+            g_context = nullptr;
+        }
+        g_dead = true;
+        return;
+    }
     if (g_session != XR_NULL_HANDLE) {
         if (g_running) {
             xrRequestExitSession(g_session);
