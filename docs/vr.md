@@ -69,6 +69,7 @@ has one.
 | Pause menu | The world stands still but stays in stereo; the pause menu is the menu panel. |
 | Race finished | The cockpit stays in stereo while the car rolls on; "FINISH" shows on the dashboard, the result board on the menu panel. |
 | Any other camera, replays, menus, loading | The flat screen: a large virtual screen where you sat down. |
+| F2 menu, Esc menu, F3 performance monitor, notices | "Desktop panels": the game's own panels, drawn on a panel in front of everything else, in stereo and flat frames alike. |
 
 ### Controls
 
@@ -139,6 +140,7 @@ and `vr::flat_acquire` gives it a swapchain image too, shown as the flat screen.
 | `src/engine/pgl/native/pgl_exec.cpp` | `exec_vr_eye`, `exec_vr_overlay`: draw a recorded picture onto a swapchain image. |
 | `src/platform/gpu.cpp` | Makes the device on the runtime's adapter, ends each frame through `vr::end_frame`, paces by the headset. |
 | `src/platform/settings_menu.cpp` | The F2 VR category. |
+| `src/platform/overlay.cpp` | The game's desktop panels (F2, Esc, F3, notices); `headset_mirror` draws them a second time onto the headset's desktop panel. |
 | `cmake/openxr.cmake` | Fetches and builds the OpenXR loader. |
 | `tools/vrspike/` | A standalone 32-bit OpenXR + D3D11 test (red and blue eyes), the first proof the approach worked. |
 
@@ -167,7 +169,6 @@ These cost time to find; they are also commented where they matter.
 
 ## Not done yet
 
-- Translations of the new menu strings (they show in English).
 - Replays and the other cameras in stereo.
 - Screen-space effects (lens flares, FXAA, the replay depth of field) are drawn
   per eye as for a flat screen; some may not look right in stereo.

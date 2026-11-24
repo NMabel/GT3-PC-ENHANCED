@@ -1,3 +1,86 @@
+# GT3-PC-ENHANCED: OpenXR Engine Addon (play Gran Turismo 3 in VR)
+
+<p align="center">
+  <img src="docs/img/vr-cockpit.gif" alt="The GT3 cockpit in a VR headset, seen through the SteamVR mirror window" width="100%">
+</p>
+
+**This is an add-on, not a replacement.** It puts the cockpit view of a Gran Turismo 3 race into a
+SteamVR / OpenXR headset (head-tracked, in stereo) for people who already run
+**[GT3-PC-ENHANCED by Silentwarior112](https://github.com/Silentwarior112/GT3-PC-ENHANCED)**.
+That project is the original: the game port, the launcher and every other feature come from it, and this
+fork changes nothing in how it is distributed. If you do not have it yet, **start there**:
+
+1. Download the GT3-PC-ENHANCED package from <https://github.com/Silentwarior112/GT3-PC-ENHANCED>
+   (its Releases, or build it from source) and install your game files with its launcher.
+2. Come back here for the VR addon.
+
+> **Tested** on a Valve Index with SteamVR, nothing else. Another headset should work if its OpenXR runtime
+> accepts a 32-bit program and Direct3D 11, but that is not tried.
+
+## Install the VR addon
+
+The addon is an *engine plugin*: a small download (about 7 MB) that the original launcher runs next to your
+installed game. Nothing of your install is replaced, and your settings are shared.
+
+**Get the latest version from this fork's [Releases (tags `vr-v...`)](https://github.com/NMabel/GT3-PC-ENHANCED-VR-Addon/releases):**
+download `GT3-PC-VR-<version>.zip` from the newest one. Download it only from there: the zip holds programs.
+
+<p align="center">
+  <img src="docs/img/vr-setup.gif" alt="Setup in three steps: add the engine, set VR headset to On, start SteamVR and play" width="720">
+</p>
+
+**Step 1. Add it to your launcher.** Unzip the download into a folder of its own (not over your game folder).
+Open the launcher you already use: its first screen is the *engine selector*. Press **Add engine...**, pick that
+folder (the launcher warns you to trust the source), select **GT3 PC VR** and press **Start**. The first time,
+give it the game files in its window: **Install game files...** from your disc image, or **Add disc...** to
+play straight from the image.
+
+| The engine selector | The VR engine added |
+|---|---|
+| <img src="docs/img/step1-engine-selector.png" alt="Engine selector with Add engine..." width="360"> | <img src="docs/img/step2-engine-added.png" alt="GT3 PC VR listed in the engine selector" width="360"> |
+
+**Step 2. Turn VR on.** In that launcher window: **Game** tab, **Cameras**, **VR headset (OpenXR): On**.
+VR draws the cockpit camera, so this also switches **Cockpit camera** on and tells you so.
+(Prefer the file? In `gt3pc.ini`, the settings file shared with your install: `Enabled=on` under `[VR]` and
+`CockpitCamera=on` under `[Graphics]`.)
+
+| Before | After |
+|---|---|
+| <img src="docs/img/step3-vr-off.png" alt="VR headset (OpenXR): Off" width="360"> | <img src="docs/img/step3-vr-on.png" alt="VR headset (OpenXR): On" width="360"> |
+
+**Step 3. Play.** Start SteamVR, put the headset on and press **Play**. In a race, press the view button until
+you reach the cockpit view. Everything else (menus, replays, the other cameras) is a large virtual screen.
+
+### What you get
+
+- **In a race, with the cockpit camera:** the cockpit in stereo. The dashboard, the rear-view mirror and the
+  pause / result menus hang inside it as panels you can move and resize.
+- **The game's own panels, in the headset:** the F2 settings menu, the Esc menu, the F3 performance monitor
+  and the notices appear in front of you, so you can change settings without taking the headset off.
+- **Controls:** `Home` recentres, `End` toggles the dashboard, `Insert` the rear-view mirror, `[` and `]`
+  make the world smaller / larger. Where each panel hangs is in the F2 menu under **VR** (the defaults:
+  dashboard 100 cm away, mirror 100 cm, menu 90 cm).
+
+<p align="center">
+  <img src="docs/img/vr-f2-menu.gif" alt="The F2 settings menu shown in the headset" width="720"><br>
+  <em>The F2 menu in the headset (SteamVR mirror window).</em>
+</p>
+
+### What the addon shares with your install, and what it keeps
+
+| Shared with your install | Kept by the VR engine |
+|---|---|
+| The settings file `gt3pc.ini`, so your graphics, controls and display settings carry over | The game files (`data_US` ...: about 7 GB unless you play from the disc image) |
+| The `screenshots` folder | Its memory cards: `saves\GT3 PC VR\`. Copy a card folder over from `saves\Gran Turismo 3 A-Spec\` to carry on a save |
+
+To build the zip yourself, run `Build Mod Plugin.cmd "GT3 PC VR"`: it writes the folder to
+`build\plugins\GT3 PC VR`. Every `[VR]` setting, how a frame gets to the headset and what is not done yet are in
+[docs/vr.md](docs/vr.md).
+
+---
+
+# The original project's README
+
 # Gran Turismo 3 decompiled, ported to Windows, and enhanced.
 
 <p align="center">
@@ -13,62 +96,6 @@ Download the compiled package, or compile from the source code with `build.cmd`.
 Then open the launcher, extract the game files from any of the three main versions
 or run the game from a disc file directly,
 configure the settings, and play.
-
-## Play in VR (this fork)
-
-This fork adds **PC VR**: the cockpit view of a Gran Turismo 3 race, drawn in stereo
-in a SteamVR / OpenXR headset and tracking your head. You sit in the driver's seat,
-look round the cabin, lean in, and glance at the mirror. It is for sim players who
-want GT3 from inside the car. Nothing else about the game changes: the cars, the
-physics, your saves, and the wheel or pad you already use.
-
-- **In a race, with the cockpit camera:** the cockpit in stereo. The dashboard, the rear-view
-  mirror and the pause / result menus hang inside it as panels you can move and resize.
-- **Everything else** (menus, replays, the other cameras): a large virtual screen in the headset.
-- **Tested** on a Valve Index with SteamVR, nothing else. Another headset should work if its
-  OpenXR runtime accepts a 32-bit program and Direct3D 11, but that is not tried.
-
-### Add it to a game you already have
-
-The VR build comes as an *engine plugin*: a small download (about 7 MB zipped) that your launcher
-runs next to your installed game. Nothing of your install is replaced.
-
-```mermaid
-flowchart TD
-    A(["GT3 PC-ENHANCED installed with its launcher<br/>(not yet? install it first)"]) --> B["Unzip the VR download<br/>into a folder of its own"]
-    B --> C["In your usual launcher:<br/>engine selector, Add engine...,<br/>pick that folder"]
-    C --> D["Start GT3 PC VR from the selector.<br/>First time: Install game files...<br/>or Add disc..."]
-    D --> E["In its Game tab, Cameras:<br/>set VR headset to On"]
-    E --> F["Start SteamVR, put the headset on,<br/>press Play, view button to the cockpit"]
-    F --> G(["The cockpit in stereo, head-tracked"])
-```
-
-1. Download the VR zip from [Releases](https://github.com/NMabel/GT3-PC-ENHANCED-VR-Addon/releases) and unzip
-   it into a folder of its own (not over your game folder).
-2. Open the launcher you already use. Its first screen is the engine selector: press **Add engine...**
-   and pick that folder. The launcher warns you to trust the source: the zip holds programs, so
-   download it only from this repository's Releases page.
-3. Start **GT3 PC VR** from the selector. The first time, give it the game files: **Install game files...**
-   from your disc image, or **Add disc...** to play straight from the image.
-4. Turn VR on, in that same launcher window: **Game** tab, **Cameras**, **VR headset (OpenXR): On**.
-   VR draws the cockpit camera, so this also switches **Cockpit camera** on, and tells you when it does.
-   (Prefer the file? In `gt3pc.ini`, the settings file shared with your install, that is
-   `Enabled=on` under `[VR]` and `CockpitCamera=on` under `[Graphics]`.)
-5. Start SteamVR, put the headset on, press **Play**. In a race, press the view button until you reach
-   the cockpit view.
-
-What the VR engine **shares** with your install, and what it **keeps for itself**:
-
-| Shared with your install | Kept by the VR engine |
-|---|---|
-| The settings file `gt3pc.ini`, so your graphics, controls and display settings carry over | The game files (`data_US` ...: about 7 GB unless you play from the disc image) |
-| The `screenshots` folder | Its memory cards: `saves\GT3 PC VR\`. Copy a card folder over from `saves\Gran Turismo 3 A-Spec\` to carry on a save |
-
-To build the zip yourself, run `Build Mod Plugin.cmd "GT3 PC VR"`: it writes the folder to
-`build\plugins\GT3 PC VR`. The controls, every `[VR]` setting, how a frame gets to the headset and what is
-not done yet are in [docs/vr.md](docs/vr.md).
-
-
 
 # Perfect 1:1 parity with the PlayStation 2 original, only better:
 
@@ -339,6 +366,8 @@ different engines. Only the game data (mod folders) are separately configured pe
 
 To make a custom build of this project as a plugin, simply run `Build Mod Plugin.cmd`, then find the output in `build/plugins`.
 Inside the plugin's folder is `engine.txt`, this allows you to set the mod's title.
+
+The VR addon at the top of this page is such a plugin.
 ```
 
 # Settings
@@ -411,9 +440,9 @@ Inside the plugin's folder is `engine.txt`, this allows you to set the mod's tit
 
 ### VR (SteamVR / OpenXR) - this fork
 - The cockpit camera in a VR headset, in stereo and head-tracked (tested on a Valve Index).
-- The dashboard, the rear-view mirror and the pause / result menus as panels in the cockpit.
+- The dashboard, the rear-view mirror and the pause / result menus as panels in the cockpit, and the F2 / F3 / Esc panels in front of you.
 - Everything else is shown on a large virtual screen.
-- Turn on with `Enabled=on` under `[VR]` in `gt3pc.ini`. Setup, controls, settings and how it works: [docs/vr.md](docs/vr.md)
+- Turn on in the launcher (Game > Cameras > VR headset (OpenXR)). Install steps are at the top of this page; controls, settings and how it works: [docs/vr.md](docs/vr.md)
 
 ### Controls
 - Keyboard / Mouse, Controllers, and Wheels are supported
