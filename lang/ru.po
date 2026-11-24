@@ -1523,6 +1523,46 @@ msgstr "1 новая песня добавлена в песни гонок."
 msgid "%d new songs added to the race songs."
 msgstr "В песни гонок добавлено новых песен: %d."
 
+#: src/launcher/psu.cpp
+msgid "This is not a PS2 save file (.psu): it is too small."
+msgstr "Это не файл сохранения PS2 (.psu): он слишком мал."
+
+#: src/launcher/psu.cpp
+msgid "This is not a PS2 save file (.psu): it does not start with a save folder."
+msgstr "Это не файл сохранения PS2 (.psu): он не начинается с папки сохранения."
+
+#: src/launcher/psu.cpp
+msgid "This .psu has a save folder name that cannot be used."
+msgstr "В этом .psu имя папки сохранения нельзя использовать."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: its file count is not right."
+msgstr "Этот .psu повреждён: неверное число файлов."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: it ends before its last file."
+msgstr "Этот .psu повреждён: он обрывается до последнего файла."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: it has a folder inside the save."
+msgstr "Этот .psu повреждён: внутри сохранения есть папка."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: an entry is neither a file nor a folder."
+msgstr "Этот .psu повреждён: одна запись не является ни файлом, ни папкой."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: a file is cut short."
+msgstr "Этот .psu повреждён: один из файлов обрезан."
+
+#: src/launcher/psu.cpp
+msgid "This .psu has a file name that cannot be used."
+msgstr "В этом .psu есть имя файла, которое нельзя использовать."
+
+#: src/launcher/psu.cpp
+msgid "This .psu has no files in it."
+msgstr "В этом .psu нет файлов."
+
 #: src/launcher/save_card.cpp
 msgid "USA"
 msgstr "США"
@@ -1888,6 +1928,92 @@ msgid "Not deleted: %s"
 msgstr "Не удалено: %s"
 
 #: src/launcher/save_manager.cpp
+msgid "It is too big to be a save file."
+msgstr "Он слишком велик для файла сохранения."
+
+#: src/launcher/save_manager.cpp
+msgid "PS2 save files"
+msgstr "Файлы сохранений PS2"
+
+#: src/launcher/save_manager.cpp src/launcher/song_manager.cpp src/launcher/ui.cpp
+msgid "All files"
+msgstr "Все файлы"
+
+#: src/launcher/save_manager.cpp
+msgid "Import PS2 saves (.psu) into this folder"
+msgstr "Импорт сохранений PS2 (.psu) в эту папку"
+
+#: src/launcher/save_manager.cpp
+msgid "Select a save folder first (New makes one): the saves are imported into it."
+msgstr "Сначала выберите папку сохранений (Создать создаёт новую): сохранения импортируются в неё."
+
+#: src/launcher/save_manager.cpp
+msgid ""
+"%s has this save already:\n"
+"%s\n"
+"\n"
+"Replace it with the one in %s?"
+msgstr ""
+"В %s уже есть это сохранение:\n"
+"%s\n"
+"\n"
+"Заменить его сохранением из %s?"
+
+#: src/launcher/save_manager.cpp
+msgid "Could not import %s: %s"
+msgstr "Не удалось импортировать %s: %s"
+
+#: src/launcher/save_manager.cpp
+msgid "Imported 1 save into %s."
+msgstr "Импортировано 1 сохранение в %s."
+
+#: src/launcher/save_manager.cpp
+msgid "Imported %s saves into %s."
+msgstr "Импортировано сохранений: %s, в %s."
+
+#: src/launcher/save_manager.cpp
+msgid "%s not imported."
+msgstr "Не импортировано: %s."
+
+#: src/launcher/save_manager.cpp
+msgid "Select the saves to export first."
+msgstr "Сначала выберите сохранения для экспорта."
+
+#: src/launcher/save_manager.cpp
+msgid "Choose the folder for the .psu files"
+msgstr "Выберите папку для файлов .psu"
+
+#: src/launcher/save_manager.cpp
+msgid "Export"
+msgstr "Экспорт"
+
+#: src/launcher/save_manager.cpp
+msgid ""
+"%s exists already.\n"
+"\n"
+"Replace it?"
+msgstr ""
+"%s уже существует.\n"
+"\n"
+"Заменить?"
+
+#: src/launcher/save_manager.cpp
+msgid "Could not export %s: %s"
+msgstr "Не удалось экспортировать %s: %s"
+
+#: src/launcher/save_manager.cpp
+msgid "Exported 1 save to %s."
+msgstr "Экспортировано 1 сохранение в %s."
+
+#: src/launcher/save_manager.cpp
+msgid "Exported %s saves to %s."
+msgstr "Экспортировано сохранений: %s, в %s."
+
+#: src/launcher/save_manager.cpp
+msgid "%s not exported."
+msgstr "Не экспортировано: %s."
+
+#: src/launcher/save_manager.cpp
 msgid "Each save folder is one memory card (8 MB). The game's memory card slots take the folders picked here when it starts; in the game, F2 > MEMORY CARDS swaps them."
 msgstr "Каждая папка сохранений — одна карта памяти (8 МБ). При запуске игра вставляет в слоты карт памяти выбранные здесь папки; в игре их меняет F2 > КАРТЫ ПАМЯТИ."
 
@@ -1930,6 +2056,14 @@ msgstr "&Копировать в..."
 #: src/launcher/save_manager.cpp
 msgid "Delete sa&ves..."
 msgstr "Удалить &записи..."
+
+#: src/launcher/save_manager.cpp
+msgid "&Import .psu..."
+msgstr "&Импорт .psu..."
+
+#: src/launcher/save_manager.cpp
+msgid "E&xport .psu..."
+msgstr "Э&кспорт .psu..."
 
 #: src/launcher/save_manager.cpp
 msgid "Slot %d: no card"
@@ -2026,10 +2160,6 @@ msgstr "В bgm\\ads.txt есть строки, которые игра проп�
 #: src/launcher/song_manager.cpp
 msgid "Music"
 msgstr "Музыка"
-
-#: src/launcher/song_manager.cpp src/launcher/ui.cpp
-msgid "All files"
-msgstr "Все файлы"
 
 #: src/launcher/song_manager.cpp
 msgid "Looking at the songs..."
@@ -6818,6 +6948,7 @@ msgstr "ТЕКСТУРЫ"
 
 #~ msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
 #~ msgstr "РАССТОЯНИЕ ДО ЭКРАНА ПЕРЕД ВАМИ. ENTER: 90 СМ."
+
 #~ msgid ""
 #~ "FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
 #~ "THE FORCES ARE STARTED AGAIN WITH EACH UPDATE.\n"

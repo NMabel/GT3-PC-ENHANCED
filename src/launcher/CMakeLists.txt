@@ -62,6 +62,7 @@ add_executable(gt3launcher WIN32
     mod_card.cpp
     texture_manager.cpp
     save_manager.cpp
+    psu.cpp
     save_card.cpp
     ps2_icon.cpp
     pclog.cpp

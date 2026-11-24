@@ -1497,6 +1497,46 @@ msgstr ""
 msgid "%d new songs added to the race songs."
 msgstr ""
 
+#: src/launcher/psu.cpp
+msgid "This is not a PS2 save file (.psu): it is too small."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This is not a PS2 save file (.psu): it does not start with a save folder."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This .psu has a save folder name that cannot be used."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: its file count is not right."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: it ends before its last file."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: it has a folder inside the save."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: an entry is neither a file nor a folder."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: a file is cut short."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This .psu has a file name that cannot be used."
+msgstr ""
+
+#: src/launcher/psu.cpp
+msgid "This .psu has no files in it."
+msgstr ""
+
 #: src/launcher/save_card.cpp
 msgid "USA"
 msgstr ""
@@ -1844,6 +1884,85 @@ msgid "Not deleted: %s"
 msgstr ""
 
 #: src/launcher/save_manager.cpp
+msgid "It is too big to be a save file."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "PS2 save files"
+msgstr ""
+
+#: src/launcher/save_manager.cpp src/launcher/song_manager.cpp src/launcher/ui.cpp
+msgid "All files"
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Import PS2 saves (.psu) into this folder"
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Select a save folder first (New makes one): the saves are imported into it."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid ""
+"%s has this save already:\n"
+"%s\n"
+"\n"
+"Replace it with the one in %s?"
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Could not import %s: %s"
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Imported 1 save into %s."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Imported %s saves into %s."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "%s not imported."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Select the saves to export first."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Choose the folder for the .psu files"
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Export"
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid ""
+"%s exists already.\n"
+"\n"
+"Replace it?"
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Could not export %s: %s"
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Exported 1 save to %s."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "Exported %s saves to %s."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "%s not exported."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
 msgid "Each save folder is one memory card (8 MB). The game's memory card slots take the folders picked here when it starts; in the game, F2 > MEMORY CARDS swaps them."
 msgstr ""
 
@@ -1885,6 +2004,14 @@ msgstr ""
 
 #: src/launcher/save_manager.cpp
 msgid "Delete sa&ves..."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "&Import .psu..."
+msgstr ""
+
+#: src/launcher/save_manager.cpp
+msgid "E&xport .psu..."
 msgstr ""
 
 #: src/launcher/save_manager.cpp
@@ -1981,10 +2108,6 @@ msgstr ""
 
 #: src/launcher/song_manager.cpp
 msgid "Music"
-msgstr ""
-
-#: src/launcher/song_manager.cpp src/launcher/ui.cpp
-msgid "All files"
 msgstr ""
 
 #: src/launcher/song_manager.cpp

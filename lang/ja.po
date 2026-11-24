@@ -1523,6 +1523,46 @@ msgstr "レース曲に新しい曲を 1 曲追加しました。"
 msgid "%d new songs added to the race songs."
 msgstr "レース曲に新しい曲を %d 曲追加しました。"
 
+#: src/launcher/psu.cpp
+msgid "This is not a PS2 save file (.psu): it is too small."
+msgstr "これは PS2 のセーブファイル (.psu) ではありません。小さすぎます。"
+
+#: src/launcher/psu.cpp
+msgid "This is not a PS2 save file (.psu): it does not start with a save folder."
+msgstr "これは PS2 のセーブファイル (.psu) ではありません。セーブフォルダで始まっていません。"
+
+#: src/launcher/psu.cpp
+msgid "This .psu has a save folder name that cannot be used."
+msgstr "この .psu のセーブフォルダ名は使用できません。"
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: its file count is not right."
+msgstr "この .psu は壊れています。ファイル数が正しくありません。"
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: it ends before its last file."
+msgstr "この .psu は壊れています。最後のファイルの前で終わっています。"
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: it has a folder inside the save."
+msgstr "この .psu は壊れています。セーブの中にフォルダがあります。"
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: an entry is neither a file nor a folder."
+msgstr "この .psu は壊れています。ファイルでもフォルダでもない項目があります。"
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: a file is cut short."
+msgstr "この .psu は壊れています。ファイルが途中で切れています。"
+
+#: src/launcher/psu.cpp
+msgid "This .psu has a file name that cannot be used."
+msgstr "この .psu には使用できないファイル名があります。"
+
+#: src/launcher/psu.cpp
+msgid "This .psu has no files in it."
+msgstr "この .psu にはファイルがありません。"
+
 #: src/launcher/save_card.cpp
 msgid "USA"
 msgstr "北米"
@@ -1888,6 +1928,92 @@ msgid "Not deleted: %s"
 msgstr "削除されませんでした：%s"
 
 #: src/launcher/save_manager.cpp
+msgid "It is too big to be a save file."
+msgstr "セーブファイルにしては大きすぎます。"
+
+#: src/launcher/save_manager.cpp
+msgid "PS2 save files"
+msgstr "PS2 セーブファイル"
+
+#: src/launcher/save_manager.cpp src/launcher/song_manager.cpp src/launcher/ui.cpp
+msgid "All files"
+msgstr "すべてのファイル"
+
+#: src/launcher/save_manager.cpp
+msgid "Import PS2 saves (.psu) into this folder"
+msgstr "PS2 のセーブ (.psu) をこのフォルダにインポート"
+
+#: src/launcher/save_manager.cpp
+msgid "Select a save folder first (New makes one): the saves are imported into it."
+msgstr "先にセーブフォルダを選んでください (新規で作成できます)。セーブはそこにインポートされます。"
+
+#: src/launcher/save_manager.cpp
+msgid ""
+"%s has this save already:\n"
+"%s\n"
+"\n"
+"Replace it with the one in %s?"
+msgstr ""
+"%s にはこのセーブがすでにあります:\n"
+"%s\n"
+"\n"
+"%s のものと置き換えますか?"
+
+#: src/launcher/save_manager.cpp
+msgid "Could not import %s: %s"
+msgstr "%s をインポートできませんでした: %s"
+
+#: src/launcher/save_manager.cpp
+msgid "Imported 1 save into %s."
+msgstr "セーブ 1 件を %s にインポートしました。"
+
+#: src/launcher/save_manager.cpp
+msgid "Imported %s saves into %s."
+msgstr "セーブ %s 件を %s にインポートしました。"
+
+#: src/launcher/save_manager.cpp
+msgid "%s not imported."
+msgstr "%s 件はインポートされていません。"
+
+#: src/launcher/save_manager.cpp
+msgid "Select the saves to export first."
+msgstr "先にエクスポートするセーブを選んでください。"
+
+#: src/launcher/save_manager.cpp
+msgid "Choose the folder for the .psu files"
+msgstr ".psu ファイルの保存先フォルダを選択"
+
+#: src/launcher/save_manager.cpp
+msgid "Export"
+msgstr "エクスポート"
+
+#: src/launcher/save_manager.cpp
+msgid ""
+"%s exists already.\n"
+"\n"
+"Replace it?"
+msgstr ""
+"%s はすでに存在します。\n"
+"\n"
+"置き換えますか?"
+
+#: src/launcher/save_manager.cpp
+msgid "Could not export %s: %s"
+msgstr "%s をエクスポートできませんでした: %s"
+
+#: src/launcher/save_manager.cpp
+msgid "Exported 1 save to %s."
+msgstr "セーブ 1 件を %s にエクスポートしました。"
+
+#: src/launcher/save_manager.cpp
+msgid "Exported %s saves to %s."
+msgstr "セーブ %s 件を %s にエクスポートしました。"
+
+#: src/launcher/save_manager.cpp
+msgid "%s not exported."
+msgstr "%s 件はエクスポートされていません。"
+
+#: src/launcher/save_manager.cpp
 msgid "Each save folder is one memory card (8 MB). The game's memory card slots take the folders picked here when it starts; in the game, F2 > MEMORY CARDS swaps them."
 msgstr "セーブフォルダー1つが1枚のメモリーカード（8 MB）です。ゲームのメモリーカードスロットには、起動時にここで選んだフォルダーが入ります。ゲーム内では F2 > メモリーカード で入れ替えられます。"
 
@@ -1930,6 +2056,14 @@ msgstr "コピー(&C)..."
 #: src/launcher/save_manager.cpp
 msgid "Delete sa&ves..."
 msgstr "セーブを削除(&V)..."
+
+#: src/launcher/save_manager.cpp
+msgid "&Import .psu..."
+msgstr ".psu をインポート(&I)..."
+
+#: src/launcher/save_manager.cpp
+msgid "E&xport .psu..."
+msgstr ".psu をエクスポート(&X)..."
 
 #: src/launcher/save_manager.cpp
 msgid "Slot %d: no card"
@@ -2026,10 +2160,6 @@ msgstr "bgm\\ads.txt にゲームが読み飛ばす行があります（%d）。
 #: src/launcher/song_manager.cpp
 msgid "Music"
 msgstr "音楽"
-
-#: src/launcher/song_manager.cpp src/launcher/ui.cpp
-msgid "All files"
-msgstr "すべてのファイル"
 
 #: src/launcher/song_manager.cpp
 msgid "Looking at the songs..."
@@ -6818,6 +6948,7 @@ msgstr "テクスチャ"
 
 #~ msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
 #~ msgstr "パネルまでの正面の距離。ENTER：90 cm。"
+
 #~ msgid ""
 #~ "FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
 #~ "THE FORCES ARE STARTED AGAIN WITH EACH UPDATE.\n"

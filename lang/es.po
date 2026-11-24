@@ -1523,6 +1523,46 @@ msgstr "1 canción nueva añadida a las canciones de carrera."
 msgid "%d new songs added to the race songs."
 msgstr "%d canciones nuevas añadidas a las canciones de carrera."
 
+#: src/launcher/psu.cpp
+msgid "This is not a PS2 save file (.psu): it is too small."
+msgstr "Esto no es un archivo de guardado de PS2 (.psu): es demasiado pequeño."
+
+#: src/launcher/psu.cpp
+msgid "This is not a PS2 save file (.psu): it does not start with a save folder."
+msgstr "Esto no es un archivo de guardado de PS2 (.psu): no empieza con una carpeta de guardado."
+
+#: src/launcher/psu.cpp
+msgid "This .psu has a save folder name that cannot be used."
+msgstr "Este .psu tiene un nombre de carpeta de guardado que no se puede usar."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: its file count is not right."
+msgstr "Este .psu está dañado: el número de archivos no es correcto."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: it ends before its last file."
+msgstr "Este .psu está dañado: termina antes de su último archivo."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: it has a folder inside the save."
+msgstr "Este .psu está dañado: tiene una carpeta dentro del guardado."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: an entry is neither a file nor a folder."
+msgstr "Este .psu está dañado: una entrada no es ni archivo ni carpeta."
+
+#: src/launcher/psu.cpp
+msgid "This .psu is damaged: a file is cut short."
+msgstr "Este .psu está dañado: un archivo está cortado."
+
+#: src/launcher/psu.cpp
+msgid "This .psu has a file name that cannot be used."
+msgstr "Este .psu tiene un nombre de archivo que no se puede usar."
+
+#: src/launcher/psu.cpp
+msgid "This .psu has no files in it."
+msgstr "Este .psu no contiene archivos."
+
 #: src/launcher/save_card.cpp
 msgid "USA"
 msgstr "EE. UU."
@@ -1888,6 +1928,92 @@ msgid "Not deleted: %s"
 msgstr "No borrado: %s"
 
 #: src/launcher/save_manager.cpp
+msgid "It is too big to be a save file."
+msgstr "Es demasiado grande para ser un archivo de guardado."
+
+#: src/launcher/save_manager.cpp
+msgid "PS2 save files"
+msgstr "Archivos de guardado de PS2"
+
+#: src/launcher/save_manager.cpp src/launcher/song_manager.cpp src/launcher/ui.cpp
+msgid "All files"
+msgstr "Todos los archivos"
+
+#: src/launcher/save_manager.cpp
+msgid "Import PS2 saves (.psu) into this folder"
+msgstr "Importar guardados de PS2 (.psu) en esta carpeta"
+
+#: src/launcher/save_manager.cpp
+msgid "Select a save folder first (New makes one): the saves are imported into it."
+msgstr "Selecciona primero una carpeta de guardado (Nueva crea una): los guardados se importan en ella."
+
+#: src/launcher/save_manager.cpp
+msgid ""
+"%s has this save already:\n"
+"%s\n"
+"\n"
+"Replace it with the one in %s?"
+msgstr ""
+"%s ya tiene este guardado:\n"
+"%s\n"
+"\n"
+"¿Reemplazarlo por el de %s?"
+
+#: src/launcher/save_manager.cpp
+msgid "Could not import %s: %s"
+msgstr "No se pudo importar %s: %s"
+
+#: src/launcher/save_manager.cpp
+msgid "Imported 1 save into %s."
+msgstr "Se ha importado 1 guardado en %s."
+
+#: src/launcher/save_manager.cpp
+msgid "Imported %s saves into %s."
+msgstr "Se han importado %s guardados en %s."
+
+#: src/launcher/save_manager.cpp
+msgid "%s not imported."
+msgstr "%s sin importar."
+
+#: src/launcher/save_manager.cpp
+msgid "Select the saves to export first."
+msgstr "Selecciona primero los guardados que quieres exportar."
+
+#: src/launcher/save_manager.cpp
+msgid "Choose the folder for the .psu files"
+msgstr "Elige la carpeta para los archivos .psu"
+
+#: src/launcher/save_manager.cpp
+msgid "Export"
+msgstr "Exportar"
+
+#: src/launcher/save_manager.cpp
+msgid ""
+"%s exists already.\n"
+"\n"
+"Replace it?"
+msgstr ""
+"%s ya existe.\n"
+"\n"
+"¿Reemplazarlo?"
+
+#: src/launcher/save_manager.cpp
+msgid "Could not export %s: %s"
+msgstr "No se pudo exportar %s: %s"
+
+#: src/launcher/save_manager.cpp
+msgid "Exported 1 save to %s."
+msgstr "Se ha exportado 1 guardado a %s."
+
+#: src/launcher/save_manager.cpp
+msgid "Exported %s saves to %s."
+msgstr "Se han exportado %s guardados a %s."
+
+#: src/launcher/save_manager.cpp
+msgid "%s not exported."
+msgstr "%s sin exportar."
+
+#: src/launcher/save_manager.cpp
 msgid "Each save folder is one memory card (8 MB). The game's memory card slots take the folders picked here when it starts; in the game, F2 > MEMORY CARDS swaps them."
 msgstr "Cada carpeta de guardado es una tarjeta de memoria (8 MB). Las ranuras de tarjeta de memoria del juego usan las carpetas elegidas aquí al iniciarse; en el juego, F2 > TARJETAS DE MEMORIA las intercambia."
 
@@ -1930,6 +2056,14 @@ msgstr "Co&piar en..."
 #: src/launcher/save_manager.cpp
 msgid "Delete sa&ves..."
 msgstr "Borrar &guardados..."
+
+#: src/launcher/save_manager.cpp
+msgid "&Import .psu..."
+msgstr "&Importar .psu..."
+
+#: src/launcher/save_manager.cpp
+msgid "E&xport .psu..."
+msgstr "E&xportar .psu..."
 
 #: src/launcher/save_manager.cpp
 msgid "Slot %d: no card"
@@ -2026,10 +2160,6 @@ msgstr "bgm\\ads.txt tiene líneas que el juego omite (%d); al guardar se reescr
 #: src/launcher/song_manager.cpp
 msgid "Music"
 msgstr "Música"
-
-#: src/launcher/song_manager.cpp src/launcher/ui.cpp
-msgid "All files"
-msgstr "Todos los archivos"
 
 #: src/launcher/song_manager.cpp
 msgid "Looking at the songs..."
@@ -6827,6 +6957,7 @@ msgstr "TEXTURAS"
 
 #~ msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
 #~ msgstr "LA DISTANCIA DEL PANEL DELANTE DE TI. INTRO: 90 CM."
+
 #~ msgid ""
 #~ "FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
 #~ "THE FORCES ARE STARTED AGAIN WITH EACH UPDATE.\n"

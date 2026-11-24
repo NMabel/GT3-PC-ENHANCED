@@ -9,10 +9,12 @@
 #include "platform/save_folders.h"
 #include "platform/ui_text.h"  /* PC (2026-11-16): the interface's languages */
 #include "ps2_icon.h"
+#include "psu.h"
 #include "save_card.h"
 #include "util.h"
 
 #include <commctrl.h>
+#include <commdlg.h>
 
 #include <algorithm>
 #include <map>
@@ -47,6 +49,8 @@ enum : int {
     IDC_DETAILS,
     IDC_COPY,
     IDC_DELETE_SAVES,
+    IDC_IMPORT,
+    IDC_EXPORT,
     IDC_STATUS,
     IDC_COPY_TO0 = 3300,                    /* the Copy to... menu's folders */
 };
@@ -60,8 +64,8 @@ struct Manager {
     HWND wnd = nullptr, owner = nullptr;
     HWND hint = nullptr, path = nullptr, slotLabel[2] = {}, slot[2] = {}, foldersLabel = nullptr, folders = nullptr,
          newFolder = nullptr, rename = nullptr, clear = nullptr, remove = nullptr, stats = nullptr,
-         contents = nullptr, details = nullptr, copy = nullptr, removeSaves = nullptr, status = nullptr,
-         close = nullptr;
+         contents = nullptr, details = nullptr, copy = nullptr, removeSaves = nullptr, importPsu = nullptr,
+         exportPsu = nullptr, status = nullptr, close = nullptr;
     HFONT font = nullptr;
     HIMAGELIST images = nullptr;
     UINT dpi = 96;
@@ -233,6 +237,8 @@ void buttons()
     const bool saves = !selected_saves().empty();
     EnableWindow(g.copy, saves && g.list.size() > 1);
     EnableWindow(g.removeSaves, saves);
+    EnableWindow(g.importPsu, f >= 0);
+    EnableWindow(g.exportPsu, saves);
 }
 
 void show_details()
@@ -766,6 +772,235 @@ void delete_saves()
     notify();
 }
 
+/* ---- .psu files (psu.h): a PS2 save in one file; the game's cards are folders ---- */
+
+/* One .psu written, or its problem ("" in *error: written). */
+bool write_bytes(const std::wstring &path, const std::vector<uint8_t> &data, const FILETIME &when, std::wstring *error)
+{
+    HANDLE h = CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (h == INVALID_HANDLE_VALUE) {
+        *error = util::system_error_text(GetLastError());
+        return false;
+    }
+    DWORD put = 0;
+    const bool ok = data.empty() || (WriteFile(h, data.data(), (DWORD)data.size(), &put, nullptr) && put == data.size());
+    if (!ok)
+        *error = util::system_error_text(GetLastError());
+    else if ((when.dwLowDateTime | when.dwHighDateTime) != 0)
+        SetFileTime(h, nullptr, nullptr, &when);
+    CloseHandle(h);
+    return ok;
+}
+
+bool read_whole(const std::wstring &path, std::vector<uint8_t> *out, std::wstring *error)
+{
+    HANDLE h = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
+                           FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (h == INVALID_HANDLE_VALUE) {
+        *error = util::system_error_text(GetLastError());
+        return false;
+    }
+    LARGE_INTEGER size = {};
+    bool ok = GetFileSizeEx(h, &size) && size.QuadPart >= 0 && size.QuadPart <= 0x2000000;   /* (32 MB: far over any save) */
+    if (ok) {
+        out->resize((size_t)size.QuadPart);
+        DWORD got = 0;
+        ok = out->empty() || (ReadFile(h, out->data(), (DWORD)out->size(), &got, nullptr) && got == out->size());
+    }
+    if (!ok)
+        *error = size.QuadPart > 0x2000000 ? std::wstring(tr(L"It is too big to be a save file.")) : util::system_error_text(GetLastError());
+    CloseHandle(h);
+    return ok;
+}
+
+/* The .psu files chosen in an Open dialog: full paths. */
+std::vector<std::wstring> choose_psu_files()
+{
+    std::wstring buf(65536, L'\0');
+    std::wstring filter = tr(L"PS2 save files");
+    filter += L" (*.psu)";
+    filter.push_back(L'\0');
+    filter += L"*.psu";
+    filter.push_back(L'\0');
+    filter += tr(L"All files");
+    filter += L" (*.*)";
+    filter.push_back(L'\0');
+    filter += L"*.*";
+    filter.push_back(L'\0');
+    OPENFILENAMEW ofn = {};
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = g.wnd;
+    ofn.lpstrFilter = filter.c_str();
+    ofn.lpstrFile = &buf[0];
+    ofn.nMaxFile = (DWORD)buf.size();
+    ofn.lpstrTitle = tr(L"Import PS2 saves (.psu) into this folder");
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR |
+                OFN_ALLOWMULTISELECT;
+    std::vector<std::wstring> out;
+    if (!GetOpenFileNameW(&ofn))
+        return out;
+    const wchar_t *p = buf.c_str();
+    const std::wstring first = p;
+    p += first.size() + 1;
+    if (*p == 0) {                          /* one file: its whole path */
+        out.push_back(first);
+        return out;
+    }
+    for (; *p != 0; p += wcslen(p) + 1)     /* several: the folder, then the names */
+        out.push_back(util::with_slash(first) + p);
+    return out;
+}
+
+void import_psu()
+{
+    Quiet quiet;
+    const std::wstring target = g.current;
+    if (target.empty()) {
+        set_status(tr(L"Select a save folder first (New makes one): the saves are imported into it."));
+        return;
+    }
+    const std::vector<std::wstring> files = choose_psu_files();
+    int imported = 0, skipped = 0;
+    std::wstring problem;
+    for (const std::wstring &path : files) {
+        const wchar_t *base = wcsrchr(path.c_str(), L'\\');
+        const std::wstring name = base != nullptr ? base + 1 : path;
+        std::vector<uint8_t> bytes;
+        psu::Save save;
+        std::wstring error;
+        if (!read_whole(path, &bytes, &error) || !psu::parse(bytes, &save, &error)) {
+            problem = name + L": " + error;
+            skipped++;
+            continue;
+        }
+        const std::wstring dir = util::widen(save.dir), to = folder_path(target) + L"\\" + dir;
+        const bool there = GetFileAttributesW(to.c_str()) != INVALID_FILE_ATTRIBUTES;
+        if (there) {
+            const int a = MessageBoxW(g.wnd,
+                                      trf(L"%s has this save already:\n%s\n\nReplace it with the one in %s?", target.c_str(),
+                                          dir.c_str(), name.c_str())
+                                          .c_str(),
+                                      tr(kTitle), MB_YESNOCANCEL | MB_ICONQUESTION | MB_DEFBUTTON2);
+            if (a == IDCANCEL)
+                break;
+            if (a != IDYES) {
+                skipped++;
+                continue;
+            }
+        }
+        /* the space as the game's copy checks it: the clusters and two more, two KB free */
+        int kb = 2;
+        for (const psu::File &f : save.files)
+            kb += std::max(1, (int)((f.data.size() + 1023) / 1024));
+        const int freeKB = save_card::kCardKB - save_card::used_kb(folder_path(target)) +
+                           (there ? save_card::used_kb(to) : 0);
+        if (kb + 2 > freeKB) {
+            problem = trf(L"%s has not enough space for %s: it needs %s KB, %s KB free.", target.c_str(), dir.c_str(),
+                          save_card::number(kb).c_str(), save_card::number(std::max(0, freeKB)).c_str());
+            skipped++;
+            continue;
+        }
+        if (there && !save_card::remove_tree(to, true, &error)) {
+            problem = trf(L"Could not replace %s in %s: %s", dir.c_str(), target.c_str(), error.c_str());
+            skipped++;
+            continue;
+        }
+        bool ok = util::make_folders(to);
+        if (!ok)
+            error = util::system_error_text(GetLastError());
+        for (size_t i = 0; ok && i < save.files.size(); i++)
+            ok = write_bytes(to + L"\\" + util::widen(save.files[i].name), save.files[i].data, save.files[i].modified, &error);
+        if (!ok) {
+            save_card::remove_tree(to, true, nullptr);      /* (no half save left) */
+            problem = trf(L"Could not import %s: %s", dir.c_str(), error.c_str());
+            skipped++;
+            continue;
+        }
+        imported++;
+    }
+    refresh(target);
+    if (files.empty())
+        return;
+    std::wstring t = imported == 1 ? trf(L"Imported 1 save into %s.", target.c_str())
+                                   : trf(L"Imported %s saves into %s.", save_card::number(imported).c_str(), target.c_str());
+    if (skipped > 0)
+        t += L" " + trf(L"%s not imported.", save_card::number(skipped).c_str());
+    if (!problem.empty()) {
+        t += L" " + problem;
+        MessageBoxW(g.wnd, problem.c_str(), tr(kTitle), MB_OK | MB_ICONWARNING);
+    }
+    set_status(t);
+    notify();
+}
+
+void export_psu()
+{
+    Quiet quiet;
+    std::vector<save_card::Save> saves;
+    for (int i : selected_saves())
+        saves.push_back(g.card.saves[(size_t)i]);
+    if (saves.empty()) {
+        set_status(tr(L"Select the saves to export first."));
+        return;
+    }
+    const std::wstring dest = util::choose_folder(g.wnd, tr(L"Choose the folder for the .psu files"), tr(L"Export"));
+    if (dest.empty())
+        return;
+    int exported = 0, skipped = 0;
+    std::wstring problem;
+    for (const save_card::Save &s : saves) {
+        const std::wstring from = folder_path(g.current) + L"\\" + s.dir, out = util::with_slash(dest) + s.dir + L".psu";
+        psu::Save save;
+        save.dir = util::narrow(s.dir);
+        std::wstring error;
+        WIN32_FIND_DATAW fd;
+        HANDLE h = FindFirstFileW((from + L"\\*").c_str(), &fd);
+        bool ok = h != INVALID_HANDLE_VALUE;
+        for (bool more = ok; more; more = FindNextFileW(h, &fd) != 0) {
+            if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+                continue;
+            psu::File f;
+            f.name = util::narrow(fd.cFileName);
+            f.modified = fd.ftLastWriteTime;
+            if (!read_whole(from + L"\\" + fd.cFileName, &f.data, &error)) {
+                ok = false;
+                break;
+            }
+            save.files.push_back(std::move(f));
+        }
+        if (h != INVALID_HANDLE_VALUE)
+            FindClose(h);
+        if (ok && GetFileAttributesW(out.c_str()) != INVALID_FILE_ATTRIBUTES) {
+            const int a = MessageBoxW(g.wnd, trf(L"%s exists already.\n\nReplace it?", out.c_str()).c_str(), tr(kTitle),
+                                      MB_YESNOCANCEL | MB_ICONQUESTION | MB_DEFBUTTON2);
+            if (a == IDCANCEL)
+                break;
+            if (a != IDYES) {
+                skipped++;
+                continue;
+            }
+        }
+        FILETIME none = {};
+        if (ok)
+            ok = write_bytes(out, psu::build(save), none, &error);
+        if (!ok) {
+            problem = trf(L"Could not export %s: %s", s.dir.c_str(), error.c_str());
+            skipped++;
+            continue;
+        }
+        exported++;
+    }
+    std::wstring t = exported == 1 ? trf(L"Exported 1 save to %s.", dest.c_str())
+                                   : trf(L"Exported %s saves to %s.", save_card::number(exported).c_str(), dest.c_str());
+    if (skipped > 0)
+        t += L" " + trf(L"%s not exported.", save_card::number(skipped).c_str());
+    if (!problem.empty()) {
+        t += L" " + problem;
+        MessageBoxW(g.wnd, problem.c_str(), tr(kTitle), MB_OK | MB_ICONWARNING);
+    }
+    set_status(t);
+}
+
 /* ---- the window ---- */
 
 void make_font()
@@ -843,10 +1078,20 @@ void layout()
     const int listTop = top + px(kStatsH) + px(4), detailsTop = row - gap - px(kDetailsH);
     put(g.contents, rx, listTop, rw, detailsTop - gap - listTop);
     put(g.details, rx, detailsTop, rw, px(kDetailsH));
-    const int cw = std::max(px(120), (int)text_size(g.copy).cx + px(16));
-    const int dw = std::max(px(120), (int)text_size(g.removeSaves).cx + px(16));
-    put(g.copy, rx, row, cw, bh);
-    put(g.removeSaves, rx + cw + px(6), row, dw, bh);
+    /* (the four buttons by their texts' widths; squeezed together when the room is short) */
+    HWND sb[4] = {g.copy, g.removeSaves, g.importPsu, g.exportPsu};
+    int sw[4], ssum = 0;
+    for (int i = 0; i < 4; i++) {
+        sw[i] = std::max(px(100), (int)text_size(sb[i]).cx + px(16));
+        ssum += sw[i];
+    }
+    const int sroom = rw - 3 * px(6);
+    int sx = rx;
+    for (int i = 0; i < 4; i++) {
+        const int bw = ssum <= sroom ? sw[i] : sw[i] * sroom / ssum;
+        put(sb[i], sx, row, bw, bh);
+        sx += bw + px(6);
+    }
     /* the bottom */
     put(g.status, m, bottom + px(6), W - 2 * m - px(kCloseW) - gap, px(20));
     put(g.close, W - m - px(kCloseW), bottom, px(kCloseW), bh);
@@ -889,6 +1134,8 @@ void create_controls()
                      WS_EX_CLIENTEDGE);
     g.copy = make(WC_BUTTONW, tr(L"&Copy to..."), WS_TABSTOP | BS_PUSHBUTTON, IDC_COPY);
     g.removeSaves = make(WC_BUTTONW, tr(L"Delete sa&ves..."), WS_TABSTOP | BS_PUSHBUTTON, IDC_DELETE_SAVES);
+    g.importPsu = make(WC_BUTTONW, tr(L"&Import .psu..."), WS_TABSTOP | BS_PUSHBUTTON, IDC_IMPORT);
+    g.exportPsu = make(WC_BUTTONW, tr(L"E&xport .psu..."), WS_TABSTOP | BS_PUSHBUTTON, IDC_EXPORT);
     g.status = make(WC_STATICW, L"", SS_LEFT | SS_NOPREFIX | SS_ENDELLIPSIS, IDC_STATUS);
     g.close = make(WC_BUTTONW, tr(L"Close"), WS_TABSTOP | BS_PUSHBUTTON, IDCANCEL);
 }
@@ -959,6 +1206,12 @@ LRESULT CALLBACK proc(HWND h, UINT msg, WPARAM wp, LPARAM lp)
             return 0;
         case IDC_DELETE_SAVES:
             delete_saves();
+            return 0;
+        case IDC_IMPORT:
+            import_psu();
+            return 0;
+        case IDC_EXPORT:
+            export_psu();
             return 0;
         case IDCANCEL:                      /* Close, Esc */
             DestroyWindow(h);
