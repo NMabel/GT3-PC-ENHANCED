@@ -41,6 +41,11 @@ for %%F in (gt3launcher.exe gt3pc.exe SDL3.dll) do (
     copy /Y "%ROOT%build\bin\%%F" "%OUT%\" >nul
     if errorlevel 1 echo "%OUT%\%%F" could not be written: is that engine running? & set "RESULT=1" & goto end
 )
+rem (the licence texts of the third-party software in the programs, licences\: handed on with them)
+if not exist "%ROOT%build\bin\licences\" goto nolic
+xcopy /E /I /Y /Q "%ROOT%build\bin\licences" "%OUT%\licences" >nul
+if errorlevel 1 echo "%OUT%\licences" could not be written: is that engine running? & set "RESULT=1" & goto end
+:nolic
 rem (the OpenXR loader: only a tree with PC VR builds one)
 if not exist "%ROOT%build\bin\openxr_loader.dll" goto noxr
 copy /Y "%ROOT%build\bin\openxr_loader.dll" "%OUT%\" >nul

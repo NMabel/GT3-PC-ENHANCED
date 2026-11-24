@@ -60,6 +60,11 @@ you reach the cockpit view. Everything else (menus, replays, the other cameras) 
 - **Controls:** `Home` recentres, `End` toggles the dashboard, `Insert` the rear-view mirror, `[` and `]`
   make the world smaller / larger. Where each panel hangs is in the F2 menu under **VR** (the defaults:
   dashboard 100 cm away, mirror 100 cm, menu 90 cm).
+- **A save that came as a `.psu` file** (what PCSX2 and most save sites use) cannot be read by the game as it is.
+  In the launcher, open **Saves...**, select a save folder and press **Import .psu...**: the save is unpacked
+  into that folder, ready to load. **Export .psu...** packs saves back into `.psu` files.
+- **If SteamVR is stuck** the game no longer freezes at start-up: after 20 seconds it gives up on VR, says why in
+  `gt3pc.log` and carries on as a flat-screen game.
 
 <p align="center">
   <img src="docs/img/vr-f2-menu.gif" alt="The F2 settings menu shown in the headset" width="720"><br>
