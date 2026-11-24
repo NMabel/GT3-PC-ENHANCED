@@ -147,6 +147,23 @@ msgstr ""
 msgid "COURSE SIZE: %s"
 msgstr ""
 
+#: src/game/app/pc_clutch.cpp
+msgid "H-SHIFTER IS OFF (PLAYER %d)"
+msgstr ""
+
+#: src/game/app/pc_clutch.cpp
+msgid ""
+"ITS GEARS ARE NOT READ: THE H-SHIFTER WORKS WITH A CLUTCH,\n"
+"AND NONE IS MAPPED. MAP ONE IN THE LAUNCHER'S CONTROLS TAB."
+msgstr ""
+
+#: src/game/app/pc_clutch.cpp
+msgid ""
+"ITS GEARS ARE NOT READ IN THIS RACE. TO USE IT, SET GEAR SHIFT\n"
+"BEHAVIOR TO REALISTIC + CLUTCH AND H-SHIFTER TO ON (GAME > EXTRAS).\n"
+"THE NEXT RACE ENTERED TAKES IT."
+msgstr ""
+
 #: src/game/app/pc_customcam.cpp
 msgid "CUSTOM CAMERA"
 msgstr ""
@@ -431,6 +448,26 @@ msgstr ""
 
 #: src/game/camera/T378_onboard_camera.cpp
 msgid "Bumper"
+msgstr ""
+
+#: src/launcher/chd_image.cpp
+msgid "this CHD file needs a parent CHD file, which is not supported"
+msgstr ""
+
+#: src/launcher/chd_image.cpp
+msgid "the CHD file could not be read (%s)"
+msgstr ""
+
+#: src/launcher/chd_image.cpp src/launcher/iso9660.cpp
+msgid "the file could not be opened (%s)"
+msgstr ""
+
+#: src/launcher/chd_image.cpp
+msgid "this CHD file holds no disc image (no ISO 9660 file system)"
+msgstr ""
+
+#: src/launcher/chd_image.cpp src/launcher/iso9660.cpp
+msgid "it ends too early (is the image complete?)"
 msgstr ""
 
 #: src/launcher/controls.cpp
@@ -1208,14 +1245,6 @@ msgstr ""
 
 #: src/launcher/install.cpp
 msgid "If the game is running from this disc image, close it first."
-msgstr ""
-
-#: src/launcher/iso9660.cpp
-msgid "it ends too early (is the image complete?)"
-msgstr ""
-
-#: src/launcher/iso9660.cpp
-msgid "the file could not be opened (%s)"
 msgstr ""
 
 #: src/launcher/iso9660.cpp
@@ -2794,6 +2823,10 @@ msgid "Buy cars not for sale"
 msgstr ""
 
 #: src/launcher/ui.cpp
+msgid "New cars without assists"
+msgstr ""
+
+#: src/launcher/ui.cpp
 msgid "Cars in a race"
 msgstr ""
 
@@ -3904,6 +3937,10 @@ msgid "Invert force feedback"
 msgstr ""
 
 #: src/platform/input_map.cpp
+msgid "Force feedback loss workaround"
+msgstr ""
+
+#: src/platform/input_map.cpp
 msgid "South (A / Cross)"
 msgstr ""
 
@@ -4692,6 +4729,15 @@ msgstr ""
 msgid ""
 "EVERY FORCE THE OTHER WAY, FOR A WHEEL PUSHED AWAY\n"
 "FROM THE CENTER (THE LAUNCHER'S TESTS SHOW WHICH)."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
+"THE STEERING FORCE IS STARTED AGAIN EACH TIME THE GAME\n"
+"SENDS IT (PCSX2'S 'WORKAROUND FOR INTERMITTENT FFB LOSS').\n"
+"LEAVE IT OFF UNLESS NEEDED: ON MANY WHEELS IT MAKES THE\n"
+"FORCES VAGUE OR CUT OUT."
 msgstr ""
 
 #: src/platform/settings_menu.cpp
@@ -5679,6 +5725,16 @@ msgid "CARS NOT FOR SALE IN SHOWROOMS CAN BE BOUGHT"
 msgstr ""
 
 #: src/platform/settings_menu.cpp
+msgid "NEW CARS WITHOUT ASSISTS"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"CARS ADDED TO THE GARAGE GET THEIR TCS AND ASM SET TO 0.\n"
+"CARS ALREADY IN THE GARAGE KEEP THEIR SETTINGS."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
 msgid "CARS IN A RACE"
 msgstr ""
 
@@ -5957,6 +6013,10 @@ msgstr ""
 
 #: src/platform/settings_menu.cpp
 msgid "INVERT FORCE FEEDBACK"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "FORCE FEEDBACK LOSS WORKAROUND"
 msgstr ""
 
 #: src/platform/settings_menu.cpp

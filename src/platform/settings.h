@@ -189,6 +189,9 @@
  *                           at their database price, and the trade buys a
  *                           guest garage's car the game would refuse (game/
  *                           app/pc_car_shop.h; Game > Extras, GAME > EXTRAS)
+ *   NewCarAssistsOff=off    on: a car added to the garage gets its TCS and
+ *                           ASM settings at 0 (PC 2026-11-23; Game > Extras,
+ *                           GAME > EXTRAS)
  *   CourseRandomizer=off    on: the GT mode's career races on a random course
  *                           of their discipline; extended: on any course of
  *                           the database, whatever its surface (tarmac,
@@ -802,6 +805,18 @@ void set_unrestricted_wheels(bool on);
  * thread. */
 bool buy_not_for_sale();
 void set_buy_not_for_sale(bool on);
+
+/* PC (2026-11-23, user: "An option to toggle driving assists for new cars
+ * added to the garage: When a car is added, the game has a default TCS and
+ * ASM setting.  While the setting is on, cars that get added have those 2
+ * settings set to 0 / off"): [Game] NewCarAssistsOff - a car added to the
+ * garage (bought new or used, won, the debug fill's) gets its TCS and ASM
+ * settings at their least, the settings page's 0 (GameStatus::addCar, T429);
+ * the cars already there keep theirs.  Read at start (the launcher's Game >
+ * Extras); set (the settings menu's GAME > EXTRAS): written at once, taken
+ * by the next car added.  Any thread. */
+bool new_car_assists_off();
+void set_new_car_assists_off(bool on);
 
 /* PC (2026-11-14): [Challenges] MoneyDecay, CarDecay, CourseShrinkage: the
  * challenge modes (game/app/pc_challenge.h).  Read at start (the launcher's

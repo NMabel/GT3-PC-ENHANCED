@@ -138,6 +138,7 @@ add_library(gt3_platform STATIC
     # disc...): the launcher's own readers of the image and its volume
     platform/disc_image.cpp
     launcher/iso9660.cpp
+    launcher/chd_image.cpp
     launcher/volume.cpp
     launcher/inflate.cpp
     launcher/util.cpp
@@ -148,6 +149,7 @@ add_library(gt3_platform STATIC
     platform/input_map.cpp
     platform/wheel.cpp
     platform/wheel_ffb.cpp
+    platform/joy_names.cpp
     platform/clutch_input.cpp
     platform/debug_camera.cpp
     platform/memcard.cpp
@@ -198,6 +200,11 @@ target_link_libraries(gt3_platform PUBLIC gt3_openxr)
 # library (cmake/sqlite.cmake) ----------------------------------------------------
 include(${GT3PC_ROOT}/cmake/sqlite.cmake)
 target_link_libraries(gt3_platform PUBLIC gt3_sqlite)
+
+# ---- disc images stored as CHD files (PC 2026-11-23): libchdr, a static
+# library (cmake/chd.cmake; src/launcher/chd_image.*) ----------------------------
+include(${GT3PC_ROOT}/cmake/chd.cmake)
+target_link_libraries(gt3_platform PUBLIC gt3_chd)
 
 # ---- the sound: the native SPU2 / BGM player (standard C++, its own options:
 # not the decomp's prelude, guarded statics) and the output above (kernel
@@ -262,4 +269,8 @@ gt3pc_languages(gt3pc)
 add_custom_command(TARGET gt3pc POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GT3PC_SDL3_DLL} $<TARGET_FILE_DIR:gt3pc>
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:OpenXR::openxr_loader> $<TARGET_FILE_DIR:gt3pc>)
+# PC (2026-11-23): the third-party software's licence texts, licences\ beside
+# the executables (SDL3, SQLite, libchdr and what it carries)
+include(${GT3PC_ROOT}/cmake/licences.cmake)
+gt3pc_licences(gt3pc)
 add_subdirectory(launcher)

@@ -171,6 +171,7 @@ const char *const kCourseScaleKeys[3] = {"CourseScaleX", "CourseScaleY", "Course
 std::atomic<bool> g_prizeCarRandomizer{false};  /* [Game] PrizeCarRandomizer */
 std::atomic<bool> g_unrestrictedWheels{false};  /* PC (2026-11-13): [Game] UnrestrictedWheels */
 std::atomic<bool> g_buyNotForSale{false};       /* PC (2026-11-14): [Game] BuyNotForSale */
+std::atomic<bool> g_newCarAssistsOff{false};    /* PC (2026-11-23): [Game] NewCarAssistsOff */
 /* PC (2026-11-14): [Challenges] MoneyDecay, CarDecay, CourseShrinkage */
 const char kChallenges[] = "Challenges";
 const char *const kChallengeKeys[kChallengeCount] = {"MoneyDecay", "CarDecay", "CourseShrinkage"};
@@ -828,6 +829,11 @@ void load()
         g_buyNotForSale = _stricmp(on, "on") == 0 || strcmp(on, "1") == 0;
         if (g_buyNotForSale.load())
             pclog::write("settings: buy cars not for sale on");
+        /* PC (2026-11-23): [Game] NewCarAssistsOff */
+        GetPrivateProfileStringA(kGame, "NewCarAssistsOff", "off", on, sizeof(on), ini_path().c_str());
+        g_newCarAssistsOff = _stricmp(on, "on") == 0 || strcmp(on, "1") == 0;
+        if (g_newCarAssistsOff.load())
+            pclog::write("settings: new cars without assists on");
         /* PC (2026-11-14): [Challenges] */
         for (int c = 0; c < kChallengeCount; c++) {
             GetPrivateProfileStringA(kChallenges, kChallengeKeys[c], "off", on, sizeof(on), ini_path().c_str());
@@ -1032,6 +1038,20 @@ void set_buy_not_for_sale(bool on)
         return;
     WritePrivateProfileStringA(kGame, "BuyNotForSale", on ? "on" : "off", ini_path().c_str());
     pclog::write("settings: buy cars not for sale %s", on ? "on" : "off");
+}
+
+/* PC (2026-11-23): [Game] NewCarAssistsOff */
+bool new_car_assists_off()
+{
+    return g_newCarAssistsOff.load(std::memory_order_relaxed);
+}
+
+void set_new_car_assists_off(bool on)
+{
+    if (g_newCarAssistsOff.exchange(on) == on)
+        return;
+    WritePrivateProfileStringA(kGame, "NewCarAssistsOff", on ? "on" : "off", ini_path().c_str());
+    pclog::write("settings: new cars without assists %s (from the next car added to the garage)", on ? "on" : "off");
 }
 
 /* PC (2026-11-14): [Challenges] */

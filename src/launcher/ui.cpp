@@ -1909,6 +1909,9 @@ void build_options()
     /* PC (2026-11-14): settings.h's buy_not_for_sale (game/app/pc_car_shop.h) */
     add(TAB_GAME, tr(L"Buy cars not for sale"), L"Game", L"BuyNotForSale", L"off",
         {{tr(L"Off"), L"off"}, {tr(L"On"), L"on"}});
+    /* PC (2026-11-23): settings.h's new_car_assists_off (GameStatus::addCar) */
+    add(TAB_GAME, tr(L"New cars without assists"), L"Game", L"NewCarAssistsOff", L"off",
+        {{tr(L"Off"), L"off"}, {tr(L"On"), L"on"}});
     /* (settings.h's kRaceCarsMin .. kRaceCarsMax) */
     add_slider(TAB_GAME, tr(L"Cars in a race"), L"Game", L"RaceCars", L"6", 6, 32, 1, 0, count_text);
     add(TAB_GAME, tr(L"Override race limits"), L"Game", L"RaceCarsOverride", L"off",
@@ -2790,13 +2793,15 @@ void install_done()
 }
 
 /* The Open dialog's filter for a disc image: "PlayStation 2 disc image
- * (*.iso)\0*.iso\0All files (*.*)\0*.*\0" (its descriptions translated). */
+ * (*.iso; *.chd)\0*.iso;*.chd\0All files (*.*)\0*.*\0" (its descriptions
+ * translated).  PC (2026-11-23): a CHD too (chd_image.h; the image is told
+ * by its first bytes: one of another name opens through "All files"). */
 std::wstring disc_image_filter()
 {
     std::wstring f = tr(L"PlayStation 2 disc image");
-    f += L" (*.iso)";
+    f += L" (*.iso; *.chd)";
     f.push_back(L'\0');
-    f += L"*.iso";
+    f += L"*.iso;*.chd";
     f.push_back(L'\0');
     f += tr(L"All files");
     f += L" (*.*)";

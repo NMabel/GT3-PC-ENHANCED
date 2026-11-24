@@ -23,6 +23,12 @@ constexpr int kRightSign = 1;
 /* a force below this (1 / 4 of the game's least step, 1 / 127) is none */
 constexpr float kNone = 0.002f;
 
+/* PC (2026-11-22): an effect's runs when started - without end, as PCSX2's
+ * (usb-pad-sdl-ff.cpp: SDL_RunHapticEffect(..., SDL_HAPTIC_INFINITY) for
+ * every effect; its effects' length infinite too, as here).  Was 1 (the
+ * length infinite alone). */
+constexpr Uint32 kIterations = SDL_HAPTIC_INFINITY;
+
 int clamp_level(float v)
 {
     const float l = v * 32767.0f;
@@ -90,6 +96,7 @@ void Device::close()
     level_ = 0;
     springOn_ = false;
     springCoef_ = springSat_ = -1;
+    restartLogged_ = false;                 /* (PC 2026-11-22) */
 }
 
 bool Device::has_constant() const { return (features_ & SDL_HAPTIC_CONSTANT) != 0; }
@@ -99,6 +106,13 @@ void Device::apply(const Forces &f, const Settings &s)
 {
     if (h_ == nullptr)
         return;
+    /* PC (2026-11-22): the FFB loss workaround (Settings::restart) */
+    const bool restart = s.restart != 0;
+    if (restart && !restartLogged_) {
+        pclog::write("wheel: force feedback: the loss workaround on - the steering force started again with each "
+                     "one the game sends (PCSX2's FfbDropoutWorkaround)");
+        restartLogged_ = true;
+    }
     /* the steering force: a constant force without end, its level updated */
     if (has_constant()) {
         const int level = kRightSign * clamp_level(scaled(f.force, s));
@@ -113,23 +127,28 @@ void Device::apply(const Forces &f, const Settings &s)
             if (constant_ < 0) {
                 pclog::write("wheel: force feedback: no constant force (%s)", SDL_GetError());
                 features_ &= ~SDL_HAPTIC_CONSTANT;
-            } else if (!SDL_RunHapticEffect(h_, constant_, 1)) {
+            } else if (!SDL_RunHapticEffect(h_, constant_, kIterations)) {
                 pclog::write("wheel: force feedback: the constant force did not start (%s)", SDL_GetError());
             }
             level_ = level;
-        } else if (constant_ >= 0 && level != level_) {
-            SDL_HapticEffect e;
-            memset(&e, 0, sizeof(e));
-            e.type = SDL_HAPTIC_CONSTANT;
-            e.constant.direction.type = SDL_HAPTIC_STEERING_AXIS;
-            e.constant.length = SDL_HAPTIC_INFINITY;
-            e.constant.level = (Sint16)level;
-            /* (a driver that stops an effect on its update, when it says
-             * so: started again) */
-            if (!SDL_UpdateHapticEffect(h_, constant_, &e) ||
-                ((features_ & SDL_HAPTIC_STATUS) && !SDL_GetHapticEffectStatus(h_, constant_)))
-                SDL_RunHapticEffect(h_, constant_, 1);
-            level_ = level;
+        } else if (constant_ >= 0) {
+            bool start = restart && f.sent;     /* (PC 2026-11-22: the workaround, each force sent) */
+            if (level != level_) {
+                SDL_HapticEffect e;
+                memset(&e, 0, sizeof(e));
+                e.type = SDL_HAPTIC_CONSTANT;
+                e.constant.direction.type = SDL_HAPTIC_STEERING_AXIS;
+                e.constant.length = SDL_HAPTIC_INFINITY;
+                e.constant.level = (Sint16)level;
+                /* (a driver that stops an effect on its update, when it says
+                 * so: started again) */
+                if (!SDL_UpdateHapticEffect(h_, constant_, &e) ||
+                    ((features_ & SDL_HAPTIC_STATUS) && !SDL_GetHapticEffectStatus(h_, constant_)))
+                    start = true;
+                level_ = level;
+            }
+            if (start)
+                SDL_RunHapticEffect(h_, constant_, kIterations);
         }
     }
     /* the centring spring: a spring about the centre, both sides alike */
@@ -159,9 +178,10 @@ void Device::apply(const Forces &f, const Settings &s)
             springCoef_ = coef;
             springSat_ = sat;
         }
+        /* (the workaround leaves the spring alone, as PCSX2's does) */
         if (on != springOn_ && spring_ >= 0) {
             if (on)
-                SDL_RunHapticEffect(h_, spring_, 1);
+                SDL_RunHapticEffect(h_, spring_, kIterations);
             else
                 SDL_StopHapticEffect(h_, spring_);
             springOn_ = on;

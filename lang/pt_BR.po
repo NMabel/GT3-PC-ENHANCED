@@ -149,6 +149,28 @@ msgstr "TAMANHO DA PISTA: %s (MÍN.)"
 msgid "COURSE SIZE: %s"
 msgstr "TAMANHO DA PISTA: %s"
 
+#: src/game/app/pc_clutch.cpp
+msgid "H-SHIFTER IS OFF (PLAYER %d)"
+msgstr "CÂMBIO H DESLIGADO (JOGADOR %d)"
+
+#: src/game/app/pc_clutch.cpp
+msgid ""
+"ITS GEARS ARE NOT READ: THE H-SHIFTER WORKS WITH A CLUTCH,\n"
+"AND NONE IS MAPPED. MAP ONE IN THE LAUNCHER'S CONTROLS TAB."
+msgstr ""
+"AS MARCHAS DELE NÃO SÃO LIDAS: O CÂMBIO H FUNCIONA COM UMA EMBREAGEM,\n"
+"E NENHUMA ESTÁ ATRIBUÍDA. ATRIBUA UMA NA ABA CONTROLES DO INICIALIZADOR."
+
+#: src/game/app/pc_clutch.cpp
+msgid ""
+"ITS GEARS ARE NOT READ IN THIS RACE. TO USE IT, SET GEAR SHIFT\n"
+"BEHAVIOR TO REALISTIC + CLUTCH AND H-SHIFTER TO ON (GAME > EXTRAS).\n"
+"THE NEXT RACE ENTERED TAKES IT."
+msgstr ""
+"AS MARCHAS DELE NÃO SÃO LIDAS NESTA CORRIDA. PARA USÁ-LO, DEFINA TROCA DE\n"
+"MARCHAS COMO REALISTA + EMBREAGEM E CÂMBIO H COMO LIGADO (JOGO > EXTRAS).\n"
+"VALE A PARTIR DA PRÓXIMA CORRIDA."
+
 #: src/game/app/pc_customcam.cpp
 msgid "CUSTOM CAMERA"
 msgstr "CÂMERA PERSONALIZADA"
@@ -436,6 +458,26 @@ msgstr "Cockpit"
 #: src/game/camera/T378_onboard_camera.cpp
 msgid "Bumper"
 msgstr "Para-choque"
+
+#: src/launcher/chd_image.cpp
+msgid "this CHD file needs a parent CHD file, which is not supported"
+msgstr "este arquivo CHD precisa de um arquivo CHD pai, o que não é suportado"
+
+#: src/launcher/chd_image.cpp
+msgid "the CHD file could not be read (%s)"
+msgstr "não foi possível ler o arquivo CHD (%s)"
+
+#: src/launcher/chd_image.cpp src/launcher/iso9660.cpp
+msgid "the file could not be opened (%s)"
+msgstr "não foi possível abrir o arquivo (%s)"
+
+#: src/launcher/chd_image.cpp
+msgid "this CHD file holds no disc image (no ISO 9660 file system)"
+msgstr "este arquivo CHD não contém uma imagem de disco (sem sistema de arquivos ISO 9660)"
+
+#: src/launcher/chd_image.cpp src/launcher/iso9660.cpp
+msgid "it ends too early (is the image complete?)"
+msgstr "termina cedo demais (a imagem está completa?)"
 
 #: src/launcher/controls.cpp
 msgid "Mapping"
@@ -1228,14 +1270,6 @@ msgstr "Não foi possível listar os arquivos do jogo da imagem de disco (%s). C
 #: src/launcher/install.cpp
 msgid "If the game is running from this disc image, close it first."
 msgstr "Se o jogo estiver rodando desta imagem de disco, feche-o primeiro."
-
-#: src/launcher/iso9660.cpp
-msgid "it ends too early (is the image complete?)"
-msgstr "termina cedo demais (a imagem está completa?)"
-
-#: src/launcher/iso9660.cpp
-msgid "the file could not be opened (%s)"
-msgstr "não foi possível abrir o arquivo (%s)"
 
 #: src/launcher/iso9660.cpp
 msgid "the file could not be read (%s)"
@@ -2848,6 +2882,10 @@ msgid "Buy cars not for sale"
 msgstr "Comprar carros não à venda"
 
 #: src/launcher/ui.cpp
+msgid "New cars without assists"
+msgstr "Carros novos sem assistências"
+
+#: src/launcher/ui.cpp
 msgid "Cars in a race"
 msgstr "Carros por corrida"
 
@@ -4012,6 +4050,10 @@ msgid "Invert force feedback"
 msgstr "Inverter force feedback"
 
 #: src/platform/input_map.cpp
+msgid "Force feedback loss workaround"
+msgstr "Evitar perda de force feedback"
+
+#: src/platform/input_map.cpp
 msgid "South (A / Cross)"
 msgstr "Sul (A / X)"
 
@@ -4844,6 +4886,20 @@ msgid ""
 msgstr ""
 "CADA FORÇA AO CONTRÁRIO, PARA UM VOLANTE EMPURRADO\n"
 "PARA LONGE DO CENTRO (OS TESTES DO INICIADOR MOSTRAM)."
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
+"THE STEERING FORCE IS STARTED AGAIN EACH TIME THE GAME\n"
+"SENDS IT (PCSX2'S 'WORKAROUND FOR INTERMITTENT FFB LOSS').\n"
+"LEAVE IT OFF UNLESS NEEDED: ON MANY WHEELS IT MAKES THE\n"
+"FORCES VAGUE OR CUT OUT."
+msgstr ""
+"PARA UM VOLANTE CUJAS FORÇAS PARAM NO MEIO DA CORRIDA:\n"
+"A FORÇA DA DIREÇÃO É REINICIADA CADA VEZ QUE O JOGO A ENVIA\n"
+"(NO PCSX2: 'WORKAROUND FOR INTERMITTENT FFB LOSS').\n"
+"LIGUE SÓ SE PRECISAR: EM MUITOS VOLANTES AS FORÇAS FICAM\n"
+"IMPRECISAS OU FALHAM."
 
 #: src/platform/settings_menu.cpp
 msgid "DISPLAY"
@@ -5990,6 +6046,18 @@ msgid "CARS NOT FOR SALE IN SHOWROOMS CAN BE BOUGHT"
 msgstr "CARROS QUE NÃO ESTÃO À VENDA NAS CONCESSIONÁRIAS PODEM SER COMPRADOS"
 
 #: src/platform/settings_menu.cpp
+msgid "NEW CARS WITHOUT ASSISTS"
+msgstr "CARROS NOVOS SEM ASSISTÊNCIAS"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"CARS ADDED TO THE GARAGE GET THEIR TCS AND ASM SET TO 0.\n"
+"CARS ALREADY IN THE GARAGE KEEP THEIR SETTINGS."
+msgstr ""
+"OS CARROS ADICIONADOS À GARAGEM FICAM COM TCS E ASM EM 0.\n"
+"OS QUE JÁ ESTÃO NA GARAGEM MANTÊM SUAS CONFIGURAÇÕES."
+
+#: src/platform/settings_menu.cpp
 msgid "CARS IN A RACE"
 msgstr "CARROS POR CORRIDA"
 
@@ -6306,6 +6374,10 @@ msgstr "FORÇA MÍNIMA"
 #: src/platform/settings_menu.cpp
 msgid "INVERT FORCE FEEDBACK"
 msgstr "INVERTER FORCE FEEDBACK"
+
+#: src/platform/settings_menu.cpp
+msgid "FORCE FEEDBACK LOSS WORKAROUND"
+msgstr "EVITAR PERDA DE FORCE FEEDBACK"
 
 #: src/platform/settings_menu.cpp
 msgid "PLAYER 2'S DEVICE, CONTROLLER AND WHEEL."
@@ -6749,6 +6821,16 @@ msgstr "TEXTURAS"
 
 #~ msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
 #~ msgstr "A DISTÂNCIA DA TELA À SUA FRENTE. ENTER: 90 CM."
+#~ msgid ""
+#~ "FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
+#~ "THE FORCES ARE STARTED AGAIN WITH EACH UPDATE.\n"
+#~ "LEAVE IT OFF IF THE FORCES DO NOT STOP: ON SOME\n"
+#~ "WHEELS IT MAKES THEM JUDDER."
+#~ msgstr ""
+#~ "PARA UM VOLANTE CUJAS FORÇAS PARAM NO MEIO DA CORRIDA:\n"
+#~ "AS FORÇAS SÃO REINICIADAS A CADA ATUALIZAÇÃO.\n"
+#~ "DEIXE DESLIGADO SE AS FORÇAS NÃO PARAM: EM ALGUNS\n"
+#~ "VOLANTES ELAS PASSAM A TREPIDAR."
 
 #~ msgid "On (the game's: the lock shrinks with speed)"
 #~ msgstr "Ligado (o do jogo: o esterço cai com a velocidade)"

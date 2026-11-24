@@ -252,6 +252,18 @@ constexpr int kPadAxisLeftTrigger = 4, kPadAxisRightTrigger = 5;
  * rests at an end (|rest| > 16384: a pedal), the direction it moved.  joy:
  * a joystick axis (else a gamepad axis: always a half). */
 bool capture_axis(bool joy, int axis, int rest, int now, Binding *out);
+/* PC (2026-11-23): the same for a wheel profile's SteerLeft / SteerRight
+ * from a joystick axis: always a half, the one the axis moved towards,
+ * taken once it moved kSteerCaptureMove from where it was (a tenth of its
+ * whole travel).  A user's report (a Fanatec direct drive base): after
+ * SteerLeft the wheel stayed where it was turned to - no spring of its own -
+ * so SteerRight began from past half lock, which capture_axis reads as an
+ * axis at rest at an end and took whole: `SteerLeft=joy:axis0-;
+ * SteerRight=joy:axis0+full'.  That steers half right with the wheel
+ * centred, and the menus then hold "right" for good, which keeps every
+ * button out (MenuControl::updateKeys): no confirm, no movie skip. */
+constexpr int kSteerCaptureMove = 6554;
+bool capture_steer_axis(int axis, int rest, int now, Binding *out);
 
 /* ---- a profile ------------------------------------------------------- */
 
@@ -274,12 +286,21 @@ const char *deadzone_name(int profile, int i);      /* the launcher's / settings
  * none; 25 by default, the user's), FfbSpring=100 (0..300: the menus' centring spring, the game's own
  * at 100), FfbMinimum=0 (0..30: the least force a non-zero one is lifted to,
  * for a wheel that does not move below it), FfbInvert=off (on: every force
- * the other way). */
-enum FfbSetting { kFfbStrength, kFfbSpring, kFfbMinimum, kFfbInvert, kFfbSettings };
+ * the other way).  PC (2026-11-22, a user's report: "Shortly after the start
+ * of a race (about 30-40 seconds or so) with certain wheels (I am using a
+ * Simagic Alpha Evo) force feedback is lost.  There is a similar issue on
+ * PCSX2 which is handled via an option called 'workaround for intermittent
+ * FFB loss'"): FfbLossWorkaround=off (on: the steering force started again
+ * with each one the game sends, as PCSX2's FfbDropoutWorkaround:
+ * platform/wheel_ffb.h). */
+enum FfbSetting { kFfbStrength, kFfbSpring, kFfbMinimum, kFfbInvert, kFfbLossWorkaround, kFfbSettings };
 const char *ffb_key(int i);                 /* the ini key: "FfbStrength" .. */
 const char *ffb_name(int i);                /* the launcher's label (N_) */
 int ffb_default(int i);
-int ffb_max(int i);                         /* (the least is 0; FfbInvert's 1) */
+int ffb_max(int i);                         /* (the least is 0; the switches' 1) */
+/* PC (2026-11-22): an on / off setting (FfbInvert, FfbLossWorkaround: the
+ * ini's "on" / "off") */
+inline bool ffb_is_switch(int i) { return i == kFfbInvert || i == kFfbLossWorkaround; }
 
 /* PC (2026-11-20, user: "There is a steering input filter for the wheel, add
  * an option to disable it, so steering is directly dictated by the wheel's
@@ -302,7 +323,7 @@ struct Profile {
     int deadzone[kDeadzones] = {0, 0, 0, 0};    /* (defaults: kStickDeadzoneDefault for a controller's sticks) */
     char device[128] = "";                  /* wheels: the joystick's name ("": auto) */
     bool controller = false;                /* wheels: Input=controller (else wheel) */
-    int ffb[kFfbSettings] = {25, 100, 0, 0};    /* wheels: the force feedback's (PC 2026-11-20) */
+    int ffb[kFfbSettings] = {25, 100, 0, 0, 0}; /* wheels: the force feedback's (PC 2026-11-20; 11-22 the workaround) */
     bool steerFilter = true;                /* wheels: SteeringFilter (PC 2026-11-20) */
     int steerCurve = 0;                     /* wheels: SteeringCurve (PC 2026-11-20) */
 };
@@ -313,6 +334,14 @@ void load(const char *ini, int profile, Profile *out);
 void save(const char *ini, int profile, const Profile &p);
 /* A binding of the profile names the device `name' (case aside). */
 bool names_device(const Profile &p, const char *name);
+/* PC (2026-11-23): the device a wheel profile's steering names (its
+ * SteerLeft / SteerRight bound to a joystick `@<name>'), "" when it names
+ * none.  That joystick is the wheel itself, whatever its Device says while
+ * that is auto: the game (gamepad.cpp wheel_for) and the launcher take it
+ * as the profile's wheel.  A user's gt3pc.ini had every binding of Wheel 1
+ * written with its own wheel base's name (platform/joy_names.h), which kept
+ * the base from being a wheel at all. */
+const char *steer_device(const Profile &p);
 
 /* ---- the sources ----------------------------------------------------- */
 

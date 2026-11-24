@@ -901,6 +901,9 @@ template <int P, int I> int ffb_edges()
 #define FFB(P, I) 0, nullptr, nullptr, nullptr, ffb_text<P, I>, ffb_step<P, I>, ffb_edges<P, I>
 template <int P> int ffb_invert_get() { return input_map::ffb(P, input_map::kFfbInvert); }
 template <int P> void ffb_invert_set(int v) { input_map::set_ffb(P, input_map::kFfbInvert, v); }
+/* PC (2026-11-22): the FFB loss workaround (input_map::kFfbLossWorkaround) */
+template <int P> int ffb_loss_get() { return input_map::ffb(P, input_map::kFfbLossWorkaround); }
+template <int P> void ffb_loss_set(int v) { input_map::set_ffb(P, input_map::kFfbLossWorkaround, v); }
 /* PC (2026-11-20, user: "In the F2 menu, the force feedback % line should let
  * the user know the in-game setting is off"): the strength's label while
  * GT3's own Force Feedback option of player P is off (wheel::game_ffb: the
@@ -984,6 +987,9 @@ void free_wheels_set(int v) { settings::set_unrestricted_wheels(v != 0); }
 /* PC (2026-11-14): GAME > EXTRAS > BUY CARS NOT FOR SALE */
 int not_for_sale_get() { return settings::buy_not_for_sale() ? 1 : 0; }
 void not_for_sale_set(int v) { settings::set_buy_not_for_sale(v != 0); }
+/* PC (2026-11-23): GAME > EXTRAS > NEW CARS WITHOUT ASSISTS */
+int new_car_assists_get() { return settings::new_car_assists_off() ? 1 : 0; }
+void new_car_assists_set(int v) { settings::set_new_car_assists_off(v != 0); }
 /* PC (2026-11-14): CHALLENGE MODES (settings::challenge, game/app/pc_challenge.h) */
 template <settings::Challenge C> int challenge_get() { return settings::challenge(C) ? 1 : 0; }
 template <settings::Challenge C> void challenge_set(int v) { settings::set_challenge(C, v != 0); }
@@ -1379,6 +1385,10 @@ const char kFfbMinimumHelp[] = N_("THE LEAST FORCE THE WHEEL GETS ONCE THERE IS 
                                   "MOVE BELOW IT. ENTER: 0%.");
 const char kFfbInvertHelp[] = N_("EVERY FORCE THE OTHER WAY, FOR A WHEEL PUSHED AWAY\nFROM THE CENTER (THE "
                                  "LAUNCHER'S TESTS SHOW WHICH).");
+/* PC (2026-11-22) */
+const char kFfbLossHelp[] = N_("FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\nTHE STEERING FORCE IS STARTED "
+                               "AGAIN EACH TIME THE GAME\nSENDS IT (PCSX2'S 'WORKAROUND FOR INTERMITTENT FFB LOSS')."
+                               "\nLEAVE IT OFF UNLESS NEEDED: ON MANY WHEELS IT MAKES THE\nFORCES VAGUE OR CUT OUT.");
 
 /* (help: any number of lines, '\n' between; the panel takes the most lines
  * and the longest line of them all) */
@@ -1585,6 +1595,10 @@ const Item kItems[] = {
     /* PC (2026-11-14): the cars the dealers show as not for sale */
     {2, N_("BUY CARS NOT FOR SALE"), N_("CARS NOT FOR SALE IN SHOWROOMS CAN BE BOUGHT"),
      2, not_for_sale_get, not_for_sale_set, on_off_value},
+    /* PC (2026-11-23) */
+    {2, N_("NEW CARS WITHOUT ASSISTS"), N_("CARS ADDED TO THE GARAGE GET THEIR TCS AND ASM SET TO 0.\nCARS ALREADY IN "
+                                           "THE GARAGE KEEP THEIR SETTINGS."),
+     2, new_car_assists_get, new_car_assists_set, on_off_value},
     {2, N_("CARS IN A RACE"), N_("THE AMOUNT OF CARS IN A RACE.\n IF A RACE HAS A LIMIT, IT WILL NEED TO BE OVERRIDDEN WITH THE SETTING BELOW."),
      0, nullptr, nullptr, nullptr, race_cars_text, race_cars_step, race_cars_edges},
     {2, N_("  OVERRIDE RACE LIMITS"), N_("RALLY AND WET COURSES CAN HAVE MORE CARS TOO."),
@@ -1666,6 +1680,8 @@ const Item kItems[] = {
     {3, N_("CENTERING SPRING"), kFfbSpringHelp, FFB(0, input_map::kFfbSpring)},
     {3, N_("MINIMUM FORCE"), kFfbMinimumHelp, FFB(0, input_map::kFfbMinimum)},
     {3, N_("INVERT FORCE FEEDBACK"), kFfbInvertHelp, 2, ffb_invert_get<0>, ffb_invert_set<0>, on_off_value},
+    /* PC (2026-11-22) */
+    {3, N_("FORCE FEEDBACK LOSS WORKAROUND"), kFfbLossHelp, 2, ffb_loss_get<0>, ffb_loss_set<0>, on_off_value},
     {1, N_("PLAYER 2"), N_("PLAYER 2'S DEVICE, CONTROLLER AND WHEEL."), kCategory},
     {2, N_("DEVICE"), kDeviceHelp, 2, device_get<1>, device_set<1>, device_value},
     {2, N_("CONTROLLER"), N_("PLAYER 2'S CONTROLLER (PORT 2)."), kCategory},
@@ -1683,6 +1699,7 @@ const Item kItems[] = {
     {3, N_("CENTERING SPRING"), kFfbSpringHelp, FFB(1, input_map::kFfbSpring)},
     {3, N_("MINIMUM FORCE"), kFfbMinimumHelp, FFB(1, input_map::kFfbMinimum)},
     {3, N_("INVERT FORCE FEEDBACK"), kFfbInvertHelp, 2, ffb_invert_get<1>, ffb_invert_set<1>, on_off_value},
+    {3, N_("FORCE FEEDBACK LOSS WORKAROUND"), kFfbLossHelp, 2, ffb_loss_get<1>, ffb_loss_set<1>, on_off_value},
     {0, N_("DEBUG"), N_("TESTING AIDS AND DEVELOPER CHEATS"), kCategory},
     {1, N_("FILL GARAGE"), N_("NEW GAME: GET ONE OF EVERY CAR IN THE DATABASE\nIN EVERY COLOR."),
      2, fill_garage_get, fill_garage_set, on_off_value},

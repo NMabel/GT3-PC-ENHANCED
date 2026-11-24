@@ -32,6 +32,9 @@ endif()
 if(NOT TARGET gt3_sqlite)
     include(${GT3PC_ROOT}/cmake/sqlite.cmake)
 endif()
+if(NOT TARGET gt3_chd)                      # (PC 2026-11-23: disc images stored as CHD files)
+    include(${GT3PC_ROOT}/cmake/chd.cmake)
+endif()
 
 add_executable(gt3launcher WIN32
     main.cpp
@@ -45,6 +48,7 @@ add_executable(gt3launcher WIN32
     display.cpp
     inflate.cpp
     iso9660.cpp
+    chd_image.cpp
     util.cpp
     volume.cpp
     music.cpp
@@ -63,6 +67,7 @@ add_executable(gt3launcher WIN32
     pclog.cpp
     ${GT3PC_ROOT}/src/platform/input_map.cpp
     ${GT3PC_ROOT}/src/platform/wheel_ffb.cpp
+    ${GT3PC_ROOT}/src/platform/joy_names.cpp
     ${GT3PC_ROOT}/src/platform/save_folders.cpp
     ${GT3PC_ROOT}/src/engine/sound/native/bgm_files.cpp
     ${GT3PC_ROOT}/src/engine/sound/native/spu2_adpcm.cpp
@@ -87,9 +92,15 @@ add_executable(gt3launcher WIN32
 )
 target_compile_definitions(gt3launcher PRIVATE UNICODE _UNICODE)
 target_include_directories(gt3launcher PRIVATE ${GT3PC_ROOT}/src)
-target_link_libraries(gt3launcher PRIVATE comctl32 comdlg32 shell32 ole32 windowscodecs gt3_sdl3 gt3_sqlite)
+target_link_libraries(gt3launcher PRIVATE comctl32 comdlg32 shell32 ole32 windowscodecs gt3_sdl3 gt3_sqlite gt3_chd)
 add_custom_command(TARGET gt3launcher POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GT3PC_SDL3_DLL} $<TARGET_FILE_DIR:gt3launcher>)
+# PC (2026-11-23): the third-party software's licence texts, licences\ beside
+# the executable (cmake/licences.cmake)
+if(NOT COMMAND gt3pc_licences)
+    include(${GT3PC_ROOT}/cmake/licences.cmake)
+endif()
+gt3pc_licences(gt3launcher)
 # (the background art and the mods window's default picture: resources,
 # decoded by WIC)
 set_property(SOURCE gt3launcher.rc APPEND PROPERTY OBJECT_DEPENDS

@@ -149,6 +149,28 @@ msgstr "РАЗМЕР ТРАССЫ: %s (МИН.)"
 msgid "COURSE SIZE: %s"
 msgstr "РАЗМЕР ТРАССЫ: %s"
 
+#: src/game/app/pc_clutch.cpp
+msgid "H-SHIFTER IS OFF (PLAYER %d)"
+msgstr "H-ШИФТЕР ВЫКЛЮЧЕН (ИГРОК %d)"
+
+#: src/game/app/pc_clutch.cpp
+msgid ""
+"ITS GEARS ARE NOT READ: THE H-SHIFTER WORKS WITH A CLUTCH,\n"
+"AND NONE IS MAPPED. MAP ONE IN THE LAUNCHER'S CONTROLS TAB."
+msgstr ""
+"ЕГО ПЕРЕДАЧИ НЕ СЧИТЫВАЮТСЯ: H-ШИФТЕР РАБОТАЕТ СО СЦЕПЛЕНИЕМ,\n"
+"А ОНО НЕ НАЗНАЧЕНО. НАЗНАЧЬТЕ ЕГО НА ВКЛАДКЕ «УПРАВЛЕНИЕ» ЛАУНЧЕРА."
+
+#: src/game/app/pc_clutch.cpp
+msgid ""
+"ITS GEARS ARE NOT READ IN THIS RACE. TO USE IT, SET GEAR SHIFT\n"
+"BEHAVIOR TO REALISTIC + CLUTCH AND H-SHIFTER TO ON (GAME > EXTRAS).\n"
+"THE NEXT RACE ENTERED TAKES IT."
+msgstr ""
+"ЕГО ПЕРЕДАЧИ НЕ СЧИТЫВАЮТСЯ В ЭТОЙ ГОНКЕ. ЧТОБЫ ИСПОЛЬЗОВАТЬ ЕГО, ВЫБЕРИТЕ\n"
+"ПЕРЕКЛЮЧЕНИЕ ПЕРЕДАЧ: РЕАЛИСТИЧНО + СЦЕПЛЕНИЕ И H-ШИФТЕР: ВКЛ.\n"
+"(ИГРА > ДОПОЛНИТЕЛЬНО). ДЕЙСТВУЕТ СО СЛЕДУЮЩЕЙ ГОНКИ."
+
 #: src/game/app/pc_customcam.cpp
 msgid "CUSTOM CAMERA"
 msgstr "СВОЯ КАМЕРА"
@@ -436,6 +458,26 @@ msgstr "Кокпит"
 #: src/game/camera/T378_onboard_camera.cpp
 msgid "Bumper"
 msgstr "Бампер"
+
+#: src/launcher/chd_image.cpp
+msgid "this CHD file needs a parent CHD file, which is not supported"
+msgstr "этому файлу CHD нужен родительский файл CHD, что не поддерживается"
+
+#: src/launcher/chd_image.cpp
+msgid "the CHD file could not be read (%s)"
+msgstr "не удалось прочитать файл CHD (%s)"
+
+#: src/launcher/chd_image.cpp src/launcher/iso9660.cpp
+msgid "the file could not be opened (%s)"
+msgstr "не удалось открыть файл (%s)"
+
+#: src/launcher/chd_image.cpp
+msgid "this CHD file holds no disc image (no ISO 9660 file system)"
+msgstr "в этом файле CHD нет образа диска (нет файловой системы ISO 9660)"
+
+#: src/launcher/chd_image.cpp src/launcher/iso9660.cpp
+msgid "it ends too early (is the image complete?)"
+msgstr "он заканчивается слишком рано (образ полный?)"
 
 #: src/launcher/controls.cpp
 msgid "Mapping"
@@ -1228,14 +1270,6 @@ msgstr "Не удалось получить список файлов игры 
 #: src/launcher/install.cpp
 msgid "If the game is running from this disc image, close it first."
 msgstr "Если игра запущена с этого образа диска, сначала закройте её."
-
-#: src/launcher/iso9660.cpp
-msgid "it ends too early (is the image complete?)"
-msgstr "он заканчивается слишком рано (образ полный?)"
-
-#: src/launcher/iso9660.cpp
-msgid "the file could not be opened (%s)"
-msgstr "не удалось открыть файл (%s)"
 
 #: src/launcher/iso9660.cpp
 msgid "the file could not be read (%s)"
@@ -2848,6 +2882,10 @@ msgid "Buy cars not for sale"
 msgstr "Покупка любых машин"
 
 #: src/launcher/ui.cpp
+msgid "New cars without assists"
+msgstr "Новые авто без TCS/ASM"
+
+#: src/launcher/ui.cpp
 msgid "Cars in a race"
 msgstr "Машин в гонке"
 
@@ -4012,6 +4050,10 @@ msgid "Invert force feedback"
 msgstr "Обратная отдача"
 
 #: src/platform/input_map.cpp
+msgid "Force feedback loss workaround"
+msgstr "Обход пропадания отдачи"
+
+#: src/platform/input_map.cpp
 msgid "South (A / Cross)"
 msgstr "Нижняя (A / Крестик)"
 
@@ -4844,6 +4886,20 @@ msgid ""
 msgstr ""
 "КАЖДАЯ СИЛА В ДРУГУЮ СТОРОНУ, ДЛЯ РУЛЯ, ТОЛКАЕМОГО\n"
 "ОТ ЦЕНТРА (ПРОВЕРКИ В ЛАУНЧЕРЕ ЭТО ПОКАЖУТ)."
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
+"THE STEERING FORCE IS STARTED AGAIN EACH TIME THE GAME\n"
+"SENDS IT (PCSX2'S 'WORKAROUND FOR INTERMITTENT FFB LOSS').\n"
+"LEAVE IT OFF UNLESS NEEDED: ON MANY WHEELS IT MAKES THE\n"
+"FORCES VAGUE OR CUT OUT."
+msgstr ""
+"ДЛЯ РУЛЯ, ЧЬИ УСИЛИЯ ПРОПАДАЮТ ПОСРЕДИ ГОНКИ:\n"
+"УСИЛИЕ РУЛЯ ЗАПУСКАЕТСЯ ЗАНОВО КАЖДЫЙ РАЗ, КОГДА ИГРА\n"
+"ЕГО ПОСЫЛАЕТ (В PCSX2: 'WORKAROUND FOR INTERMITTENT FFB LOSS').\n"
+"ВКЛЮЧАЙТЕ ТОЛЬКО ПРИ НЕОБХОДИМОСТИ: НА МНОГИХ РУЛЯХ\n"
+"УСИЛИЯ СТАНОВЯТСЯ РАЗМЫТЫМИ ИЛИ ПРОПАДАЮТ."
 
 #: src/platform/settings_menu.cpp
 msgid "DISPLAY"
@@ -5987,6 +6043,18 @@ msgid "CARS NOT FOR SALE IN SHOWROOMS CAN BE BOUGHT"
 msgstr "МОЖНО КУПИТЬ МАШИНЫ, КОТОРЫЕ НЕ ПРОДАЮТСЯ В АВТОСАЛОНАХ"
 
 #: src/platform/settings_menu.cpp
+msgid "NEW CARS WITHOUT ASSISTS"
+msgstr "НОВЫЕ АВТО БЕЗ TCS/ASM"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"CARS ADDED TO THE GARAGE GET THEIR TCS AND ASM SET TO 0.\n"
+"CARS ALREADY IN THE GARAGE KEEP THEIR SETTINGS."
+msgstr ""
+"У МАШИН, ДОБАВЛЯЕМЫХ В ГАРАЖ, TCS И ASM СТАВЯТСЯ НА 0.\n"
+"МАШИНЫ, УЖЕ СТОЯЩИЕ В ГАРАЖЕ, СОХРАНЯЮТ СВОИ НАСТРОЙКИ."
+
+#: src/platform/settings_menu.cpp
 msgid "CARS IN A RACE"
 msgstr "МАШИН В ГОНКЕ"
 
@@ -6303,6 +6371,10 @@ msgstr "МИНИМАЛЬНАЯ СИЛА"
 #: src/platform/settings_menu.cpp
 msgid "INVERT FORCE FEEDBACK"
 msgstr "ОБРАТНАЯ ОТДАЧА"
+
+#: src/platform/settings_menu.cpp
+msgid "FORCE FEEDBACK LOSS WORKAROUND"
+msgstr "ОБХОД ПРОПАДАНИЯ ОТДАЧИ"
 
 #: src/platform/settings_menu.cpp
 msgid "PLAYER 2'S DEVICE, CONTROLLER AND WHEEL."
@@ -6746,6 +6818,16 @@ msgstr "ТЕКСТУРЫ"
 
 #~ msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
 #~ msgstr "РАССТОЯНИЕ ДО ЭКРАНА ПЕРЕД ВАМИ. ENTER: 90 СМ."
+#~ msgid ""
+#~ "FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
+#~ "THE FORCES ARE STARTED AGAIN WITH EACH UPDATE.\n"
+#~ "LEAVE IT OFF IF THE FORCES DO NOT STOP: ON SOME\n"
+#~ "WHEELS IT MAKES THEM JUDDER."
+#~ msgstr ""
+#~ "ДЛЯ РУЛЯ, ЧЬИ УСИЛИЯ ПРОПАДАЮТ ПОСРЕДИ ГОНКИ:\n"
+#~ "УСИЛИЯ ЗАПУСКАЮТСЯ ЗАНОВО ПРИ КАЖДОМ ОБНОВЛЕНИИ.\n"
+#~ "ОСТАВЬТЕ ВЫКЛЮЧЕННЫМ, ЕСЛИ УСИЛИЯ НЕ ПРОПАДАЮТ: НА\n"
+#~ "НЕКОТОРЫХ РУЛЯХ ОНИ НАЧИНАЮТ ДЁРГАТЬСЯ."
 
 #~ msgid "On (the game's: the lock shrinks with speed)"
 #~ msgstr "Вкл. (как в игре: угол падает со скоростью)"

@@ -123,12 +123,14 @@ const char *const kWheelDeadzoneKeys[kDeadzones] = {"SteeringDeadzone", "GasDead
 const char *const kWheelDeadzoneNames[kDeadzones] = {N_("Steering dead zone"), N_("Gas pedal dead zone"),
                                                      N_("Brake pedal dead zone"), N_("Clutch pedal dead zone")};
 /* PC (2026-11-20): a wheel's force feedback (FfbSetting) */
-const char *const kFfbKeys[kFfbSettings] = {"FfbStrength", "FfbSpring", "FfbMinimum", "FfbInvert"};
+/* (PC 2026-11-22: FfbLossWorkaround) */
+const char *const kFfbKeys[kFfbSettings] = {"FfbStrength", "FfbSpring", "FfbMinimum", "FfbInvert", "FfbLossWorkaround"};
 const char *const kFfbNames[kFfbSettings] = {N_("Force feedback strength"), N_("Centering spring"),
-                                             N_("Minimum force"), N_("Invert force feedback")};
+                                             N_("Minimum force"), N_("Invert force feedback"),
+                                             N_("Force feedback loss workaround")};
 /* (PC 2026-11-20, user: "Default FFB% should be 25%": the strength's) */
-const int kFfbDefaults[kFfbSettings] = {25, 100, 0, 0};
-const int kFfbMax[kFfbSettings] = {200, 300, 30, 1};
+const int kFfbDefaults[kFfbSettings] = {25, 100, 0, 0, 0};
+const int kFfbMax[kFfbSettings] = {200, 300, 30, 1, 1};
 
 /* SDL3's gamepad buttons and axes: the ini names (SDL_GetGamepadStringForButton's)
  * and the labels. */
@@ -755,6 +757,16 @@ bool capture_axis(bool joyAxis, int axis, int rest, int now, Binding *out)
     return true;
 }
 
+/* PC (2026-11-23) */
+bool capture_steer_axis(int axis, int rest, int now, Binding *out)
+{
+    const int d = now - rest;
+    if (abs(d) < kSteerCaptureMove)
+        return false;
+    *out = joy(Source::joy_axis, axis, d > 0 ? 1 : -1);
+    return true;
+}
+
 const char *deadzone_key(int profile, int i)
 {
     if (i < 0 || i >= deadzone_count(profile))
@@ -895,6 +907,23 @@ void load(const char *ini, int profile, Profile *out)
             out->map[c][s] = parse(texts[s], &b) && slot_takes(profile, s, b.source) ? b : Binding();
         }
     }
+    /* PC (2026-11-23): a wheel's steering with one side a half of a joystick
+     * axis and the other the whole of the same axis (capture_steer_axis: the
+     * launcher wrote that for a wheel that stays where it is turned to) - the
+     * whole one becomes the other half, what was meant.  (Both whole steers
+     * right, and is left.) */
+    if (is_wheel(profile)) {
+        for (int s = 0; s < kSlots; s++) {
+            Binding *side[2] = {&out->map[WHEEL_STEER_LEFT][s], &out->map[WHEEL_STEER_RIGHT][s]};
+            for (int i = 0; i < 2; i++) {
+                Binding &whole = *side[i];
+                const Binding &half = *side[1 - i];
+                if (whole.source == Source::joy_axis && abs(whole.dir) == 2 && half.source == Source::joy_axis &&
+                    abs(half.dir) == 1 && whole.index == half.index && whole.device == half.device)
+                    whole.dir = (int8_t)-half.dir;
+            }
+        }
+    }
     for (int i = 0; i < deadzone_count(profile); i++)     /* (PC 2026-11-09 / 10: an H-Shifter none, a wheel four) */
         out->deadzone[i] =
             clamp_deadzone((int)GetPrivateProfileIntA(sec, deadzone_key(profile, i), out->deadzone[i], ini));
@@ -908,14 +937,14 @@ void load(const char *ini, int profile, Profile *out)
         trim(input);
         out->controller = _stricmp(input, "controller") == 0;
         /* PC (2026-11-20): the force feedback's (FfbInvert on / off, the
-         * others a number) */
+         * others a number; 11-22 FfbLossWorkaround on / off too) */
         for (int i = 0; i < kFfbSettings; i++) {
             char v[16];
             GetPrivateProfileStringA(sec, ffb_key(i), "", v, sizeof(v), ini);
             trim(v);
             if (v[0] == '\0')
                 out->ffb[i] = kFfbDefaults[i];
-            else if (i == kFfbInvert)
+            else if (ffb_is_switch(i))
                 out->ffb[i] = _stricmp(v, "on") == 0 || strcmp(v, "1") == 0 ? 1 : 0;
             else
                 out->ffb[i] = clamp_ffb(i, atoi(v));
@@ -949,7 +978,7 @@ void save(const char *ini, int profile, const Profile &p)
         WritePrivateProfileStringA(sec, "Input", p.controller ? "controller" : "wheel", ini);
         for (int i = 0; i < kFfbSettings; i++) {     /* PC (2026-11-20) */
             char v[16];
-            if (i == kFfbInvert)
+            if (ffb_is_switch(i))                   /* (PC 2026-11-22: the workaround too) */
                 snprintf(v, sizeof(v), "%s", p.ffb[i] != 0 ? "on" : "off");
             else
                 snprintf(v, sizeof(v), "%d", clamp_ffb(i, p.ffb[i]));
@@ -971,6 +1000,17 @@ bool names_device(const Profile &p, const char *name)
             if (b.device != 0 && _stricmp(device_name(b.device), name) == 0)
                 return true;
     return false;
+}
+
+/* PC (2026-11-23) */
+const char *steer_device(const Profile &p)
+{
+    for (int c : {(int)WHEEL_STEER_LEFT, (int)WHEEL_STEER_RIGHT})
+        for (const Binding &b : p.map[c])
+            if (b.device != 0 &&
+                (b.source == Source::joy_axis || b.source == Source::joy_button || b.source == Source::joy_hat))
+                return device_name(b.device);
+    return "";
 }
 
 float value(const Binding &b, const Sources &s)
@@ -1053,7 +1093,7 @@ void set_ffb(int player, int i, int v)
     if (g_ffb[player][i].exchange(v) == v || g_ini.empty())
         return;
     char t[16];
-    if (i == kFfbInvert)
+    if (ffb_is_switch(i))                   /* (PC 2026-11-22: the workaround too) */
         snprintf(t, sizeof(t), "%s", v != 0 ? "on" : "off");
     else
         snprintf(t, sizeof(t), "%d", v);

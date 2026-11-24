@@ -149,6 +149,28 @@ msgstr "コースサイズ：%s（下限）"
 msgid "COURSE SIZE: %s"
 msgstr "コースサイズ：%s"
 
+#: src/game/app/pc_clutch.cpp
+msgid "H-SHIFTER IS OFF (PLAYER %d)"
+msgstr "Hシフターがオフ（プレイヤー %d）"
+
+#: src/game/app/pc_clutch.cpp
+msgid ""
+"ITS GEARS ARE NOT READ: THE H-SHIFTER WORKS WITH A CLUTCH,\n"
+"AND NONE IS MAPPED. MAP ONE IN THE LAUNCHER'S CONTROLS TAB."
+msgstr ""
+"ギアは読み取られません: Hシフターにはクラッチが必要です。\n"
+"ランチャーの「操作」タブでクラッチを割り当ててください。"
+
+#: src/game/app/pc_clutch.cpp
+msgid ""
+"ITS GEARS ARE NOT READ IN THIS RACE. TO USE IT, SET GEAR SHIFT\n"
+"BEHAVIOR TO REALISTIC + CLUTCH AND H-SHIFTER TO ON (GAME > EXTRAS).\n"
+"THE NEXT RACE ENTERED TAKES IT."
+msgstr ""
+"このレースではギアは読み取られません。\n"
+"「シフトチェンジの挙動」をリアル + クラッチ、Hシフターをオンに\n"
+"してください（ゲーム > エクストラ）。次のレースから有効です。"
+
 #: src/game/app/pc_customcam.cpp
 msgid "CUSTOM CAMERA"
 msgstr "カスタムカメラ"
@@ -436,6 +458,26 @@ msgstr "コックピット"
 #: src/game/camera/T378_onboard_camera.cpp
 msgid "Bumper"
 msgstr "バンパー"
+
+#: src/launcher/chd_image.cpp
+msgid "this CHD file needs a parent CHD file, which is not supported"
+msgstr "この CHD ファイルには親 CHD ファイルが必要ですが、対応していません"
+
+#: src/launcher/chd_image.cpp
+msgid "the CHD file could not be read (%s)"
+msgstr "CHD ファイルを読み込めませんでした（%s）"
+
+#: src/launcher/chd_image.cpp src/launcher/iso9660.cpp
+msgid "the file could not be opened (%s)"
+msgstr "ファイルを開けませんでした（%s）"
+
+#: src/launcher/chd_image.cpp
+msgid "this CHD file holds no disc image (no ISO 9660 file system)"
+msgstr "この CHD ファイルにはディスクイメージがありません（ISO 9660 ファイルシステムがありません）"
+
+#: src/launcher/chd_image.cpp src/launcher/iso9660.cpp
+msgid "it ends too early (is the image complete?)"
+msgstr "途中で終わっています（イメージは完全ですか？）"
 
 #: src/launcher/controls.cpp
 msgid "Mapping"
@@ -1228,14 +1270,6 @@ msgstr "ディスクイメージのゲームファイルの一覧を取得でき
 #: src/launcher/install.cpp
 msgid "If the game is running from this disc image, close it first."
 msgstr "このディスクイメージからゲームを実行中の場合は、先に終了してください。"
-
-#: src/launcher/iso9660.cpp
-msgid "it ends too early (is the image complete?)"
-msgstr "途中で終わっています（イメージは完全ですか？）"
-
-#: src/launcher/iso9660.cpp
-msgid "the file could not be opened (%s)"
-msgstr "ファイルを開けませんでした（%s）"
 
 #: src/launcher/iso9660.cpp
 msgid "the file could not be read (%s)"
@@ -2848,6 +2882,10 @@ msgid "Buy cars not for sale"
 msgstr "非売車の購入"
 
 #: src/launcher/ui.cpp
+msgid "New cars without assists"
+msgstr "新しい車のアシストをオフ"
+
+#: src/launcher/ui.cpp
 msgid "Cars in a race"
 msgstr "出走台数"
 
@@ -4012,6 +4050,10 @@ msgid "Invert force feedback"
 msgstr "フォースフィードバックを反転"
 
 #: src/platform/input_map.cpp
+msgid "Force feedback loss workaround"
+msgstr "フォースフィードバック消失の回避策"
+
+#: src/platform/input_map.cpp
 msgid "South (A / Cross)"
 msgstr "下ボタン（A / バツ）"
 
@@ -4843,6 +4885,20 @@ msgid ""
 msgstr ""
 "すべての力を逆向きに。中央から押し出される\n"
 "ステアリング用（ランチャーのテストで分かります）。"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
+"THE STEERING FORCE IS STARTED AGAIN EACH TIME THE GAME\n"
+"SENDS IT (PCSX2'S 'WORKAROUND FOR INTERMITTENT FFB LOSS').\n"
+"LEAVE IT OFF UNLESS NEEDED: ON MANY WHEELS IT MAKES THE\n"
+"FORCES VAGUE OR CUT OUT."
+msgstr ""
+"レースの途中で力が止まってしまうステアリング向け:\n"
+"ゲームがステアリングの力を送るたびに開始し直します\n"
+"（PCSX2の'WORKAROUND FOR INTERMITTENT FFB LOSS'と同じ）。\n"
+"必要な場合のみオンにしてください: 多くのステアリングでは\n"
+"力があいまいになったり途切れたりします。"
 
 #: src/platform/settings_menu.cpp
 msgid "DISPLAY"
@@ -5987,6 +6043,18 @@ msgid "CARS NOT FOR SALE IN SHOWROOMS CAN BE BOUGHT"
 msgstr "ショールームの非売車を購入できます"
 
 #: src/platform/settings_menu.cpp
+msgid "NEW CARS WITHOUT ASSISTS"
+msgstr "新しい車のアシストをオフ"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"CARS ADDED TO THE GARAGE GET THEIR TCS AND ASM SET TO 0.\n"
+"CARS ALREADY IN THE GARAGE KEEP THEIR SETTINGS."
+msgstr ""
+"ガレージに追加される車は TCS と ASM が 0 になります。\n"
+"すでにガレージにある車の設定は変わりません。"
+
+#: src/platform/settings_menu.cpp
 msgid "CARS IN A RACE"
 msgstr "出走台数"
 
@@ -6303,6 +6371,10 @@ msgstr "最小の力"
 #: src/platform/settings_menu.cpp
 msgid "INVERT FORCE FEEDBACK"
 msgstr "フォースフィードバックを反転"
+
+#: src/platform/settings_menu.cpp
+msgid "FORCE FEEDBACK LOSS WORKAROUND"
+msgstr "フォースフィードバック消失の回避策"
 
 #: src/platform/settings_menu.cpp
 msgid "PLAYER 2'S DEVICE, CONTROLLER AND WHEEL."
@@ -6746,6 +6818,16 @@ msgstr "テクスチャ"
 
 #~ msgid "THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 90 CM."
 #~ msgstr "パネルまでの正面の距離。ENTER：90 cm。"
+#~ msgid ""
+#~ "FOR A WHEEL WHOSE FORCES STOP PARTWAY INTO A RACE:\n"
+#~ "THE FORCES ARE STARTED AGAIN WITH EACH UPDATE.\n"
+#~ "LEAVE IT OFF IF THE FORCES DO NOT STOP: ON SOME\n"
+#~ "WHEELS IT MAKES THEM JUDDER."
+#~ msgstr ""
+#~ "レースの途中で力が止まってしまうステアリング向け:\n"
+#~ "更新のたびに力を開始し直します。\n"
+#~ "力が止まらない場合はオフのままにしてください:\n"
+#~ "一部のステアリングでは力がガタつきます。"
 
 #~ msgid "On (the game's: the lock shrinks with speed)"
 #~ msgstr "オン（ゲーム本来：速度で切れ角が減る）"

@@ -12,6 +12,7 @@
 #include "platform/input_map.h"
 #include "platform/ui_text.h"  /* PC (2026-11-16): the interface's languages */
 #include "platform/wheel_ffb.h" /* PC (2026-11-20): the force feedback testers (the game's own code) */
+#include "platform/joy_names.h" /* PC (2026-11-23): the names joysticks go by (the game's own code) */
 
 #include <SDL3/SDL.h>
 #include <commctrl.h>
@@ -78,6 +79,8 @@ enum : int {
     IDC_FFB_TEST0 = IDC_FFB_INVERT + 1,
     IDC_FFB_TEST_LABEL = IDC_FFB_TEST0 + 3,
     IDC_FFB_STATUS,
+    IDC_FFB_LOSS_LABEL,                     /* PC (2026-11-22): the FFB loss workaround's label, list */
+    IDC_FFB_LOSS,
     /* PC (2026-11-20): a wheel's steering filter (label, list) and curve
      * (label, slider, value, the graph window's button) */
     IDC_STEER_FILTER_LABEL = kFirstId + 84,
@@ -98,7 +101,7 @@ enum : int {
     IDC_END = IDC_HOT_DEV0 + kHotkeyIds,            /* (the first id after the tab's) */
 };
 static_assert(IDC_DEADZONE_VALUE0 + kDeadzones <= IDC_CONTROL_LABEL0, "the tab's ids");
-static_assert(IDC_HOT_NOTE < IDC_FFB0 && IDC_FFB_STATUS < IDC_DEADZONE_VALUE0, "the force feedback's ids");
+static_assert(IDC_HOT_NOTE < IDC_FFB0 && IDC_FFB_LOSS < IDC_DEADZONE_VALUE0, "the force feedback's ids");
 static_assert(IDC_DEADZONE_VALUE0 + kDeadzones <= IDC_STEER_FILTER_LABEL && IDC_STEER_GRAPH < IDC_CONTROL_LABEL0,
               "the steering's ids");
 static_assert(IDC_CONTROL_LABEL0 + kMaxControls <= IDC_SLOT0, "the tab's ids");
@@ -120,9 +123,10 @@ struct PadState {
 /* Any joystick, raw. */
 struct JoyState {
     SDL_JoystickID id;
-    std::string name;
+    std::string name;                       /* (PC 2026-11-23: joy_names' - the 2nd of a name "<name> #2") */
     bool gamepad, wheel;                    /* SDL maps it as a gamepad / types it a wheel */
     bool haptic;                            /* PC (2026-11-20): SDL finds force feedback on it */
+    bool lesser;                            /* PC (2026-11-23): joy_names::lesser - never an automatic wheel */
     int buttonCount, axisCount, hatCount;
     uint8_t buttons[128];
     int16_t axes[16];
@@ -186,9 +190,12 @@ void sdl_main()
         SDL_JoystickID id;
         SDL_Joystick *joy;
         SDL_Gamepad *pad;
+        std::string name;                   /* PC (2026-11-23): joy_names::of / lesser, as of `named' */
+        bool lesser = false;
     };
     std::vector<Open> open;
     unsigned devices = 0;
+    unsigned named = ~0u;                   /* (the `devices' the names were made at) */
     /* PC (2026-11-20): the test playing - its wheel's force feedback (opened
      * for the test alone: the wheel's own centring comes back between
      * tests), what, with which settings, until when */
@@ -209,7 +216,10 @@ void sdl_main()
             if (e.type == SDL_EVENT_JOYSTICK_ADDED) {
                 const SDL_JoystickID id = e.jdevice.which;
                 if (std::none_of(open.begin(), open.end(), [&](const Open &o) { return o.id == id; })) {
-                    Open o = {id, SDL_OpenJoystick(id), SDL_IsGamepad(id) ? SDL_OpenGamepad(id) : nullptr};
+                    Open o;
+                    o.id = id;
+                    o.joy = SDL_OpenJoystick(id);
+                    o.pad = SDL_IsGamepad(id) ? SDL_OpenGamepad(id) : nullptr;
                     if (o.joy != nullptr) {
                         open.push_back(o);
                         devices++;
@@ -231,6 +241,16 @@ void sdl_main()
                         devices++;
                         break;
                     }
+                joy_names::forget(e.jdevice.which);     /* PC (2026-11-23) */
+            }
+        }
+        /* PC (2026-11-23): the names they go by, made again when one came or
+         * went (another of a name changes "<name> #2") */
+        if (named != devices) {
+            named = devices;
+            for (Open &o : open) {
+                o.name = joy_names::of(o.id);
+                o.lesser = joy_names::lesser(o.id);
             }
         }
         /* PC (2026-11-20): a test asked for: its wheel's force feedback
@@ -272,6 +292,7 @@ void sdl_main()
                     f.springClip = 30.0f / 255.0f;
                 } else {
                     f.force = test.kind == kTestRight ? kTestForce : -kTestForce;
+                    f.sent = true;              /* (PC 2026-11-22: as the game, a force each pass) */
                 }
                 ffb.apply(f, test.set);
             } else {
@@ -289,8 +310,8 @@ void sdl_main()
         for (const Open &o : open) {
             JoyState j = {};
             j.id = o.id;
-            const char *name = SDL_GetJoystickName(o.joy);
-            j.name = name != nullptr ? name : "";
+            j.name = o.name;                    /* (PC 2026-11-23: was SDL_GetJoystickName) */
+            j.lesser = o.lesser;
             j.gamepad = o.pad != nullptr;
             j.wheel = SDL_GetJoystickType(o.joy) == SDL_JOYSTICK_TYPE_WHEEL;
             j.haptic = haptic && SDL_IsJoystickHaptic(o.joy);     /* PC (2026-11-20) */
@@ -387,6 +408,7 @@ struct Tab {
      * values, Invert's list, the tests' buttons and label, the status */
     HWND ffb[3] = {}, ffbLabel[4] = {}, ffbValue[3] = {};
     HWND ffbInvert = nullptr, ffbTest[kTestCount] = {}, ffbTestLabel = nullptr, ffbStatus = nullptr;
+    HWND ffbLossLabel = nullptr, ffbLoss = nullptr;     /* PC (2026-11-22): the FFB loss workaround's */
     std::wstring ffbText;                   /* the status shown */
     unsigned testSeq = 0;                   /* the last test asked (0: none) */
     /* PC (2026-11-20): a wheel's steering filter and curve (Calibration) */
@@ -518,6 +540,7 @@ wheel_ffb::Settings ffb_settings()
     s.spring = t.p.ffb[kFfbSpring];
     s.minimum = t.p.ffb[kFfbMinimum];
     s.invert = t.p.ffb[kFfbInvert];
+    s.restart = t.p.ffb[kFfbLossWorkaround];   /* PC (2026-11-22) */
     return s;
 }
 
@@ -591,9 +614,23 @@ const JoyState *wheel_device(const Snapshot &s)
                 return &j;
         return nullptr;
     }
-    int skip = t.prof == kWheel2 && t.otherDevice.empty() ? 1 : 0;
+    /* PC (2026-11-23), as the game's wheel_for (gamepad.cpp): the joystick
+     * the profile's steering is bound to by name is its wheel; the lesser
+     * part of a device (the collection without force feedback of a wheel
+     * base that shows as two controllers) is no automatic wheel; a wheel
+     * whose steering names its joystick takes none of the automatic ones */
+    const char *steer = steer_device(t.p);
+    if (steer[0] != '\0') {
+        for (const JoyState &j : s.joys)
+            if (_stricmp(j.name.c_str(), steer) == 0)
+                return &j;
+        return nullptr;
+    }
+    int skip = t.prof == kWheel2 && t.otherDevice.empty() && steer_device(t.otherWheel)[0] == '\0' ? 1 : 0;
     for (const JoyState &j : s.joys) {
-        if (!j.wheel || named_by_wheel(j.name) ||
+        /* (a joystick the bindings name is a wheel's device unless it has
+         * force feedback: the wheel itself, joy_names::haptic) */
+        if (!j.wheel || j.lesser || (named_by_wheel(j.name) && !j.haptic) ||
             (!t.otherDevice.empty() && _stricmp(j.name.c_str(), t.otherDevice.c_str()) == 0))
             continue;
         if (skip-- == 0)
@@ -1171,6 +1208,9 @@ void refresh()
         ShowWindow(h, dev ? SW_SHOW : SW_HIDE);
     SendMessageW(t.ffbInvert, CB_SETCURSEL, t.p.ffb[kFfbInvert] != 0 ? 1 : 0, 0);
     ShowWindow(t.ffbInvert, dev ? SW_SHOW : SW_HIDE);
+    SendMessageW(t.ffbLoss, CB_SETCURSEL, t.p.ffb[kFfbLossWorkaround] != 0 ? 1 : 0, 0);   /* PC (2026-11-22) */
+    ShowWindow(t.ffbLoss, dev ? SW_SHOW : SW_HIDE);
+    ShowWindow(t.ffbLossLabel, dev ? SW_SHOW : SW_HIDE);
     for (HWND h : t.ffbTest)
         ShowWindow(h, dev ? SW_SHOW : SW_HIDE);
     ShowWindow(t.ffbTestLabel, dev ? SW_SHOW : SW_HIDE);
@@ -1297,7 +1337,8 @@ void take(Binding b, const PadState *pad, const JoyState *joy)
     if (joy != nullptr && is_wheel(t.prof) && _stricmp(joy->name.c_str(), t.p.device) != 0) {
         const Snapshot now = snapshot();
         const JoyState *own = wheel_device(now);
-        if (own == nullptr && t.p.device[0] == '\0' && !named_by_wheel(joy->name)) {
+        /* (PC 2026-11-23: not the lesser part of a device: that one is named) */
+        if (own == nullptr && t.p.device[0] == '\0' && !named_by_wheel(joy->name) && !joy->lesser) {
             snprintf(t.p.device, sizeof(t.p.device), "%s", joy->name.c_str());
             t.listed = ~0u;
             fill_devices(now);
@@ -1493,8 +1534,20 @@ void capture_poll()
                     return;
                 }
         }
+        /* PC (2026-11-23): a wheel's steering - the half the axis moved
+         * towards, wherever it was (capture_steer_axis: a wheel that stays
+         * where it was turned to made the other side "the whole axis") */
+        const bool steering = t.capHot < 0 && is_wheel(t.prof) &&
+                              (t.capControl == WHEEL_STEER_LEFT || t.capControl == WHEEL_STEER_RIGHT);
         for (int a = 0; a < j.axisCount; a++) {
             Binding x;
+            if (steering) {
+                if (capture_steer_axis(a, r->axes[a], j.axes[a], &x)) {
+                    take(x, nullptr, &j);
+                    return;
+                }
+                continue;
+            }
             const bool centred = std::abs(r->axes[a]) <= 16384;
             if ((!centred || std::abs(j.axes[a] - r->axes[a]) >= 16384) &&
                 capture_axis(true, a, r->axes[a], j.axes[a], &x)) {
@@ -1595,6 +1648,11 @@ void create(HWND page, HINSTANCE inst, const std::wstring &ini)
     t.ffbInvert = make_combo(t.list, IDC_FFB_INVERT);
     SendMessageW(t.ffbInvert, CB_ADDSTRING, 0, (LPARAM)tr(L"Off"));
     SendMessageW(t.ffbInvert, CB_ADDSTRING, 0, (LPARAM)tr(L"On"));
+    /* PC (2026-11-22): the FFB loss workaround (FfbLossWorkaround) */
+    t.ffbLossLabel = make_label(t.list, widen(tr(ffb_name(kFfbLossWorkaround))).c_str(), IDC_FFB_LOSS_LABEL);
+    t.ffbLoss = make_combo(t.list, IDC_FFB_LOSS);
+    SendMessageW(t.ffbLoss, CB_ADDSTRING, 0, (LPARAM)tr(L"Off"));
+    SendMessageW(t.ffbLoss, CB_ADDSTRING, 0, (LPARAM)tr(L"On"));
     t.ffbTestLabel = make_label(t.list, tr(L"Force feedback test"), IDC_FFB_TEST_LABEL);
     for (int k = 0; k < kTestCount; k++)
         t.ffbTest[k] = make(t.list, WC_BUTTONW, tr(kTestNames[k]), WS_TABSTOP | BS_PUSHBUTTON, IDC_FFB_TEST0 + k);
@@ -1657,6 +1715,8 @@ void set_font(HFONT font, HFONT tabFont)
     for (HWND h : t.ffbTest)
         all.push_back(h);
     all.push_back(t.ffbInvert);
+    all.push_back(t.ffbLossLabel);              /* PC (2026-11-22) */
+    all.push_back(t.ffbLoss);
     all.push_back(t.ffbTestLabel);
     all.push_back(t.ffbStatus);
     for (HWND h : {t.steerFilterLabel, t.steerFilter, t.steerCurveLabel, t.steerCurve, t.steerCurveValue, t.steerGraph})
@@ -1759,7 +1819,9 @@ void layout(UINT dpi)
          * three sliders, Invert, the tests - and their status; the label
          * column as wide as their longest label, kLabelW at least) */
         const bool wheel = is_wheel(t.prof);
-        const int ffbRows = wheel ? 6 + 2 : 0;  /* (PC 2026-11-20: + the steering filter's and curve's) */
+        /* (PC 2026-11-20: + the steering filter's and curve's; 11-22 + the
+         * FFB loss workaround's) */
+        const int ffbRows = wheel ? 7 + 2 : 0;
         const int statusH = wheel ? px(kLiveH) : 0;
         const int rows = deadzone_count(t.prof) + (wheel ? 2 : 0) + ffbRows;
         const int content = rows * px(kRowH) + statusH + px(kLiveH) + noteH + px(kPad) + (wheel ? px(4) : 0);
@@ -1768,7 +1830,7 @@ void layout(UINT dpi)
         if (wheel) {
             for (HWND h : t.ffbLabel)
                 calLabelW = std::max(calLabelW, text_width(h) + px(10));
-            for (HWND h : {t.steerFilterLabel, t.steerCurveLabel})
+            for (HWND h : {t.steerFilterLabel, t.steerCurveLabel, t.ffbLossLabel})     /* (PC 2026-11-22) */
                 calLabelW = std::max(calLabelW, text_width(h) + px(10));
             for (int i = 0; i < deadzone_count(t.prof); i++)
                 calLabelW = std::max(calLabelW, text_width(t.deadzoneLabel[i]) + px(10));
@@ -1822,6 +1884,11 @@ void layout(UINT dpi)
             }
             panel::place(t.list, t.ffbLabel[kFfbInvert], x, ry + px(4), calLabelW, px(20));
             panel::place(t.list, t.ffbInvert, x + calLabelW, ry, std::min(px(120), cw - x - calLabelW - x),
+                         px(kComboListH));
+            ry += px(kRowH);
+            /* PC (2026-11-22): the FFB loss workaround, as Invert */
+            panel::place(t.list, t.ffbLossLabel, x, ry + px(4), calLabelW, px(20));
+            panel::place(t.list, t.ffbLoss, x + calLabelW, ry, std::min(px(120), cw - x - calLabelW - x),
                          px(kComboListH));
             ry += px(kRowH);
             /* the tests: their label, then a row of three buttons as wide as
@@ -1976,6 +2043,16 @@ void command(int id, int code, HWND from)
         const int sel = (int)SendMessageW(t.ffbInvert, CB_GETCURSEL, 0, 0);
         if (sel == 0 || sel == 1) {
             t.p.ffb[kFfbInvert] = sel;
+            save();
+        }
+        return;
+    }
+    if (id == IDC_FFB_LOSS) {                   /* PC (2026-11-22): the FFB loss workaround */
+        if (code != CBN_SELCHANGE)
+            return;
+        const int sel = (int)SendMessageW(t.ffbLoss, CB_GETCURSEL, 0, 0);
+        if (sel == 0 || sel == 1) {
+            t.p.ffb[kFfbLossWorkaround] = sel;
             save();
         }
         return;
@@ -2298,7 +2375,7 @@ bool is_text(HWND c)
             return true;
     /* PC (2026-11-20): a wheel's force feedback's, its steering's */
     if (c == t.ffbTestLabel || c == t.ffbStatus || c == t.steerFilterLabel || c == t.steerCurveLabel ||
-        c == t.steerCurveValue || c == t.steerCurve)
+        c == t.steerCurveValue || c == t.steerCurve || c == t.ffbLossLabel)    /* (PC 2026-11-22: the workaround's) */
         return true;
     for (HWND h : t.ffbLabel)
         if (h == c)

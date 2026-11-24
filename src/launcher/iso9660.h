@@ -9,12 +9,21 @@
  *
  * The image is opened for reading only and is never written.  Nothing here
  * knows about Gran Turismo: install.cpp checks the disc, and a later
- * loose-file installer can walk the tree with list() and read(). */
+ * loose-file installer can walk the tree with list() and read().
+ *
+ * PC (2026-11-23, user: "CHD support for direct disc loading"): the image
+ * file may be a CHD (chd_image.h) - told by its first bytes, not its name -
+ * and is then read through it as the image it holds; everything below is the
+ * same for both. */
 #pragma once
 
 #include <cstdint>
 #include <string>
 #include <vector>
+
+namespace chd_image {
+class Reader;
+}
 
 namespace iso9660 {
 
@@ -45,9 +54,12 @@ public:
      * (with a message in `error`) when the file is not an ISO 9660 image. */
     bool open(const std::wstring &path, std::wstring *error);
     void close();
-    bool is_open() const { return handle_ != nullptr; }
+    bool is_open() const { return handle_ != nullptr || chd_ != nullptr; }
+    /* PC (2026-11-23): what the file is when it is not a plain image - a
+     * CHD's "CHD v5, 4096-byte hunks (zstd, zlib, huff, flac)" - else "". */
+    std::string container() const;
 
-    uint64_t image_size() const { return image_size_; }        /* bytes of the image file */
+    uint64_t image_size() const { return image_size_; }        /* bytes of the image (a CHD: of the image it holds) */
     uint32_t volume_sectors() const { return volume_sectors_; } /* volume space size (PVD) */
     const std::string &volume_id() const { return volume_id_; } /* e.g. "GRANTURISMO3" */
     const Entry &root() const { return root_; }
@@ -77,7 +89,8 @@ public:
 private:
     bool read_dir(const Entry &dir, std::vector<Entry> *out, std::wstring *error) const;
 
-    void *handle_ = nullptr;   /* Win32 file handle */
+    void *handle_ = nullptr;   /* Win32 file handle (a plain image) */
+    chd_image::Reader *chd_ = nullptr; /* PC (2026-11-23): the CHD it is read through instead */
     std::wstring path_;
     uint64_t image_size_ = 0;
     uint32_t volume_sectors_ = 0;

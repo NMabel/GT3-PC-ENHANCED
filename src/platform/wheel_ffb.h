@@ -23,14 +23,26 @@ struct SDL_Haptic;
 
 namespace wheel_ffb {
 
-/* input_map::Profile::ffb, as percents (invert 0 / 1) */
+/* input_map::Profile::ffb, as percents (invert 0 / 1).  PC (2026-11-22):
+ * restart 1 (FfbLossWorkaround on) - a user's Simagic Alpha Evo lost its
+ * forces some 30 - 40 s into a race, which PCSX2 works round with its
+ * "Workaround for Intermittent FFB Loss" (FfbDropoutWorkaround).  The same
+ * as PCSX2's (its usb-pad-sdl-ff.cpp SetConstantForce, read 2026-11-22):
+ * the steering force started again with each one the game sends (GT3: every
+ * tick), changed or not; the spring left alone.  PCSX2's notes: some wheels
+ * (the Simagic Alpha Mini) do not keep an effect of infinite length going;
+ * restarting a playing effect costs most wheels detail and makes some cut
+ * out at each update - so it is off by default. */
 struct Settings {
-    int strength = 100, spring = 100, minimum = 0, invert = 0;
+    int strength = 100, spring = 100, minimum = 0, invert = 0, restart = 0;
 };
 
 /* What the game asks of a wheel. */
 struct Forces {
     float force = 0.0f;                     /* the steering force, -1..1, + to the right */
+    /* PC (2026-11-22): the game sent a steering force since the last apply
+     * (PCSX2's SetConstantForce call; Settings::restart starts it again) */
+    bool sent = false;
     bool spring = false;                    /* the centring spring on */
     float springK = 0.0f;                   /* its coefficient, 0..1 (the protocol's K / 7) */
     float springClip = 0.0f;                /* its most force, 0..1 (clip / 255) */
@@ -62,6 +74,7 @@ private:
     int level_ = 0;                         /* the constant force's level sent */
     bool springOn_ = false;
     int springCoef_ = -1, springSat_ = -1;  /* the spring's sent */
+    bool restartLogged_ = false;            /* (PC 2026-11-22: the workaround logged since open) */
     char why_[160] = "";
 };
 
