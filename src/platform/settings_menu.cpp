@@ -247,10 +247,12 @@ int vr_hud_get() { return vr::hud_on() ? 1 : 0; }
 void vr_hud_set(int v) { vr::set_hud_on(v != 0); }
 int vr_mirror_get() { return vr::mirror_on() ? 1 : 0; }
 void vr_mirror_set(int v) { vr::set_mirror_on(v != 0); }
+int vr_shake_get() { return vr::shake_on() ? 1 : 0; }
+void vr_shake_set(int v) { vr::set_shake_on(v != 0); }
 template <int S> void vr_text(char *out, size_t n)
 {
     const int v = vr::setting((vr::Setting)S);
-    if (S == vr::kWorldScale)
+    if (S == vr::kWorldScale || S == vr::kHeadShake || S == vr::kCabinShake)
         snprintf(out, n, "%d%%", v);
     else
         snprintf(out, n, "%d CM", v);
@@ -1489,6 +1491,12 @@ const Item kItems[] = {
     {1, N_("WORLD SCALE"), N_("THE WORLD'S SIZE TO YOUR EYES: ABOVE 100% THE COCKPIT LOOKS\nLARGER. ENTER: 100%."), 0, nullptr,
      nullptr, nullptr, vr_text<vr::kWorldScale>, vr_step<vr::kWorldScale>, vr_edges<vr::kWorldScale>,
      input_map::kHotVrScaleUp},
+    {1, N_("CAMERA SHAKE"), N_("THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\nONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."), 2,
+     vr_shake_get, vr_shake_set, on_off_value},
+    {2, N_("HEAD SHAKE"), N_("THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\nAND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."), 0, nullptr,
+     nullptr, nullptr, vr_text<vr::kHeadShake>, vr_step<vr::kHeadShake>, vr_edges<vr::kHeadShake>},
+    {2, N_("CABIN SHAKE"), N_("THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\nUSUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."), 0, nullptr,
+     nullptr, nullptr, vr_text<vr::kCabinShake>, vr_step<vr::kCabinShake>, vr_edges<vr::kCabinShake>},
     {1, N_("DASHBOARD"), N_("THE SPEED, REVS AND LAP INFORMATION AS A PANEL OF THE COCKPIT."), 2, vr_hud_get, vr_hud_set,
      on_off_value, nullptr, nullptr, nullptr, input_map::kHotVrHud},
     {2, N_("DISTANCE"), N_("THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 100 CM."), 0, nullptr, nullptr, nullptr,

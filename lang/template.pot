@@ -5269,6 +5269,36 @@ msgid ""
 msgstr ""
 
 #: src/platform/settings_menu.cpp
+msgid "CAMERA SHAKE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\n"
+"ONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "HEAD SHAKE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\n"
+"AND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "CABIN SHAKE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
+"USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
 msgstr ""
 

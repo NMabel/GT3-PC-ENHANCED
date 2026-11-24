@@ -70,4 +70,21 @@ void pc_vr_capture_menu(GSBuffer *canvas);
  * place.  Leaves the modelview matrix current.  Nothing outside an eye. */
 void pc_vr_apply(void);
 
+/* The cockpit's shake in the headset ([VR] Shake, HeadShake, CabinShake: platform/vr_view.h shake; the flat
+ * screen's is not touched): two kinds, the view's (head shake: the whole picture moves against the head) and the
+ * car's body over the road (cabin shake: pc_vr_cabin_matrix, below).  The view's:  OnBoardCamera::update calls pc_vr_shake_tick once a tick with the car's speed
+ * squared (m/s)^2; applyMountView's cockpit view takes pc_vr_shake_get: gain, the factor for the game's own
+ * shake (1 without a headset view), and the vibration added to it - degrees about the camera's x, y and z
+ * (pitch, yaw, roll), all 0 without a headset view or with the shake off.  The vibration is two sines a
+ * channel at frequencies that do not share a beat, under a slow swell: its size grows with the square of the
+ * speed (as drag does) from a little at a stop, at most half a degree at 100% and top speed; the camera holds
+ * the whole shake of an axis to 3 degrees (a view that shakes in the headset is what makes people ill). */
+void pc_vr_shake_tick(f32 speedSq);
+f32 pc_vr_shake_cap(f32 degrees);               /* held to +-3 degrees */
+/* The cabin shake: 1 with m the column-major rotation (about the eye, in the eye's frame) the player's own car's
+ * body and tyres are to be drawn under - pgl_mult_matrix_90(m) on the modelview matrix, which applies it last,
+ * so the world, the shadow and the head stay still and the cabin moves over them; 0: none now (off, flat, or 0%). */
+int pc_vr_cabin_matrix(f32 m[16]);
+void pc_vr_shake_get(f32 *gain, f32 *pitch, f32 *yaw, f32 *roll);
+
 #endif /* GAME_APP_PC_VR_H */

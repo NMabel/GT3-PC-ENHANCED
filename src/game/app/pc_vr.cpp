@@ -7,6 +7,7 @@
 #include "engine/gfx/T514_gs_buffer.h"
 #include "engine/pgl/G001_flare.h"              /* gfx_set_picture_vr, gfx_vr_eye, pgl_*_matrix */
 #include "platform/vr_view.h"
+#include <math.h>
 #include <stdio.h>
 
 /* The panels the overlay pass can feed (the numbering of vr.h's kOverlay*, which this file does not include:
@@ -176,6 +177,91 @@ enum ProjectionElement {
     PROJ_W_PER_Z = 11,                  /* the perspective divide: w' = -z (glFrustum: -1) */
     PROJ_Z_OFFSET = 14
 };
+
+/* ---- the shake in the headset (pc_vr.h) ---- */
+static const f32 kVibrationDegrees = 0.5f;      /* the vibration's largest sum at 100% and the top speed */
+static const f32 kVibrationTopSpeed = 83.3f;    /* m/s: 300 km/h, where the drag-like growth reaches its full size */
+static const f32 kVibrationAtRest = 0.1f;       /* the share of it at a stop (the engine idling) */
+static const f32 kCabinDegrees = 0.8f;          /* the cabin shake's largest at 100% and the top speed */
+static const f32 kTwoPi = 6.2831853f;
+static f32 s_shakeTime;                         /* seconds, advanced a tick (1/60 s) at a time */
+static f32 s_shakeSpeedSq = 1.0f;
+
+void pc_vr_shake_tick(f32 speedSq)
+{
+    s_shakeTime += 1.0f / 60.0f;
+    if (s_shakeTime > 3600.0f)
+        s_shakeTime -= 3600.0f;                 /* (keeps the sines' arguments small: a float's precision) */
+    s_shakeSpeedSq = speedSq;
+}
+
+f32 pc_vr_shake_cap(f32 degrees)
+{
+    return degrees < -3.0f ? -3.0f : degrees > 3.0f ? 3.0f : degrees;
+}
+
+/* two sines of different frequencies (Hz), the second a third the size: a wobble that does not repeat at once */
+static f32 wobble(f32 hz1, f32 hz2, f32 phase)
+{
+    return sinf(kTwoPi * hz1 * s_shakeTime + phase) + 0.33f * sinf(kTwoPi * hz2 * s_shakeTime + phase * 2.3f);
+}
+
+/* the shake's size from the speed: from a little at a stop to full at the top speed, as the square of it
+ * (drag), under a slow swell */
+static f32 shake_envelope(void)
+{
+    f32 ratio = sqrtf(s_shakeSpeedSq > 0.0f ? s_shakeSpeedSq : 0.0f) / kVibrationTopSpeed;
+    if (ratio > 1.0f)
+        ratio = 1.0f;
+    const f32 growth = kVibrationAtRest + (1.0f - kVibrationAtRest) * ratio * ratio;
+    const f32 swell = 0.65f + 0.35f * sinf(kTwoPi * 0.37f * s_shakeTime);
+    return growth * swell / 1.33f;
+}
+
+int pc_vr_cabin_matrix(f32 m[16])
+{
+    f32 gain, vibration, cabin = 0.0f;
+    vrview::shake(&gain, &vibration, &cabin);
+    if (cabin <= 0.0f)
+        return 0;
+    /* the car's body on its springs: more roll and pitch than yaw, at its own frequencies (not the view's:
+     * the two kinds mixed do not beat together) */
+    const f32 amplitude = kCabinDegrees * cabin * shake_envelope();
+    const f32 deg2rad = 3.1415927f / 180.0f;
+    const f32 pitch = pc_vr_shake_cap(amplitude * wobble(3.1f, 8.3f, 1.3f)) * deg2rad;
+    const f32 yaw = pc_vr_shake_cap(amplitude * 0.4f * wobble(4.7f, 9.1f, 3.4f)) * deg2rad;
+    const f32 roll = pc_vr_shake_cap(amplitude * wobble(2.3f, 6.7f, 5.6f)) * deg2rad;
+    /* R = Rz(roll) Ry(yaw) Rx(pitch), column-major (the game's matrices' layout: m[column * 4 + row]) */
+    const f32 cx = cosf(pitch), sx = sinf(pitch), cy = cosf(yaw), sy = sinf(yaw), cz = cosf(roll), sz = sinf(roll);
+    m[0] = cz * cy;
+    m[1] = sz * cy;
+    m[2] = -sy;
+    m[3] = 0.0f;
+    m[4] = cz * sy * sx - sz * cx;
+    m[5] = sz * sy * sx + cz * cx;
+    m[6] = cy * sx;
+    m[7] = 0.0f;
+    m[8] = cz * sy * cx + sz * sx;
+    m[9] = sz * sy * cx - cz * sx;
+    m[10] = cy * cx;
+    m[11] = 0.0f;
+    m[12] = m[13] = m[14] = 0.0f;
+    m[15] = 1.0f;
+    return 1;
+}
+
+void pc_vr_shake_get(f32 *gain, f32 *pitch, f32 *yaw, f32 *roll)
+{
+    f32 vibration = 0.0f, cabin = 0.0f;
+    vrview::shake(gain, &vibration, &cabin);
+    *pitch = *yaw = *roll = 0.0f;
+    if (vibration <= 0.0f)
+        return;
+    const f32 amplitude = kVibrationDegrees * vibration * shake_envelope();
+    *pitch = amplitude * wobble(7.3f, 17.9f, 0.7f);
+    *yaw = amplitude * 0.5f * wobble(9.7f, 21.1f, 2.1f);
+    *roll = amplitude * 0.8f * wobble(11.3f, 19.7f, 4.2f);
+}
 
 void pc_vr_apply(void)
 {

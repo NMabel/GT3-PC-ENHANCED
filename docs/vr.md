@@ -106,6 +106,23 @@ below is negative.
 | `ScreenDistance` / `ScreenWidth` / `ScreenHeight` | `90` / `80` / `0` | The menu panel (pause menu, race result) |
 | `MenuDistance` / `MenuWidth` | `2.5` / `4.0` | Metres: the flat screen |
 | `MenuFov` | `0` | Degrees (5 to 120, 0 = off): size the flat screen by the angle it covers instead of `MenuWidth` (THX recommends about 40) |
+| `Shake` | `on` | The cockpit's shake in the headset, off: none. Only the headset's view, the flat screen is as ever |
+| `HeadShake` | `100` | Percent, 0 to 300: the whole view shakes against your head (the game's own shake by speed and bumps, times this, plus a small road / engine vibration that grows with the square of the speed) |
+| `CabinShake` | `0` | Percent, 0 to 300: the car's body shakes over the road while the world and the view stay still |
+
+### Camera shake
+
+Two kinds, set apart in the F2 menu under **VR** (**CAMERA SHAKE** on / off, **HEAD SHAKE**, **CABIN SHAKE**), so they can be mixed
+(50% and 50%) or used alone. Both are off the flat screen: without a headset view the game's own shake is untouched.
+
+- **Head shake** is the view moving: `OnBoardCamera::applyMountView` (the cockpit camera) turns the whole scene by the game's own
+  random shake, times `HeadShake`, plus a vibration (`pc_vr_shake_get`: two sines a channel under a slow swell, at most half a
+  degree at 100% and 300 km/h, growing as speed squared like drag). The springs' small position shifts follow `HeadShake` too.
+- **Cabin shake** moves only the player's own car: `drawCars` (T131) draws its body and tyres under a small rotation about the eye
+  (`pc_vr_cabin_matrix`, applied with `pgl_mult_matrix_90`, which acts last, in the eye's frame), so the world, the shadow and
+  the panels stay still. At most 0.8 degrees at 100% and top speed.
+- An axis is held to 3 degrees. A view that shakes in the headset is what makes people ill: the default is the game's own shake as
+  it was, and no cabin shake.
 
 ## How a frame gets to the headset
 

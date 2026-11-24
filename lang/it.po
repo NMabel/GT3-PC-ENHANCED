@@ -5524,6 +5524,42 @@ msgstr ""
 "SEMBRA PIÙ GRANDE. INVIO: 100%."
 
 #: src/platform/settings_menu.cpp
+msgid "CAMERA SHAKE"
+msgstr "SCOSSE DELLA CAMERA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\n"
+"ONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."
+msgstr ""
+"L'ABITACOLO TREMA CON LA VELOCITÀ E LA STRADA, SOLO NEL VISORE.\n"
+"DUE TIPI, MISCELATI COME VUOI. NO: NESSUNA SCOSSA."
+
+#: src/platform/settings_menu.cpp
+msgid "HEAD SHAKE"
+msgstr "SCOSSE DELLA TESTA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\n"
+"AND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."
+msgstr ""
+"TUTTA LA VISTA TREMA CONTRO LA TESTA: LA SCOSSA DEL GIOCO E UNA\n"
+"LEGGERA VIBRAZIONE. PUÒ DARE NAUSEA. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "CABIN SHAKE"
+msgstr "SCOSSE DELL'ABITACOLO"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
+"USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+"LA CARROZZERIA TREMA SULLA STRADA, IL MONDO RESTA FERMO:\n"
+"SPESSO PIÙ COMODA DELLA TESTA. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
 msgstr "CRUSCOTTO"
 

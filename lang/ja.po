@@ -5523,6 +5523,42 @@ msgstr ""
 "ENTER：100%。"
 
 #: src/platform/settings_menu.cpp
+msgid "CAMERA SHAKE"
+msgstr "カメラシェイク"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\n"
+"ONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."
+msgstr ""
+"コックピットが速度と路面で揺れます (ヘッドセットのみ)。\n"
+"2 種類を好きな割合で混ぜられます。オフ: 揺れなし。"
+
+#: src/platform/settings_menu.cpp
+msgid "HEAD SHAKE"
+msgstr "ヘッドシェイク"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\n"
+"AND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."
+msgstr ""
+"視界全体が頭に対して揺れます: ゲーム本来の揺れと少しの振動。\n"
+"酔うことがあります。ENTER: 100%。"
+
+#: src/platform/settings_menu.cpp
+msgid "CABIN SHAKE"
+msgstr "キャビンシェイク"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
+"USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+"車体だけが路面上で揺れ、世界は静止します:\n"
+"多くの場合ヘッドシェイクより楽です。ENTER: 0%。"
+
+#: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
 msgstr "ダッシュボード"
 

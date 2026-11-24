@@ -20,6 +20,12 @@ bool frame_on();
 bool hud_on();
 bool mirror_on();
 
+/* The cockpit's shake in the headset ([VR] Shake, HeadShake, CabinShake): gain, the factor for the game's
+ * own shake of the view (1: as it is); vibration, the factor for the road / engine vibration added to the
+ * view's (0: none); cabin, the factor for the car's body shaking over the road (0: none).  Without a headset
+ * view (flat) they are 1, 0 and 0: the flat screen's shake is untouched. */
+void shake(float *gain, float *vibration, float *cabin);
+
 /* The eye textures' size (pixels). */
 void eye_size(int *width, int *height);
 

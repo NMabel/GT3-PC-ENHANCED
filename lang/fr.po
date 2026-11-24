@@ -5526,6 +5526,42 @@ msgstr ""
 "PLUS GRAND. ENTRÉE: 100%."
 
 #: src/platform/settings_menu.cpp
+msgid "CAMERA SHAKE"
+msgstr "SECOUSSES CAMÉRA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\n"
+"ONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."
+msgstr ""
+"L'HABITACLE SECOUE AVEC LA VITESSE ET LA ROUTE, DANS LE CASQUE\n"
+"SEULEMENT. DEUX TYPES, MÉLANGÉS À VOTRE GOÛT. NON : AUCUNE."
+
+#: src/platform/settings_menu.cpp
+msgid "HEAD SHAKE"
+msgstr "SECOUSSES DE TÊTE"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\n"
+"AND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."
+msgstr ""
+"TOUTE LA VUE SECOUE CONTRE VOTRE TÊTE : LES SECOUSSES DU JEU ET\n"
+"UNE LÉGÈRE VIBRATION. PEUT DONNER LA NAUSÉE. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "CABIN SHAKE"
+msgstr "SECOUSSES HABITACLE"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
+"USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+"LA CARROSSERIE SECOUE SUR LA ROUTE, LE MONDE RESTE FIXE :\n"
+"SOUVENT PLUS CONFORTABLE QUE LA TÊTE. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
 msgstr "TABLEAU DE BORD"
 

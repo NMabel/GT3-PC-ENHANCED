@@ -5522,6 +5522,42 @@ msgstr ""
 "WIĘKSZY. ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
+msgid "CAMERA SHAKE"
+msgstr "DRŻENIE KAMERY"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\n"
+"ONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."
+msgstr ""
+"KABINA DRŻY ZALEŻNIE OD PRĘDKOŚCI I DROGI, TYLKO W GOGLACH.\n"
+"DWA RODZAJE, MIESZANE WG USTAWIEŃ. WYŁ.: BRAK DRGAŃ."
+
+#: src/platform/settings_menu.cpp
+msgid "HEAD SHAKE"
+msgstr "DRŻENIE GŁOWY"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\n"
+"AND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."
+msgstr ""
+"CAŁY OBRAZ DRŻY WZGLĘDEM GŁOWY: DRGANIA GRY I LEKKA WIBRACJA.\n"
+"MOŻE MDLIĆ. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "CABIN SHAKE"
+msgstr "DRŻENIE KABINY"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
+"USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+"NADWOZIE DRŻY NA DRODZE, ŚWIAT STOI W MIEJSCU:\n"
+"ZWYKLE WYGODNIEJSZE NIŻ GŁOWA. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
 msgstr "DESKA ROZDZIELCZA"
 

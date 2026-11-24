@@ -73,9 +73,11 @@ const SettingInfo kInfo[kSettingCount] = {
     /* kScreenDistance  */ {"ScreenDistance", 90, 40, 300, 5},
     /* kScreenWidth     */ {"ScreenWidth", 80, 20, 250, 5},
     /* kScreenHeight    */ {"ScreenHeight", 0, -100, 100, 5},
+    /* kHeadShake       */ {"HeadShake", 100, 0, 300, 10},          /* percent */
+    /* kCabinShake      */ {"CabinShake", 0, 0, 300, 10},           /* percent */
 };
 int g_set[kSettingCount];
-bool g_hudOn = true, g_mirrorOn = true;
+bool g_hudOn = true, g_mirrorOn = true, g_shakeOn = true;
 bool g_loaded;
 
 bool ini_on(const char *key, bool def)
@@ -97,6 +99,7 @@ void ensure_loaded()
     }
     g_hudOn = ini_on("Hud", true);
     g_mirrorOn = ini_on("Mirror", true);
+    g_shakeOn = ini_on("Shake", true);
 }
 
 void save_value(const char *key, const char *value)
@@ -1134,6 +1137,19 @@ void set_mirror_on(bool on)
     save_value("Mirror", on ? "on" : "off");
 }
 
+bool shake_on()
+{
+    ensure_loaded();
+    return g_shakeOn;
+}
+
+void set_shake_on(bool on)
+{
+    ensure_loaded();
+    g_shakeOn = on;
+    save_value("Shake", on ? "on" : "off");
+}
+
 bool available()
 {
     return g_session != XR_NULL_HANDLE && !g_dead;
@@ -1263,6 +1279,21 @@ bool hud_on()
 bool mirror_on()
 {
     return vr::mirror_on();
+}
+
+void shake(float *gain, float *vibration, float *cabin)
+{
+    if (!vr::stereo_ready()) {              /* no headset view: the game's shake as it is */
+        *gain = 1.0f;
+        *vibration = 0.0f;
+        *cabin = 0.0f;
+        return;
+    }
+    const bool on = vr::shake_on();
+    const float head = on ? (float)vr::setting(vr::kHeadShake) * 0.01f : 0.0f;
+    *gain = head;
+    *vibration = head;
+    *cabin = on ? (float)vr::setting(vr::kCabinShake) * 0.01f : 0.0f;
 }
 
 void eye_size(int *width, int *height)

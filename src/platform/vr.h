@@ -31,6 +31,14 @@
  *   ScreenHeight=0
  *   MenuFov=0            degrees (5 .. 120; 0: off): the width as the angle the
  *                        screen covers, from MenuDistance (THX: ~40, SMPTE: 30)
+ *   Shake=on | off       the cockpit's shake in the headset, two kinds that can be
+ *                        mixed (50% and 50%): off: none.  Only the headset's view:
+ *                        the flat screen is as ever.
+ *   HeadShake=100        percent (0 .. 300): the view shakes (the game's own shake by
+ *                        the speed and the bumps, plus a road / engine vibration):
+ *                        the whole picture moves against your head
+ *   CabinShake=0         percent (0 .. 300): the car's body shakes over the road,
+ *                        the world and the view stay still
  *
  * The session is made on the game's own Direct3D 11 device (the adapter the
  * runtime asks for: gpu.cpp makes the device on it).  Every call here is made
@@ -72,7 +80,7 @@ void shutdown();
 
 /* ---- the settings ([VR]; the F2 menu's VR category; saved when changed) ---- */
 enum Setting { kWorldScale, kHudDistance, kHudWidth, kHudHeight, kMirrorDistance, kMirrorWidth, kMirrorHeight,
-               kScreenDistance, kScreenWidth, kScreenHeight, kSettingCount };
+               kScreenDistance, kScreenWidth, kScreenHeight, kHeadShake, kCabinShake, kSettingCount };
 struct SettingInfo {
     const char *key;                    /* the ini key */
     int def, min, max, step;            /* percent (the world's scale), else centimetres */
@@ -84,6 +92,11 @@ bool hud_on();
 void set_hud_on(bool on);
 bool mirror_on();
 void set_mirror_on(bool on);
+/* The cockpit's shake in the headset ([VR] Shake, HeadShake, CabinShake; the flat screen's is not touched):
+ * off, no shake at all; on, the head shake (the view: the game's own shake and a vibration, times kHeadShake
+ * percent) and the cabin shake (the car's body over the road, times kCabinShake percent), mixed as set. */
+bool shake_on();
+void set_shake_on(bool on);
 /* A headset session exists (the F2 menu says so). */
 bool available();
 /* The VR hotkeys (input_map::kHotVr*, window.cpp; vr.cpp also polls them while the

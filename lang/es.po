@@ -5526,6 +5526,42 @@ msgstr ""
 "MÁS GRANDE. INTRO: 100%."
 
 #: src/platform/settings_menu.cpp
+msgid "CAMERA SHAKE"
+msgstr "SACUDIDA DE CÁMARA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\n"
+"ONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."
+msgstr ""
+"EL HABITÁCULO VIBRA CON LA VELOCIDAD Y LA CARRETERA, SOLO EN EL\n"
+"VISOR. DOS TIPOS, MEZCLADOS A TU GUSTO. NO: SIN SACUDIDA."
+
+#: src/platform/settings_menu.cpp
+msgid "HEAD SHAKE"
+msgstr "SACUDIDA DE CABEZA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\n"
+"AND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."
+msgstr ""
+"TODA LA VISTA SE SACUDE CONTRA TU CABEZA: LA SACUDIDA PROPIA\n"
+"DEL JUEGO Y UNA LEVE VIBRACIÓN. PUEDE MAREAR. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "CABIN SHAKE"
+msgstr "SACUDIDA DE CABINA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
+"USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+"LA CARROCERÍA TIEMBLA SOBRE LA CARRETERA, EL MUNDO NO SE MUEVE:\n"
+"SUELE SER MÁS CÓMODO QUE LA DE CABEZA. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
 msgstr "TABLERO"
 

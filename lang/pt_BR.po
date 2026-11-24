@@ -5526,6 +5526,42 @@ msgstr ""
 "MAIOR. ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
+msgid "CAMERA SHAKE"
+msgstr "TREMOR DA CÂMERA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\n"
+"ONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."
+msgstr ""
+"A CABINE TREME COM A VELOCIDADE E A PISTA, SÓ NO VISOR.\n"
+"DOIS TIPOS, MISTURADOS COMO QUISER. DESL.: SEM TREMOR."
+
+#: src/platform/settings_menu.cpp
+msgid "HEAD SHAKE"
+msgstr "TREMOR DA CABEÇA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\n"
+"AND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."
+msgstr ""
+"TODA A IMAGEM TREME CONTRA SUA CABEÇA: O TREMOR DO JOGO E UMA\n"
+"LEVE VIBRAÇÃO. PODE CAUSAR ENJOO. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "CABIN SHAKE"
+msgstr "TREMOR DA CABINE"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
+"USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+"A CARROCERIA TREME SOBRE A PISTA, O MUNDO FICA PARADO:\n"
+"GERALMENTE MAIS CONFORTÁVEL. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
 msgstr "PAINEL"
 

@@ -5523,6 +5523,42 @@ msgstr ""
 "ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
+msgid "CAMERA SHAKE"
+msgstr "ТРЯСКА КАМЕРЫ"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE COCKPIT SHAKES WITH THE SPEED AND THE ROAD, IN THE HEADSET\n"
+"ONLY. TWO KINDS, MIXED AS YOU SET THEM. OFF: NO SHAKE."
+msgstr ""
+"КАБИНА ТРЯСЁТСЯ ОТ СКОРОСТИ И ДОРОГИ, ТОЛЬКО В ШЛЕМЕ.\n"
+"ДВА ВИДА, СМЕШИВАЮТСЯ ПО ВАШЕМУ ВЫБОРУ. ВЫКЛ.: БЕЗ ТРЯСКИ."
+
+#: src/platform/settings_menu.cpp
+msgid "HEAD SHAKE"
+msgstr "ТРЯСКА ГОЛОВЫ"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE WHOLE VIEW SHAKES AGAINST YOUR HEAD: THE GAME'S OWN SHAKE\n"
+"AND A LITTLE VIBRATION. MAY MAKE YOU SICK. ENTER: 100%."
+msgstr ""
+"ВЕСЬ ВИД ТРЯСЁТСЯ ОТНОСИТЕЛЬНО ГОЛОВЫ: ТРЯСКА ИГРЫ И НЕБОЛЬШАЯ\n"
+"ВИБРАЦИЯ. МОЖЕТ УКАЧАТЬ. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "CABIN SHAKE"
+msgstr "ТРЯСКА КАБИНЫ"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
+"USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+"КУЗОВ ТРЯСЁТСЯ НА ДОРОГЕ, МИР НЕПОДВИЖЕН:\n"
+"ОБЫЧНО КОМФОРТНЕЕ, ЧЕМ ТРЯСКА ГОЛОВЫ. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
 msgid "DASHBOARD"
 msgstr "ПРИБОРЫ"
 

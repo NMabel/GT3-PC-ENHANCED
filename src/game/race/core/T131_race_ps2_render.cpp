@@ -822,6 +822,16 @@ void RacePS2Base::drawCars(GSBuffer *envBuf, int lod, int tyreBlur, f32 t)
             car->model.pcMenuDraw = 1;
             pc_headcam_hide_file(car->model.pcMenuFile);
         }
+        /* PC VR: the cabin shake (game/app/pc_vr.h; [VR] CabinShake): in a headset's eye, the player's own car's body
+         * and tyres are drawn rotated a little about the eye, after the view's matrices - the world, the shadow
+         * and the head stay still and the cabin moves over them */
+        f32 pcCabin[16];
+        const int pcCabinOn = pcHead && pc_vr_in_eye() && pc_vr_cabin_matrix(pcCabin);
+        if (pcCabinOn) {
+            pgl_matrix_mode(PGL_MTX_MODELVIEW);
+            pgl_push_matrix();
+            pgl_mult_matrix_90(pcCabin);
+        }
         car->drawBody(t);
         if (pcMenuBody) {
             car->model.pcMenuDraw = 0;
@@ -834,6 +844,8 @@ void RacePS2Base::drawCars(GSBuffer *envBuf, int lod, int tyreBlur, f32 t)
         } else {
             car->drawTires(tyreBlur != 0 ? 2 : 0, env->brakeGlowScale, t, lod);
         }
+        if (pcCabinOn)
+            pgl_pop_matrix();
         car->F_00177988(0.0f);
         if (pcHead)
             pc_headcam_hide(car, pcCockpit, 0);     /* PC */

@@ -63,6 +63,10 @@ you reach the cockpit view. Everything else (menus, replays, the other cameras) 
 - **A save that came as a `.psu` file** (what PCSX2 and most save sites use) cannot be read by the game as it is.
   In the launcher, open **Saves...**, select a save folder and press **Import .psu...**: the save is unpacked
   into that folder, ready to load. **Export .psu...** packs saves back into `.psu` files.
+- **Camera shake in the headset, to taste** (F2 menu > **VR**): **CAMERA SHAKE** on / off, then **HEAD SHAKE** (the whole view
+  moves, as the game's own shake does) and **CABIN SHAKE** (the car's body shakes over the road while the world stays still),
+  each as a percentage, so you can use one, the other or both. Off the flat screen: nothing changes there. Too much shake can make
+  you sick, so start low.
 - **If SteamVR is stuck** the game no longer freezes at start-up: after 20 seconds it gives up on VR, says why in
   `gt3pc.log` and carries on as a flat-screen game.
 

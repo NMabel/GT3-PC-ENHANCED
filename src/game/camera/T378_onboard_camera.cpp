@@ -35,6 +35,7 @@
 #include "game/app/pc_debugcam.h"           /* PC: pc_debugcam_mount (update) */
 #include "game/app/pc_headcam.h"            /* PC: the cockpit camera (applyMountView, update) */
 #include "game/app/pc_customcam.h"          /* PC: the user's own cameras (applyMountView, update, pcNextView) */
+#include "game/app/pc_vr.h"                 /* PC VR: the headset's shake (applyMountView, update) */
 #include "game/save/T426_controller_config.h"   /* PC: ControllerConfig::keyAxis (update) */
 #include <string.h>                         /* PC: memset (pc_freecam_ground) */
 #include "platform/ui_text.h"               /* PC (2026-11-16): the interface's language (pcNextView's notice) */
@@ -325,6 +326,7 @@ int OnBoardCamera::update(RaceOrganization *org, RaceInput *input, CameraTargetI
         vz = (nz - vz) * 60.0f;
         speedSq = vx * vx + vy * vy + vz * vz;
     }
+    pc_vr_shake_tick(speedSq);              /* PC VR: the headset's vibration (game/app/pc_vr.h) */
     if (counter == 0) {
         keep = 0;                           /* first: else CSE takes counter's 1 from keep */
         counter = 1;
@@ -689,10 +691,17 @@ void OnBoardCamera::applyMountView(RaceEntryCar *viewed)
          * rotates row vectors right-handed about x: nose up for a positive
          * angle, as the car's pitch undone below by -pitch) */
         vu0_rotate_x(-pc_headcam_tilt(viewed, pcCockpit));
-        vu0_rotate_x(shakeX.getValue());
-        vu0_rotate_y(shakeY.getValue() * 0.8f);
-        x += springX.clampedPos();
-        y += springY.clampedPos();
+        /* PC VR: in the headset the view's shake is the player's to set ([VR] Shake, HeadShake: the game's own shake
+         * times the strength, a road / engine vibration on top, none when off; the cabin's shake is drawCars's); on the
+         * flat screen gain is 1 and the vibration 0: as ever.  An axis is held to 3 degrees. */
+        f32 shakeGain, vibPitch, vibYaw, vibRoll;
+        pc_vr_shake_get(&shakeGain, &vibPitch, &vibYaw, &vibRoll);
+        vu0_rotate_x(pc_vr_shake_cap(shakeX.getValue() * shakeGain + vibPitch));
+        vu0_rotate_y(pc_vr_shake_cap(shakeY.getValue() * 0.8f * shakeGain + vibYaw));
+        if (vibRoll != 0.0f)
+            vu0_rotate_z(pc_vr_shake_cap(vibRoll));
+        x += springX.clampedPos() * shakeGain;      /* (the springs are the shake's: the car's body on its springs) */
+        y += springY.clampedPos() * shakeGain;
         pgl_translate(-eye[0], -eye[1], -eye[2]);
         yaw = car_yaw(s, 0.0f);
         pitch = car_pitch(s, 0.0f);
