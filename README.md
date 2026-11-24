@@ -1,7 +1,7 @@
 # GT3-PC-ENHANCED: OpenXR Engine Addon (play Gran Turismo 3 in VR)
 
 <p align="center">
-  <img src="docs/img/vr-cockpit.gif" alt="The GT3 cockpit in a VR headset, seen through the SteamVR mirror window" width="100%">
+  <img src="docs/img/vr-cockpit.webp" alt="The GT3 cockpit in a VR headset, seen through the SteamVR mirror window" width="100%">
 </p>
 
 **This is an add-on, not a replacement.** It puts the cockpit view of a Gran Turismo 3 race into a
