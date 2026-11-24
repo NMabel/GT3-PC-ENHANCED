@@ -25,6 +25,9 @@ bool mirror_on();
  * view's (0: none); cabin, the factor for the car's body shaking over the road (0: none).  Without a headset
  * view (flat) they are 1, 0 and 0: the flat screen's shake is untouched. */
 void shake(float *gain, float *vibration, float *cabin);
+/* The levels of the layers the vibration and the cabin shake are made of (1: 100%): road sway, the engine's
+ * vibration, the kicks of bumps and kerbs ([VR] ShakeSway, ShakeEngine, ShakeBumps, or a ShakePreset's). */
+void shake_layers(float *sway, float *engine, float *bumps);
 
 /* The eye textures' size (pixels). */
 void eye_size(int *width, int *height);

@@ -4596,6 +4596,26 @@ msgid "ENTER"
 msgstr "ENTER"
 
 #: src/platform/settings_menu.cpp
+msgid "EARTHQUAKE"
+msgstr "TERREMOTO"
+
+#: src/platform/settings_menu.cpp
+msgid "RALLY"
+msgstr "RALI"
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD"
+msgstr "ESTRADA"
+
+#: src/platform/settings_menu.cpp
+msgid "SUBTLE"
+msgstr "SUTIL"
+
+#: src/platform/settings_menu.cpp
+msgid "CUSTOM"
+msgstr "PERSONALIZADO"
+
+#: src/platform/settings_menu.cpp
 msgid "NO HEADSET"
 msgstr "SEM HEADSET"
 
@@ -4734,10 +4754,6 @@ msgstr "%s - AO REINICIAR"
 #: src/platform/settings_menu.cpp
 msgid "MPH, MILES"
 msgstr "MPH, MILHAS"
-
-#: src/platform/settings_menu.cpp
-msgid "CUSTOM"
-msgstr "PERSONALIZADO"
 
 #: src/platform/settings_menu.cpp
 msgid "FORCE FEEDBACK STRENGTH"
@@ -5560,6 +5576,54 @@ msgid ""
 msgstr ""
 "A CARROCERIA TREME SOBRE A PISTA, O MUNDO FICA PARADO:\n"
 "GERALMENTE MAIS CONFORTÁVEL. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
+msgid "SHAKE PRESET"
+msgstr "PREDEFINIÇÃO DE TREMOR"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"SETS THE THREE LAYERS BELOW: SUBTLE (A ROAD CAR), ROAD, RALLY (BIG\n"
+"BUMPS), EARTHQUAKE. CHANGE A LAYER BY HAND AND IT SAYS CUSTOM."
+msgstr ""
+"AJUSTA AS TRÊS CAMADAS ABAIXO: SUTIL, ESTRADA, RALI (BURACOS\n"
+"GRANDES), TERREMOTO. MUDAR UMA À MÃO: PERSONALIZADO."
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD SWAY"
+msgstr "BALANÇO DA ESTRADA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE SLOW SWAY OF THE CAR ON THE ROAD, STRONGER WITH SPEED.\n"
+"ENTER: 100%."
+msgstr ""
+"O BALANÇO LENTO DO CARRO NA ESTRADA, MAIS FORTE COM A VELOCIDADE.\n"
+"ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "ENGINE VIBRATION"
+msgstr "VIBRAÇÃO DO MOTOR"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE ENGINE'S BUZZ, FOLLOWING THE REVS, WITH A SURGE WHILE\n"
+"THEY CLIMB. ENTER: 100%."
+msgstr ""
+"O ZUMBIDO DO MOTOR, ACOMPANHA AS ROTAÇÕES, COM UM PUXÃO\n"
+"QUANDO SOBEM. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "BUMPS AND KERBS"
+msgstr "BURACOS E ZEBRAS"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"KICKS FROM KERBS, BUMPS, LANDINGS, COLLISIONS AND GEAR\n"
+"CHANGES THAT DIE AWAY. ENTER: 100%."
+msgstr ""
+"PANCADAS DE ZEBRAS, BURACOS, ATERRISSAGENS, COLISÕES E TROCAS\n"
+"DE MARCHA QUE SE DISSIPAM. ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
 msgid "DASHBOARD"

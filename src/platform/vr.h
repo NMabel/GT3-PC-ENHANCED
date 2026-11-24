@@ -39,6 +39,12 @@
  *                        the whole picture moves against your head
  *   CabinShake=0         percent (0 .. 300): the car's body shakes over the road,
  *                        the world and the view stay still
+ *   ShakePreset=2        0 custom, 1 subtle, 2 road, 3 rally, 4 earthquake: sets the
+ *                        three layers below (any of them changed by hand: 0)
+ *   ShakeSway=100        percent (0 .. 300): the layers both kinds are made of -
+ *   ShakeEngine=100      road sway (slow), the engine's vibration (follows the rpm and
+ *   ShakeBumps=100       how fast it rises) and the kicks of kerbs, bumps, landings,
+ *                        collisions and gear changes
  *
  * The session is made on the game's own Direct3D 11 device (the adapter the
  * runtime asks for: gpu.cpp makes the device on it).  Every call here is made
@@ -80,7 +86,8 @@ void shutdown();
 
 /* ---- the settings ([VR]; the F2 menu's VR category; saved when changed) ---- */
 enum Setting { kWorldScale, kHudDistance, kHudWidth, kHudHeight, kMirrorDistance, kMirrorWidth, kMirrorHeight,
-               kScreenDistance, kScreenWidth, kScreenHeight, kHeadShake, kCabinShake, kSettingCount };
+               kScreenDistance, kScreenWidth, kScreenHeight, kHeadShake, kCabinShake, kShakePreset,
+               kShakeSway, kShakeEngine, kShakeBumps, kSettingCount };
 struct SettingInfo {
     const char *key;                    /* the ini key */
     int def, min, max, step;            /* percent (the world's scale), else centimetres */

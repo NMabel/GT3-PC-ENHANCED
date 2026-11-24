@@ -4596,6 +4596,26 @@ msgid "ENTER"
 msgstr "INTRO"
 
 #: src/platform/settings_menu.cpp
+msgid "EARTHQUAKE"
+msgstr "TERREMOTO"
+
+#: src/platform/settings_menu.cpp
+msgid "RALLY"
+msgstr "RALLY"
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD"
+msgstr "CARRETERA"
+
+#: src/platform/settings_menu.cpp
+msgid "SUBTLE"
+msgstr "SUTIL"
+
+#: src/platform/settings_menu.cpp
+msgid "CUSTOM"
+msgstr "PERSONALIZADO"
+
+#: src/platform/settings_menu.cpp
 msgid "NO HEADSET"
 msgstr "SIN VISOR"
 
@@ -4734,10 +4754,6 @@ msgstr "%s - PRÓXIMO INICIO"
 #: src/platform/settings_menu.cpp
 msgid "MPH, MILES"
 msgstr "MPH, MILLAS"
-
-#: src/platform/settings_menu.cpp
-msgid "CUSTOM"
-msgstr "PERSONALIZADO"
 
 #: src/platform/settings_menu.cpp
 msgid "FORCE FEEDBACK STRENGTH"
@@ -5560,6 +5576,54 @@ msgid ""
 msgstr ""
 "LA CARROCERÍA TIEMBLA SOBRE LA CARRETERA, EL MUNDO NO SE MUEVE:\n"
 "SUELE SER MÁS CÓMODO QUE LA DE CABEZA. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
+msgid "SHAKE PRESET"
+msgstr "AJUSTE DE SACUDIDA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"SETS THE THREE LAYERS BELOW: SUBTLE (A ROAD CAR), ROAD, RALLY (BIG\n"
+"BUMPS), EARTHQUAKE. CHANGE A LAYER BY HAND AND IT SAYS CUSTOM."
+msgstr ""
+"AJUSTA LAS TRES CAPAS DE ABAJO: SUTIL, CARRETERA, RALLY (GRANDES\n"
+"BACHES), TERREMOTO. SI CAMBIAS UNA A MANO, PONE PERSONALIZADO."
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD SWAY"
+msgstr "BALANCEO DE CARRETERA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE SLOW SWAY OF THE CAR ON THE ROAD, STRONGER WITH SPEED.\n"
+"ENTER: 100%."
+msgstr ""
+"EL BALANCEO LENTO DEL COCHE EN LA CARRETERA, MÁS FUERTE CON LA VELOCIDAD.\n"
+"ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "ENGINE VIBRATION"
+msgstr "VIBRACIÓN DEL MOTOR"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE ENGINE'S BUZZ, FOLLOWING THE REVS, WITH A SURGE WHILE\n"
+"THEY CLIMB. ENTER: 100%."
+msgstr ""
+"EL ZUMBIDO DEL MOTOR, SIGUE LAS REVOLUCIONES, CON UN TIRÓN\n"
+"CUANDO SUBEN. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "BUMPS AND KERBS"
+msgstr "BACHES Y BORDILLOS"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"KICKS FROM KERBS, BUMPS, LANDINGS, COLLISIONS AND GEAR\n"
+"CHANGES THAT DIE AWAY. ENTER: 100%."
+msgstr ""
+"GOLPES DE BORDILLOS, BACHES, ATERRIZAJES, COLISIONES Y CAMBIOS\n"
+"DE MARCHA QUE SE APAGAN. ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
 msgid "DASHBOARD"

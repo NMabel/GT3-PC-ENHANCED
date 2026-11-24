@@ -4596,6 +4596,26 @@ msgid "ENTER"
 msgstr "ENTER"
 
 #: src/platform/settings_menu.cpp
+msgid "EARTHQUAKE"
+msgstr "ЗЕМЛЕТРЯСЕНИЕ"
+
+#: src/platform/settings_menu.cpp
+msgid "RALLY"
+msgstr "РАЛЛИ"
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD"
+msgstr "ДОРОГА"
+
+#: src/platform/settings_menu.cpp
+msgid "SUBTLE"
+msgstr "ЛЁГКАЯ"
+
+#: src/platform/settings_menu.cpp
+msgid "CUSTOM"
+msgstr "СВОЯ"
+
+#: src/platform/settings_menu.cpp
 msgid "NO HEADSET"
 msgstr "НЕТ ШЛЕМА"
 
@@ -4734,10 +4754,6 @@ msgstr "%s - СО СЛЕД. ЗАПУСКА"
 #: src/platform/settings_menu.cpp
 msgid "MPH, MILES"
 msgstr "MPH, МИЛИ"
-
-#: src/platform/settings_menu.cpp
-msgid "CUSTOM"
-msgstr "СВОЯ"
 
 #: src/platform/settings_menu.cpp
 msgid "FORCE FEEDBACK STRENGTH"
@@ -5557,6 +5573,54 @@ msgid ""
 msgstr ""
 "КУЗОВ ТРЯСЁТСЯ НА ДОРОГЕ, МИР НЕПОДВИЖЕН:\n"
 "ОБЫЧНО КОМФОРТНЕЕ, ЧЕМ ТРЯСКА ГОЛОВЫ. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
+msgid "SHAKE PRESET"
+msgstr "ПРЕСЕТ ТРЯСКИ"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"SETS THE THREE LAYERS BELOW: SUBTLE (A ROAD CAR), ROAD, RALLY (BIG\n"
+"BUMPS), EARTHQUAKE. CHANGE A LAYER BY HAND AND IT SAYS CUSTOM."
+msgstr ""
+"ЗАДАЁТ ТРИ СЛОЯ НИЖЕ: ЛЁГКАЯ, ДОРОГА, РАЛЛИ (БОЛЬШИЕ\n"
+"УХАБЫ), ЗЕМЛЕТРЯСЕНИЕ. ИЗМЕНИТЕ СЛОЙ ВРУЧНУЮ — БУДЕТ СВОЙ."
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD SWAY"
+msgstr "КАЧКА НА ДОРОГЕ"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE SLOW SWAY OF THE CAR ON THE ROAD, STRONGER WITH SPEED.\n"
+"ENTER: 100%."
+msgstr ""
+"МЕДЛЕННАЯ КАЧКА МАШИНЫ НА ДОРОГЕ, СИЛЬНЕЕ С РОСТОМ СКОРОСТИ.\n"
+"ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "ENGINE VIBRATION"
+msgstr "ВИБРАЦИЯ ДВИГАТЕЛЯ"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE ENGINE'S BUZZ, FOLLOWING THE REVS, WITH A SURGE WHILE\n"
+"THEY CLIMB. ENTER: 100%."
+msgstr ""
+"ГУЛ ДВИГАТЕЛЯ СЛЕДУЕТ ЗА ОБОРОТАМИ, С РЫВКОМ, ПОКА\n"
+"ОНИ РАСТУТ. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "BUMPS AND KERBS"
+msgstr "УХАБЫ И БОРДЮРЫ"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"KICKS FROM KERBS, BUMPS, LANDINGS, COLLISIONS AND GEAR\n"
+"CHANGES THAT DIE AWAY. ENTER: 100%."
+msgstr ""
+"УДАРЫ ОТ БОРДЮРОВ, УХАБОВ, ПРИЗЕМЛЕНИЙ, СТОЛКНОВЕНИЙ И СМЕНЫ\n"
+"ПЕРЕДАЧ, КОТОРЫЕ ЗАТУХАЮТ. ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
 msgid "DASHBOARD"

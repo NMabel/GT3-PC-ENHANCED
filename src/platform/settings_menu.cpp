@@ -249,10 +249,17 @@ int vr_mirror_get() { return vr::mirror_on() ? 1 : 0; }
 void vr_mirror_set(int v) { vr::set_mirror_on(v != 0); }
 int vr_shake_get() { return vr::shake_on() ? 1 : 0; }
 void vr_shake_set(int v) { vr::set_shake_on(v != 0); }
+int vr_preset_get() { return vr::setting(vr::kShakePreset); }
+void vr_preset_set(int v) { vr::set_setting(vr::kShakePreset, v); }
+const char *vr_preset_value(int v)
+{
+    return v == 4 ? N_("EARTHQUAKE") : v == 3 ? N_("RALLY") : v == 2 ? N_("ROAD") : v == 1 ? N_("SUBTLE") : N_("CUSTOM");
+}
 template <int S> void vr_text(char *out, size_t n)
 {
     const int v = vr::setting((vr::Setting)S);
-    if (S == vr::kWorldScale || S == vr::kHeadShake || S == vr::kCabinShake)
+    if (S == vr::kWorldScale || S == vr::kHeadShake || S == vr::kCabinShake || S == vr::kShakeSway ||
+        S == vr::kShakeEngine || S == vr::kShakeBumps)
         snprintf(out, n, "%d%%", v);
     else
         snprintf(out, n, "%d CM", v);
@@ -1497,6 +1504,14 @@ const Item kItems[] = {
      nullptr, nullptr, vr_text<vr::kHeadShake>, vr_step<vr::kHeadShake>, vr_edges<vr::kHeadShake>},
     {2, N_("CABIN SHAKE"), N_("THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\nUSUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."), 0, nullptr,
      nullptr, nullptr, vr_text<vr::kCabinShake>, vr_step<vr::kCabinShake>, vr_edges<vr::kCabinShake>},
+    {2, N_("SHAKE PRESET"), N_("SETS THE THREE LAYERS BELOW: SUBTLE (A ROAD CAR), ROAD, RALLY (BIG\nBUMPS), EARTHQUAKE. CHANGE A LAYER BY HAND AND IT SAYS CUSTOM."), 5,
+     vr_preset_get, vr_preset_set, vr_preset_value},
+    {2, N_("ROAD SWAY"), N_("THE SLOW SWAY OF THE CAR ON THE ROAD, STRONGER WITH SPEED.\nENTER: 100%."), 0, nullptr,
+     nullptr, nullptr, vr_text<vr::kShakeSway>, vr_step<vr::kShakeSway>, vr_edges<vr::kShakeSway>},
+    {2, N_("ENGINE VIBRATION"), N_("THE ENGINE'S BUZZ, FOLLOWING THE REVS, WITH A SURGE WHILE\nTHEY CLIMB. ENTER: 100%."), 0, nullptr,
+     nullptr, nullptr, vr_text<vr::kShakeEngine>, vr_step<vr::kShakeEngine>, vr_edges<vr::kShakeEngine>},
+    {2, N_("BUMPS AND KERBS"), N_("KICKS FROM KERBS, BUMPS, LANDINGS, COLLISIONS AND GEAR\nCHANGES THAT DIE AWAY. ENTER: 100%."), 0, nullptr,
+     nullptr, nullptr, vr_text<vr::kShakeBumps>, vr_step<vr::kShakeBumps>, vr_edges<vr::kShakeBumps>},
     {1, N_("DASHBOARD"), N_("THE SPEED, REVS AND LAP INFORMATION AS A PANEL OF THE COCKPIT."), 2, vr_hud_get, vr_hud_set,
      on_off_value, nullptr, nullptr, nullptr, input_map::kHotVrHud},
     {2, N_("DISTANCE"), N_("THE PANEL'S DISTANCE IN FRONT OF YOU. ENTER: 100 CM."), 0, nullptr, nullptr, nullptr,

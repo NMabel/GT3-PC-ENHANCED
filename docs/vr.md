@@ -109,20 +109,34 @@ below is negative.
 | `Shake` | `on` | The cockpit's shake in the headset, off: none. Only the headset's view, the flat screen is as ever |
 | `HeadShake` | `100` | Percent, 0 to 300: the whole view shakes against your head (the game's own shake by speed and bumps, times this, plus a small road / engine vibration that grows with the square of the speed) |
 | `CabinShake` | `0` | Percent, 0 to 300: the car's body shakes over the road while the world and the view stay still |
+| `ShakePreset` | `2` | 0 custom, 1 subtle, 2 road, 3 rally, 4 earthquake (the F2 menu sets the three layers below with it) |
+| `ShakeSway` / `ShakeEngine` / `ShakeBumps` | `100` / `100` / `100` | Percent, 0 to 300: the levels of the shake's layers |
 
 ### Camera shake
 
 Two kinds, set apart in the F2 menu under **VR** (**CAMERA SHAKE** on / off, **HEAD SHAKE**, **CABIN SHAKE**), so they can be mixed
-(50% and 50%) or used alone. Both are off the flat screen: without a headset view the game's own shake is untouched.
+(50% and 50%) or used alone. Both are made of the same three layers, whose levels have their own rows (**ROAD SWAY**, **ENGINE
+VIBRATION**, **BUMPS AND KERBS**) and a **SHAKE PRESET** that sets them in one go. Off the flat screen: without a headset view the
+game's own shake is untouched.
+
+| Layer | What it is | Where it comes from |
+|---|---|---|
+| Road sway | Slow sines (0.4 to 2 Hz) under a swell, growing with the square of the speed (drag-like) | the car's speed |
+| Engine vibration | A faster, smaller buzz at 9 to 24 Hz whose pitch and size follow the rpm; it surges while the rpm ramps up and fades as it settles; the throttle and the rev limiter add to it | `DynCarState.rpm`, `throttle`, `limiterOn` |
+| Bumps and kerbs | Decaying kicks (three springs at about 6 Hz): a wheel's vertical force leaving its own average (kerb, bump, dip), a landing after the wheels left the ground, a collision, a gear change | `wheelForce[]`, `vel`, `impact`, `gear` |
+
+Presets (sway / engine / bumps, percent): **Subtle** 60 / 60 / 40, **Road** 100 / 100 / 100 (the default), **Rally** 100 / 80 / 220,
+**Earthquake** 250 / 250 / 300. Changing a layer by hand makes it **Custom**.
 
 - **Head shake** is the view moving: `OnBoardCamera::applyMountView` (the cockpit camera) turns the whole scene by the game's own
-  random shake, times `HeadShake`, plus a vibration (`pc_vr_shake_get`: two sines a channel under a slow swell, at most half a
-  degree at 100% and 300 km/h, growing as speed squared like drag). The springs' small position shifts follow `HeadShake` too.
+  random shake times `HeadShake`, plus the layers' sum (`pc_vr_shake_get`). The springs' small position shifts follow `HeadShake` too.
 - **Cabin shake** moves only the player's own car: `drawCars` (T131) draws its body and tyres under a small rotation about the eye
-  (`pc_vr_cabin_matrix`, applied with `pgl_mult_matrix_90`, which acts last, in the eye's frame), so the world, the shadow and
-  the panels stay still. At most 0.8 degrees at 100% and top speed.
-- An axis is held to 3 degrees. A view that shakes in the headset is what makes people ill: the default is the game's own shake as
-  it was, and no cabin shake.
+  (`pc_vr_cabin_matrix`, applied with `pgl_mult_matrix_90`, which acts last, in the eye's frame), so the world, the shadow and the
+  panels stay still. Same layers, the sway at other frequencies, and the body moves 1.6 times as much as the view.
+- The layers are read once a tick in `OnBoardCamera::update` (`pc_vr_shake_tick`). The kicks are not drawn below about 15 km/h,
+  where the launch and the grid's crawl shift the weight hard.
+- An axis is held to 3 degrees. A view that shakes in the headset is what makes people ill: the defaults are the game's own shake as
+  it was, no cabin shake, and the Road preset's layers.
 
 ## How a frame gets to the headset
 

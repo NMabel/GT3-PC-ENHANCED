@@ -7,6 +7,7 @@
 #include "engine/gfx/T514_gs_buffer.h"
 #include "engine/pgl/G001_flare.h"              /* gfx_set_picture_vr, gfx_vr_eye, pgl_*_matrix */
 #include "platform/vr_view.h"
+#include "game/sound/T288_car_sound.h"      /* DynCarState: the car's rpm, wheel forces ... (the shake) */
 #include <math.h>
 #include <stdio.h>
 
@@ -178,26 +179,156 @@ enum ProjectionElement {
     PROJ_Z_OFFSET = 14
 };
 
-/* ---- the shake in the headset (pc_vr.h) ---- */
-static const f32 kVibrationDegrees = 0.5f;      /* the vibration's largest sum at 100% and the top speed */
+/* ---- the shake in the headset (pc_vr.h) ----
+ * Three layers, each a small rotation (pitch, yaw, roll) in degrees, at 100% of their level:
+ *   sway    slow sines (0.4 .. 2 Hz) under a swell, growing with the square of the speed (drag): the car on the road;
+ *   engine  a faster, smaller buzz at 9 .. 24 Hz that follows the rpm (the frequency, and the size from its share of
+ *           the highest seen) and how fast it rises: a surge while the rpm ramps up, which fades as it settles; the
+ *           throttle and the rev limiter add to it;
+ *   bumps   decaying kicks - each a push on three springs (about 6 Hz, lightly damped) - from the events the car's
+ *           state shows: a wheel's vertical force far from its own average (a kerb, a bump, a dip), the wheels
+ *           leaving the ground and coming back (a landing, by the time up and the fall), a collision, a gear change.
+ * The sums are the head shake's vibration (the view) and the cabin shake (the car's body): same events, the sway at
+ * other frequencies for the body. */
+static const f32 kSwayDegrees = 0.30f;          /* the sway's largest at 100% and the top speed */
+static const f32 kEngineDegrees = 0.18f;        /* the engine's, at the highest rpm (the surge up to 2.5 times it) */
+static const f32 kKickDegrees = 0.9f;           /* a kick of strength 1: the first swing */
+static const f32 kCabinScale = 1.6f;            /* the body moves more than the view for the same layers */
 static const f32 kVibrationTopSpeed = 83.3f;    /* m/s: 300 km/h, where the drag-like growth reaches its full size */
-static const f32 kVibrationAtRest = 0.1f;       /* the share of it at a stop (the engine idling) */
-static const f32 kCabinDegrees = 0.8f;          /* the cabin shake's largest at 100% and the top speed */
+static const f32 kSwayAtRest = 0.1f;            /* the share of the sway at a stop */
 static const f32 kTwoPi = 6.2831853f;
-static f32 s_shakeTime;                         /* seconds, advanced a tick (1/60 s) at a time */
-static f32 s_shakeSpeedSq = 1.0f;
+static const f32 kTickSeconds = 1.0f / 60.0f;
 
-void pc_vr_shake_tick(f32 speedSq)
-{
-    s_shakeTime += 1.0f / 60.0f;
-    if (s_shakeTime > 3600.0f)
-        s_shakeTime -= 3600.0f;                 /* (keeps the sines' arguments small: a float's precision) */
-    s_shakeSpeedSq = speedSq;
-}
+static f32 s_shakeTime;                         /* seconds, advanced a tick at a time */
+static f32 s_shakeSpeedSq = 1.0f;
+/* the engine */
+static int s_rpmSeen;                           /* the first sample taken */
+static f32 s_rpm, s_rpmPrev, s_rpmPeak = 3000.0f;
+static f32 s_surge;                             /* 0..1, how hard the rpm is ramping up, fading over ~0.3 s */
+static f32 s_throttle;
+static int s_limiter;
+static f32 s_phaseA, s_phaseB;                  /* the engine's two sines' phases (the frequency moves with the rpm) */
+/* the kicks: the three springs, and what the events read */
+static f32 s_kickPos[3], s_kickVel[3];          /* pitch, yaw, roll */
+static f32 s_wheelBase[4];                      /* each wheel's average vertical force */
+static int s_baseSeen;
+static int s_airTicks;                          /* ticks with (nearly) no force on the wheels */
+static f32 s_fallSpeed;                         /* the fastest fall seen in the air (m/s) */
+static f32 s_prevImpact;
+static int s_wheelHot[4];                       /* a wheel's force is far from its average (an event's start is a kick) */
+static int s_prevGear = -1;
 
 f32 pc_vr_shake_cap(f32 degrees)
 {
     return degrees < -3.0f ? -3.0f : degrees > 3.0f ? 3.0f : degrees;
+}
+
+static f32 clampf(f32 v, f32 lo, f32 hi)
+{
+    return v < lo ? lo : v > hi ? hi : v;
+}
+
+/* a push on the springs: strength 1 swings kKickDegrees; pitch, yaw, roll shares */
+static void kick(f32 strength, f32 pitch, f32 yaw, f32 roll)
+{
+    const f32 omega = kTwoPi * 6.0f;
+    s_kickVel[0] += strength * pitch * kKickDegrees * omega;
+    s_kickVel[1] += strength * yaw * kKickDegrees * omega;
+    s_kickVel[2] += strength * roll * kKickDegrees * omega;
+}
+
+void pc_vr_shake_tick(const DynCarState *st, f32 speedSq)
+{
+    s_shakeTime += kTickSeconds;
+    if (s_shakeTime > 3600.0f)
+        s_shakeTime -= 3600.0f;                 /* (keeps the sines' arguments small: a float's precision) */
+    s_shakeSpeedSq = speedSq;
+    if (st == NULL)
+        return;
+
+    /* the engine: the rpm smoothed, how fast it rises, the throttle, the limiter */
+    const int rpmField = st->rpm;               /* (s16: the engine's rpm) */
+    const f32 engineRpm = rpmField > 0 ? (f32)rpmField : 0.0f;
+    if (!s_rpmSeen) {
+        s_rpmSeen = 1;
+        s_rpm = s_rpmPrev = engineRpm;
+    }
+    s_rpmPrev = s_rpm;
+    s_rpm += (engineRpm - s_rpm) * 0.35f;
+    if (s_rpm > s_rpmPeak)
+        s_rpmPeak = s_rpm;
+    const f32 rise = (s_rpm - s_rpmPrev) / kTickSeconds / 6000.0f;     /* 1: 6000 rpm a second */
+    const f32 surgeTarget = clampf(rise, 0.0f, 1.0f);
+    s_surge = surgeTarget > s_surge ? surgeTarget : s_surge * 0.94f;
+    s_throttle = clampf(st->throttle, 0.0f, 1.0f);
+    s_limiter = st->limiterOn != 0;
+    const f32 rpmShare = clampf(s_rpm / s_rpmPeak, 0.0f, 1.0f);
+    const f32 hz = 9.0f + 15.0f * rpmShare;                           /* (under the sample rate's half: 30 Hz) */
+    s_phaseA += kTwoPi * hz * kTickSeconds;
+    s_phaseB += kTwoPi * hz * 1.37f * kTickSeconds;
+    if (s_phaseA > 1000.0f * kTwoPi)
+        s_phaseA -= 1000.0f * kTwoPi;
+    if (s_phaseB > 1000.0f * kTwoPi)
+        s_phaseB -= 1000.0f * kTwoPi;
+
+    /* the bumps: each wheel's vertical force against its own average (about 0.3 s: the slow weight transfer of a
+     * corner is the average's, a kerb or a bump is not) */
+    f32 total = 0.0f, baseTotal = 0.0f;
+    for (int w = 0; w < 4; w++) {
+        const f32 force = st->wheelForce[w] > 0.0f ? st->wheelForce[w] : 0.0f;
+        if (!s_baseSeen || force > 3.0f * s_wheelBase[w] + 1.0f)
+            s_wheelBase[w] = force;             /* (the car just placed, or back from the air: no baseline yet) */
+        const f32 base = s_wheelBase[w];
+        total += force;
+        baseTotal += base;
+        const f32 dev = base > 1.0f ? (force - base) / base : 0.0f;
+        const int hot = dev > 0.35f || dev < -0.35f;
+        if (hot && !s_wheelHot[w]) {
+            const f32 over = dev > 0.0f ? dev - 0.35f : dev + 0.35f;
+            const f32 front = w < 2 ? 1.0f : -1.0f;
+            const f32 left = (w & 1) ? -1.0f : 1.0f;
+            /* (the launch and the slow crawl of the grid shift the weight hard: no kick below ~15 km/h, growing to
+             * full by ~40 km/h) */
+            const f32 moving = clampf((sqrtf(speedSq > 0.0f ? speedSq : 0.0f) - 4.0f) / 7.0f, 0.0f, 1.0f);
+            kick(clampf(over, -1.5f, 1.5f) * 1.2f * moving, 0.7f * front, 0.25f * left, 0.8f * left);
+        }
+        s_wheelHot[w] = hot;
+        s_wheelBase[w] += (force - base) * 0.06f;
+    }
+    s_baseSeen = 1;
+    /* a landing: the wheels were off the ground a while, and the force is back */
+    const int airborne = baseTotal > 1.0f && total < 0.2f * baseTotal;
+    if (airborne) {
+        s_airTicks++;
+        const f32 fall = st->vel[2] < 0.0f ? -st->vel[2] : 0.0f;           /* (z up) */
+        if (fall > s_fallSpeed)
+            s_fallSpeed = fall;
+    } else {
+        if (s_airTicks > 4) {
+            const f32 strength = clampf(((f32)s_airTicks / 30.0f > s_fallSpeed / 6.0f ? (f32)s_airTicks / 30.0f
+                                                                                       : s_fallSpeed / 6.0f),
+                                        0.3f, 2.0f);
+            kick(1.6f * strength, 1.0f, 0.0f, 0.2f);
+        }
+        s_airTicks = 0;
+        s_fallSpeed = 0.0f;
+    }
+    /* a collision (the impact is held 24 frames at its peak: only its rise is an event) */
+    if (st->impact > s_prevImpact + 0.01f)
+        kick(1.5f, 0.6f, 0.8f, 1.0f);
+    s_prevImpact = st->impact;
+    /* a gear change: the gear number changes (not a first sample) */
+    if (s_prevGear >= 0 && st->gear != s_prevGear)
+        kick(0.5f, 1.0f, 0.0f, 0.2f);
+    s_prevGear = st->gear;
+
+    /* the springs (about 6 Hz, lightly damped), stepped at 60 Hz */
+    const f32 omega = kTwoPi * 6.0f, stiffness = omega * omega, damping = 2.0f * 0.22f * omega;
+    for (int i = 0; i < 3; i++) {
+        s_kickVel[i] += (-stiffness * s_kickPos[i] - damping * s_kickVel[i]) * kTickSeconds;
+        s_kickPos[i] += s_kickVel[i] * kTickSeconds;
+        s_kickPos[i] = clampf(s_kickPos[i], -4.0f, 4.0f);
+    }
 }
 
 /* two sines of different frequencies (Hz), the second a third the size: a wobble that does not repeat at once */
@@ -206,16 +337,39 @@ static f32 wobble(f32 hz1, f32 hz2, f32 phase)
     return sinf(kTwoPi * hz1 * s_shakeTime + phase) + 0.33f * sinf(kTwoPi * hz2 * s_shakeTime + phase * 2.3f);
 }
 
-/* the shake's size from the speed: from a little at a stop to full at the top speed, as the square of it
- * (drag), under a slow swell */
-static f32 shake_envelope(void)
+/* The layers' sum, degrees (pitch, yaw, roll) - the head's (body 0) or the cabin's (1), whose sway is at other
+ * frequencies - at the levels of the layers (vr_view.h shake_layers). */
+static void shake_vector(int body, f32 out[3])
 {
+    f32 sway = 0.0f, engine = 0.0f, bumps = 0.0f;
+    vrview::shake_layers(&sway, &engine, &bumps);
     f32 ratio = sqrtf(s_shakeSpeedSq > 0.0f ? s_shakeSpeedSq : 0.0f) / kVibrationTopSpeed;
     if (ratio > 1.0f)
         ratio = 1.0f;
-    const f32 growth = kVibrationAtRest + (1.0f - kVibrationAtRest) * ratio * ratio;
-    const f32 swell = 0.65f + 0.35f * sinf(kTwoPi * 0.37f * s_shakeTime);
-    return growth * swell / 1.33f;
+    const f32 growth = kSwayAtRest + (1.0f - kSwayAtRest) * ratio * ratio;            /* ~ drag: v squared */
+    const f32 swell = 0.65f + 0.35f * sinf(kTwoPi * 0.37f * s_shakeTime);           /* it comes and goes */
+    const f32 swayAmp = kSwayDegrees * sway * growth * swell / 1.33f;
+    const f32 rpmShare = clampf(s_rpm / s_rpmPeak, 0.0f, 1.0f);
+    const f32 engineAmp = kEngineDegrees * engine * (0.25f + 0.75f * rpmShare) * (0.5f + 0.5f * s_throttle) *
+                          (1.0f + 1.5f * s_surge) * (s_limiter ? 1.4f : 1.0f);
+    const f32 scale = body ? kCabinScale : 1.0f;
+    if (body == 0) {
+        out[0] = swayAmp * wobble(0.45f, 1.3f, 0.7f);
+        out[1] = swayAmp * 0.5f * wobble(0.6f, 1.7f, 2.1f);
+        out[2] = swayAmp * 0.8f * wobble(0.8f, 2.1f, 4.2f);
+    } else {
+        out[0] = swayAmp * wobble(0.55f, 1.1f, 1.3f);
+        out[1] = swayAmp * 0.4f * wobble(0.7f, 1.5f, 3.4f);
+        out[2] = swayAmp * wobble(0.4f, 1.9f, 5.6f);
+    }
+    out[0] += engineAmp * sinf(s_phaseA);
+    out[1] += engineAmp * 0.3f * sinf(s_phaseB * 0.7f);
+    out[2] += engineAmp * 0.8f * sinf(s_phaseB + 1.1f);
+    out[0] += bumps * s_kickPos[0];
+    out[1] += bumps * s_kickPos[1];
+    out[2] += bumps * s_kickPos[2];
+    for (int i = 0; i < 3; i++)
+        out[i] *= scale;
 }
 
 int pc_vr_cabin_matrix(f32 m[16])
@@ -224,13 +378,12 @@ int pc_vr_cabin_matrix(f32 m[16])
     vrview::shake(&gain, &vibration, &cabin);
     if (cabin <= 0.0f)
         return 0;
-    /* the car's body on its springs: more roll and pitch than yaw, at its own frequencies (not the view's:
-     * the two kinds mixed do not beat together) */
-    const f32 amplitude = kCabinDegrees * cabin * shake_envelope();
+    f32 v[3];
+    shake_vector(1, v);
     const f32 deg2rad = 3.1415927f / 180.0f;
-    const f32 pitch = pc_vr_shake_cap(amplitude * wobble(3.1f, 8.3f, 1.3f)) * deg2rad;
-    const f32 yaw = pc_vr_shake_cap(amplitude * 0.4f * wobble(4.7f, 9.1f, 3.4f)) * deg2rad;
-    const f32 roll = pc_vr_shake_cap(amplitude * wobble(2.3f, 6.7f, 5.6f)) * deg2rad;
+    const f32 pitch = pc_vr_shake_cap(v[0] * cabin) * deg2rad;
+    const f32 yaw = pc_vr_shake_cap(v[1] * cabin) * deg2rad;
+    const f32 roll = pc_vr_shake_cap(v[2] * cabin) * deg2rad;
     /* R = Rz(roll) Ry(yaw) Rx(pitch), column-major (the game's matrices' layout: m[column * 4 + row]) */
     const f32 cx = cosf(pitch), sx = sinf(pitch), cy = cosf(yaw), sy = sinf(yaw), cz = cosf(roll), sz = sinf(roll);
     m[0] = cz * cy;
@@ -257,10 +410,11 @@ void pc_vr_shake_get(f32 *gain, f32 *pitch, f32 *yaw, f32 *roll)
     *pitch = *yaw = *roll = 0.0f;
     if (vibration <= 0.0f)
         return;
-    const f32 amplitude = kVibrationDegrees * vibration * shake_envelope();
-    *pitch = amplitude * wobble(7.3f, 17.9f, 0.7f);
-    *yaw = amplitude * 0.5f * wobble(9.7f, 21.1f, 2.1f);
-    *roll = amplitude * 0.8f * wobble(11.3f, 19.7f, 4.2f);
+    f32 v[3];
+    shake_vector(0, v);
+    *pitch = v[0] * vibration;
+    *yaw = v[1] * vibration;
+    *roll = v[2] * vibration;
 }
 
 void pc_vr_apply(void)

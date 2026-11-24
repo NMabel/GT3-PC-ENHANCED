@@ -4596,6 +4596,26 @@ msgid "ENTER"
 msgstr "ENTER"
 
 #: src/platform/settings_menu.cpp
+msgid "EARTHQUAKE"
+msgstr "ERDBEBEN"
+
+#: src/platform/settings_menu.cpp
+msgid "RALLY"
+msgstr "RALLYE"
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD"
+msgstr "STRASSE"
+
+#: src/platform/settings_menu.cpp
+msgid "SUBTLE"
+msgstr "DEZENT"
+
+#: src/platform/settings_menu.cpp
+msgid "CUSTOM"
+msgstr "BENUTZERDEFINIERT"
+
+#: src/platform/settings_menu.cpp
 msgid "NO HEADSET"
 msgstr "KEIN HEADSET"
 
@@ -4734,10 +4754,6 @@ msgstr "%s - NÄCHSTER START"
 #: src/platform/settings_menu.cpp
 msgid "MPH, MILES"
 msgstr "MPH, MEILEN"
-
-#: src/platform/settings_menu.cpp
-msgid "CUSTOM"
-msgstr "BENUTZERDEFINIERT"
 
 #: src/platform/settings_menu.cpp
 msgid "FORCE FEEDBACK STRENGTH"
@@ -5558,6 +5574,54 @@ msgid ""
 msgstr ""
 "DIE KAROSSERIE WACKELT ÜBER DER STRASSE, DIE WELT BLEIBT RUHIG:\n"
 "MEIST ANGENEHMER ALS KOPF-WACKELN. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
+msgid "SHAKE PRESET"
+msgstr "WACKEL-VORGABE"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"SETS THE THREE LAYERS BELOW: SUBTLE (A ROAD CAR), ROAD, RALLY (BIG\n"
+"BUMPS), EARTHQUAKE. CHANGE A LAYER BY HAND AND IT SAYS CUSTOM."
+msgstr ""
+"STELLT DIE DREI EBENEN UNTEN EIN: DEZENT, STRASSE, RALLYE (GROSSE\n"
+"STÖSSE), ERDBEBEN. EINE EBENE VON HAND ÄNDERN: BENUTZERDEFINIERT."
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD SWAY"
+msgstr "STRASSENSCHWANKEN"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE SLOW SWAY OF THE CAR ON THE ROAD, STRONGER WITH SPEED.\n"
+"ENTER: 100%."
+msgstr ""
+"DAS LANGSAME SCHWANKEN DES AUTOS AUF DER STRASSE, MIT TEMPO STÄRKER.\n"
+"ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "ENGINE VIBRATION"
+msgstr "MOTORVIBRATION"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE ENGINE'S BUZZ, FOLLOWING THE REVS, WITH A SURGE WHILE\n"
+"THEY CLIMB. ENTER: 100%."
+msgstr ""
+"DAS SUMMEN DES MOTORS, FOLGT DER DREHZAHL, MIT EINEM SCHUB,\n"
+"WENN SIE STEIGT. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "BUMPS AND KERBS"
+msgstr "STÖSSE UND BORDSTEINE"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"KICKS FROM KERBS, BUMPS, LANDINGS, COLLISIONS AND GEAR\n"
+"CHANGES THAT DIE AWAY. ENTER: 100%."
+msgstr ""
+"STÖSSE DURCH BORDSTEINE, UNEBENHEITEN, LANDUNGEN, KOLLISIONEN UND\n"
+"GANGWECHSEL, DIE ABKLINGEN. ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
 msgid "DASHBOARD"

@@ -4476,6 +4476,26 @@ msgid "ENTER"
 msgstr ""
 
 #: src/platform/settings_menu.cpp
+msgid "EARTHQUAKE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "RALLY"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "SUBTLE"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "CUSTOM"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
 msgid "NO HEADSET"
 msgstr ""
 
@@ -4613,10 +4633,6 @@ msgstr ""
 
 #: src/platform/settings_menu.cpp
 msgid "MPH, MILES"
-msgstr ""
-
-#: src/platform/settings_menu.cpp
-msgid "CUSTOM"
 msgstr ""
 
 #: src/platform/settings_menu.cpp
@@ -5296,6 +5312,46 @@ msgstr ""
 msgid ""
 "THE CAR'S BODY SHAKES OVER THE ROAD, THE WORLD STAYS STILL:\n"
 "USUALLY MORE COMFORTABLE THAN HEAD SHAKE. ENTER: 0%."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "SHAKE PRESET"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"SETS THE THREE LAYERS BELOW: SUBTLE (A ROAD CAR), ROAD, RALLY (BIG\n"
+"BUMPS), EARTHQUAKE. CHANGE A LAYER BY HAND AND IT SAYS CUSTOM."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD SWAY"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE SLOW SWAY OF THE CAR ON THE ROAD, STRONGER WITH SPEED.\n"
+"ENTER: 100%."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "ENGINE VIBRATION"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE ENGINE'S BUZZ, FOLLOWING THE REVS, WITH A SURGE WHILE\n"
+"THEY CLIMB. ENTER: 100%."
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid "BUMPS AND KERBS"
+msgstr ""
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"KICKS FROM KERBS, BUMPS, LANDINGS, COLLISIONS AND GEAR\n"
+"CHANGES THAT DIE AWAY. ENTER: 100%."
 msgstr ""
 
 #: src/platform/settings_menu.cpp

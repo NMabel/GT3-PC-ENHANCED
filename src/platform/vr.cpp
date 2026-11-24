@@ -75,7 +75,13 @@ const SettingInfo kInfo[kSettingCount] = {
     /* kScreenHeight    */ {"ScreenHeight", 0, -100, 100, 5},
     /* kHeadShake       */ {"HeadShake", 100, 0, 300, 10},          /* percent */
     /* kCabinShake      */ {"CabinShake", 0, 0, 300, 10},           /* percent */
+    /* kShakePreset     */ {"ShakePreset", 2, 0, 4, 1},             /* 0 custom .. 4 earthquake */
+    /* kShakeSway       */ {"ShakeSway", 100, 0, 300, 10},          /* percent: the layers */
+    /* kShakeEngine     */ {"ShakeEngine", 100, 0, 300, 10},
+    /* kShakeBumps      */ {"ShakeBumps", 100, 0, 300, 10},
 };
+/* the presets of the shake's layers (the F2 menu's SHAKE PRESET; 0, custom, has none): sway, engine, bumps, percent */
+const int kShakePresets[5][3] = {{0, 0, 0}, {60, 60, 40}, {100, 100, 100}, {100, 80, 220}, {250, 250, 300}};
 int g_set[kSettingCount];
 bool g_hudOn = true, g_mirrorOn = true, g_shakeOn = true;
 bool g_loaded;
@@ -1109,6 +1115,19 @@ void set_setting(Setting s, int value)
     char b[16];
     snprintf(b, sizeof(b), "%d", value);
     save_value(i.key, b);
+    if (s == kShakePreset && value >= 1) {
+        /* a preset: its three layers */
+        for (int layer = 0; layer < 3; layer++) {
+            const Setting ls = (Setting)(kShakeSway + layer);
+            g_set[ls] = kShakePresets[value][layer];
+            snprintf(b, sizeof(b), "%d", g_set[ls]);
+            save_value(kInfo[ls].key, b);
+        }
+    } else if (s >= kShakeSway && s <= kShakeBumps && g_set[kShakePreset] != 0) {
+        /* a layer changed by hand: no preset any more */
+        g_set[kShakePreset] = 0;
+        save_value(kInfo[kShakePreset].key, "0");
+    }
 }
 
 bool hud_on()
@@ -1294,6 +1313,13 @@ void shake(float *gain, float *vibration, float *cabin)
     *gain = head;
     *vibration = head;
     *cabin = on ? (float)vr::setting(vr::kCabinShake) * 0.01f : 0.0f;
+}
+
+void shake_layers(float *sway, float *engine, float *bumps)
+{
+    *sway = (float)vr::setting(vr::kShakeSway) * 0.01f;
+    *engine = (float)vr::setting(vr::kShakeEngine) * 0.01f;
+    *bumps = (float)vr::setting(vr::kShakeBumps) * 0.01f;
 }
 
 void eye_size(int *width, int *height)

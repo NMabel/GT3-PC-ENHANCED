@@ -4596,6 +4596,26 @@ msgid "ENTER"
 msgstr "INVIO"
 
 #: src/platform/settings_menu.cpp
+msgid "EARTHQUAKE"
+msgstr "TERREMOTO"
+
+#: src/platform/settings_menu.cpp
+msgid "RALLY"
+msgstr "RALLY"
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD"
+msgstr "STRADA"
+
+#: src/platform/settings_menu.cpp
+msgid "SUBTLE"
+msgstr "LEGGERA"
+
+#: src/platform/settings_menu.cpp
+msgid "CUSTOM"
+msgstr "PERSONALIZZATI"
+
+#: src/platform/settings_menu.cpp
 msgid "NO HEADSET"
 msgstr "NESSUN VISORE"
 
@@ -4734,10 +4754,6 @@ msgstr "%s - AL PROSSIMO AVVIO"
 #: src/platform/settings_menu.cpp
 msgid "MPH, MILES"
 msgstr "MPH, MIGLIA"
-
-#: src/platform/settings_menu.cpp
-msgid "CUSTOM"
-msgstr "PERSONALIZZATI"
 
 #: src/platform/settings_menu.cpp
 msgid "FORCE FEEDBACK STRENGTH"
@@ -5558,6 +5574,54 @@ msgid ""
 msgstr ""
 "LA CARROZZERIA TREMA SULLA STRADA, IL MONDO RESTA FERMO:\n"
 "SPESSO PIÙ COMODA DELLA TESTA. ENTER: 0%."
+
+#: src/platform/settings_menu.cpp
+msgid "SHAKE PRESET"
+msgstr "PRESET SCOSSE"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"SETS THE THREE LAYERS BELOW: SUBTLE (A ROAD CAR), ROAD, RALLY (BIG\n"
+"BUMPS), EARTHQUAKE. CHANGE A LAYER BY HAND AND IT SAYS CUSTOM."
+msgstr ""
+"IMPOSTA I TRE LIVELLI SOTTO: LEGGERA, STRADA, RALLY (GROSSI\n"
+"URTI), TERREMOTO. CAMBIANDONE UNO A MANO: PERSONALIZZATO."
+
+#: src/platform/settings_menu.cpp
+msgid "ROAD SWAY"
+msgstr "OSCILLAZIONE DELLA STRADA"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE SLOW SWAY OF THE CAR ON THE ROAD, STRONGER WITH SPEED.\n"
+"ENTER: 100%."
+msgstr ""
+"LA LENTA OSCILLAZIONE DELL'AUTO SULLA STRADA, PIÙ FORTE CON LA VELOCITÀ.\n"
+"ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "ENGINE VIBRATION"
+msgstr "VIBRAZIONE DEL MOTORE"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"THE ENGINE'S BUZZ, FOLLOWING THE REVS, WITH A SURGE WHILE\n"
+"THEY CLIMB. ENTER: 100%."
+msgstr ""
+"IL RONZIO DEL MOTORE SEGUE I GIRI, CON UNO STRATTONE\n"
+"QUANDO SALGONO. ENTER: 100%."
+
+#: src/platform/settings_menu.cpp
+msgid "BUMPS AND KERBS"
+msgstr "URTI E CORDOLI"
+
+#: src/platform/settings_menu.cpp
+msgid ""
+"KICKS FROM KERBS, BUMPS, LANDINGS, COLLISIONS AND GEAR\n"
+"CHANGES THAT DIE AWAY. ENTER: 100%."
+msgstr ""
+"COLPI DA CORDOLI, URTI, ATTERRAGGI, COLLISIONI E CAMBI DI\n"
+"MARCIA CHE SI SPENGONO. ENTER: 100%."
 
 #: src/platform/settings_menu.cpp
 msgid "DASHBOARD"

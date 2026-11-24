@@ -326,7 +326,7 @@ int OnBoardCamera::update(RaceOrganization *org, RaceInput *input, CameraTargetI
         vz = (nz - vz) * 60.0f;
         speedSq = vx * vx + vy * vy + vz * vz;
     }
-    pc_vr_shake_tick(speedSq);              /* PC VR: the headset's vibration (game/app/pc_vr.h) */
+    pc_vr_shake_tick(&st->st, speedSq);     /* PC VR: the headset's shake (game/app/pc_vr.h) */
     if (counter == 0) {
         keep = 0;                           /* first: else CSE takes counter's 1 from keep */
         counter = 1;

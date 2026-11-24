@@ -65,8 +65,10 @@ you reach the cockpit view. Everything else (menus, replays, the other cameras) 
   into that folder, ready to load. **Export .psu...** packs saves back into `.psu` files.
 - **Camera shake in the headset, to taste** (F2 menu > **VR**): **CAMERA SHAKE** on / off, then **HEAD SHAKE** (the whole view
   moves, as the game's own shake does) and **CABIN SHAKE** (the car's body shakes over the road while the world stays still),
-  each as a percentage, so you can use one, the other or both. Off the flat screen: nothing changes there. Too much shake can make
-  you sick, so start low.
+  each as a percentage, so you can use one, the other or both, built from three layers: **road sway**, **engine vibration**
+  (it follows the revs and surges while they climb) and **bumps and kerbs** (kicks that die away: kerbs, bumps, landings, collisions,
+  gear changes). **SHAKE PRESET** sets them in one go (Subtle, Road, Rally, Earthquake). Off the flat screen: nothing changes
+  there. Too much shake can make you sick, so start low.
 - **If SteamVR is stuck** the game no longer freezes at start-up: after 20 seconds it gives up on VR, says why in
   `gt3pc.log` and carries on as a flat-screen game.
 
